@@ -1,2 +1,2 @@
 # unisalud
-unisalud proyecyo sena 2025
+unisalud proyecto sena 2025
