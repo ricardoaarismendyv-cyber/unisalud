@@ -1,0 +1,243 @@
+{% extends "plantilla_admin.html" %}
+{% load static %}
+{% block title %}Gestion de usuarios{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static "css/custom.css" %}">
+{% endblock estilo %}
+
+{% block auth_button %}
+<li>
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio_unisalud" %}'">
+        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    </button>
+</li>
+
+{% endblock auth_button %}
+
+{% block content %}
+
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <!-- Columna para el contenido principal -->
+            <div class="col-lg-10 col-md-10">
+                <div>
+                    <a class="btn btn-main btn-nav" href='{% url "inicio_admin" %}'>Volver</a>
+                    
+                </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-12 col-md-12">
+                    <div class="container border border-dark rounded p-4 my-5 div-main">
+                        <h1>Gestion de usuarios</h1>
+                        <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#agregarUsuario" aria-expanded="false" aria-controls="agregarUsuario">Agregar usuario</button>
+                        <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#eliminarProf" aria-expanded="false" aria-controls="eliminarProf">Eliminar profesional de salud</button>
+                        <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#modificarUsuario" aria-expanded="false" aria-controls="modificarUsuario">Modificar información de usuario</button>
+                        <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#agregarProf" aria-expanded="false" aria-controls="agregarProf">Añadir nuevo profesional de salud</button>
+                        <div class="collapse mt-3" id="agregarUsuario">
+                            <div class="card card-body div-main p-3">
+                                <h5>Agregar nuevo usuario</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <input class="form-control my-2" type="text" placeholder="Primer nombre">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                    <input class="form-control my-2" type="text" placeholder="Segundo nombre">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                    <input class="form-control my-2" type="text" placeholder="Primer apellido">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                    <input class="form-control my-2" type="text" placeholder="Segundo apellido">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                    <input class="form-control my-2" type="text" placeholder="Tipo de documento">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                    <input class="form-control my-2" type="text" placeholder="Número de documento">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                    <input class="form-control my-2" type="text" placeholder="Teléfono">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                    <input class="form-control my-2" type="email" placeholder="Correo electrónico">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                    <input class="form-control my-2" type="password" placeholder="Contraseña">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                    <input class="form-control my-2" type="password" placeholder="Confirmar contraseña">
+                                    </div>
+                                </div>
+                                <button class="btn btn-success mt-2" onclick="mostrarExito()">Guardar usuario</button>
+                                <div id="mensaje-exito" class="alert alert-success mt-3 d-none" role="alert">
+                                    ✅ Usuario registrado con éxito.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse mt-3" id="eliminarProf">
+                            <div class="card card-body div-main p-3">
+                                <h5>Eliminar profesional de la salud</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <input class="form-control my-2" type="text" placeholder="Documento del profesional">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <textarea class="form-control my-2" placeholder="Justificación de la eliminación"></textarea>
+                                    </div>
+                                </div>
+                                <button class="btn btn-danger mt-2" onclick="mostrarExito()">Eliminar profesional</button>
+                                <div id="mensaje-exito" class="alert alert-success mt-3 d-none" role="alert">
+                                    ✅ El profesional fue eliminado con éxito.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse mt-3" id="modificarUsuario">
+                            <div class="card card-body div-main p-3">
+        <h5>Modificar información de usuario</h5>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="text" placeholder="Primer nombre">
+            </div>
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="text" placeholder="Segundo nombre">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="text" placeholder="Primer apellido">
+            </div>
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="text" placeholder="Segundo apellido">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="text" placeholder="Tipo de documento">
+            </div>
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="text" placeholder="Número de documento">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="text" placeholder="Teléfono">
+            </div>
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="email" placeholder="Correo electrónico">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 mb-3">
+                <input class="form-control my-2" type="password" placeholder="Nueva contraseña (opcional)">
+            </div>
+        </div>
+        <button class="btn btn-warning mt-2" onclick="mostrarExito()" >Guardar cambios</button>
+        <div id="mensaje-exito" class="alert alert-success mt-3 d-none" role="alert">
+    ✅ Los cambios se guardaron con éxito.
+</div>
+    </div>
+                        </div>
+                        <div class="collapse mt-3" id="agregarProf">
+                            <div class="card card-body div-main p-3">
+        <h5>Agregar nuevo profesional de la salud</h5>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="text" placeholder="Nombres">
+            </div>
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="text" placeholder="Apellidos">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="text" placeholder="Documento de identidad">
+            </div>
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="text" placeholder="Especialidad">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="text" placeholder="Teléfono">
+            </div>
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="email" placeholder="Correo electrónico">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="password" placeholder="Contraseña">
+            </div>
+            <div class="col-md-6 mb-3">
+                <input class="form-control my-2" type="password" placeholder="Confirmar contraseña">
+            </div>
+        </div>
+        <button class="btn btn-success mt-2" onclick="mostrarExito()">Registrar profesional</button>
+        <div id="mensaje-exito" class="alert alert-success mt-3 d-none" role="alert">
+    ✅ El/La profesinal fue registrado con éxito.
+</div>
+    </div>
+                        </div>
+                        <div class="mt-4">
+                            <h4>Registro de actividad</h4>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <strong>Juan Pérez</strong> - CC: 1032456789
+                                            <br>
+                                            <small>Última actividad: Ingreso al sistema - 02/10/2025 10:45 AM</small>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <strong>María López</strong> - CC: 987654321
+                                            <br>
+                                            <small>Última actividad: Modificación de datos - 01/10/2025 3:20 PM</small>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <strong>Carlos Gómez</strong> - CC: 1122334455
+                                            <br>
+                                            <small>Última actividad: Registro eliminado - 30/09/2025 8:10 AM</small>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
+{% block script %}
+<script>
+    function mostrarExito() {
+        const alerta = document.getElementById("mensaje-exito");
+        alerta.classList.remove("d-none");  // mostrar
+        setTimeout(() => {
+            alerta.classList.add("d-none"); // ocultar después de 3s
+        }, 5000);
+    }
+</script>
+{% endblock script %}

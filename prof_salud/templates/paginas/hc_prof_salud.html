@@ -1,0 +1,54 @@
+{% extends "plantilla_ps.html" %}
+{% load static %}
+{% block title %}Historia Clínica Paciente{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static "css/custom.css" %}">
+{% endblock estilo %}
+
+{% block auth_button %}
+<li>
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "consultas_prof_salud" %}'">
+        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    </button>
+</li>
+
+{% endblock auth_button %}
+
+{% block content %}
+
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <!-- Columna para el contenido principal -->
+            <div class="col-lg-10 col-md-10">
+                <div>
+                    <a class="btn btn-main btn-nav" href='{% url "inicio_prof_salud" %}'>Volver</a>
+                <a class="btn btn-main btn-nav" href="{% static "docs/HCdiligenciada.pdf" %}">Descargar historia clínica reciente</a>
+                </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-md-10">
+                    <div class="container border border-dark rounded p-4 my-5 div-main">
+                        <h1>Diligencie historia clínica del paciente</h1>
+                        <a class="btn btn-main btn-nav" href="{% static 'docs/hcejemplo.pdf' %}">Diligenciar</a>
+                        <p>Por favor diligencie el siguiente formulario para actualizar la historia clínica del paciente.</p>
+                        <p>Recuerde que la información debe ser precisa y completa para garantizar una atención</p>
+                        <object data="{% static 'docs/hcejemplo.pdf' %}" type="application/pdf" width="100%" height="500px" class="mb-3"> <p>Su navegador o dispositivo no permite visualizar el pdf correctamente, por favor descarguelo para visualizarlo.</p></object>
+                        <!-- Contenido colapsable con el Registro del historial clinico -->
+                        <div class="collapse mt-3" id="RegistroClinicoCompleto">
+                            <div class="card card-body div-main">
+                                <h5 class="card-title">Registrar Historial Clínico</h5>
+                                <p>A continuación diligencie el historial clínico del paciente.</p>
+                            </div>
+                        </div>
+                        <a class="btn btn-main btn-nav" href="{% static 'docs/ResultadosLaboratorio.pdf' %}">Ver Resultados Laboratorio Paciente</a>
+                        <a class="btn btn-main btn-nav" href="{% static 'docs/hcdiligenciada.pdf' %}">Imprimir HC</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

@@ -1,0 +1,38 @@
+section.main{
+    margin-top:70px;
+}
+
+.btn-nav{
+    margin: 0 15px
+}
+
+.btn-main{
+    margin-bottom: 6px;
+}
+
+.btn-main:focus {
+    background-color: #2268c97c;
+    border-color: black;
+}
+
+.div-main{
+    margin-top: 2px;
+}
+
+.itemList a{
+    color: #ffffff; /* Blanco por defecto */
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+
+}
+
+.itemList a span{
+    color: #ffd700; /* Amarillo dorado para destacar */
+}
+
+.list-group .div-main{
+    box-shadow: none;
+    color: #000000;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(68, 65, 65, 0.8);
+}

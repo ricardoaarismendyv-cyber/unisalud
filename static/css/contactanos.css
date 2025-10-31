@@ -1,0 +1,27 @@
+/*boton contactanos*/
+.custom-contact-btn {
+    /* Color de fondo que contraste fuertemente (ej: Verde vibrante) */
+    background-color: #28a745 !important; /* El color verde de Bootstrap 'success' */
+    border-color: #1e7e34 !important;
+    color: #ffffff !important; /* Texto blanco para alto contraste */
+    font-weight: bold;
+    text-transform: uppercase; /* Mayúsculas para más énfasis */
+    /* Efecto de sombra para hacerlo destacar (muy importante) */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease-in-out; /* Transición suave para el hover */
+}
+
+/* Efecto Hover: Resalta cuando el usuario pasa el ratón */
+.custom-contact-btn:hover {
+    background-color: #1e7e34 !important; /* Oscurece el fondo */
+    border-color: #1c7430 !important;
+    /* Sombra más grande para el efecto de "levantarse" */
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px); /* Un ligero movimiento hacia arriba */
+}
+
+/* Efecto Active: Feedback visual al hacer clic */
+.custom-contact-btn:active {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+    transform: translateY(0);
+}

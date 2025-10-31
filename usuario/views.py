@@ -1,0 +1,46 @@
+from django.shortcuts import render, redirect
+
+# Create your views here.
+
+def inicio_unisalud(request):
+    if request.user.is_authenticated:
+        if request.user.is_paciente:
+            return redirect('inicio_paciente')
+        elif request.user.is_profesional:
+            return redirect('inicio_profesionalS')
+        elif request.user.is_admin:
+            return redirect('inicio_admin')
+    return render(request, 'paginas/inicio_unisalud.html')
+
+def loginus(request):
+    return render(request, 'paginas/login-us.html' )
+
+def iniciousuario(request):
+    return render(request, 'paginas/inicio-usuario.html')
+
+def hcusuario(request):
+    return render(request, 'paginas/historia-clinica-usuario.html')
+
+def omusuario(request):
+    return render(request, 'paginas/orden-medica-usuario.html')
+
+def omeusuario(request):
+    return render(request, 'paginas/orden-medicamentos-usuario.html')
+
+def turnosusuario(request):
+    return render(request, 'paginas/turnos-usuario.html')
+
+def preguntasfrecuentes(request):
+    return render(request, 'paginas/preguntas-frecuentes.html')
+
+def usosistema(request):
+    return render(request, 'paginas/uso-sistema.html')
+
+def buzonsugerencias(request):
+    return render(request, 'paginas/buzon-sugerencias.html')
+
+def registro(request):
+    return render(request, 'paginas/registro.html')
+
+def contactanos(request):
+    return render(request, 'paginas/contactanos.html')

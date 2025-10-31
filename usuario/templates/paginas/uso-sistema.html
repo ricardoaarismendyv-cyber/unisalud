@@ -1,0 +1,90 @@
+{% extends "plantilla.html" %}
+{% load static %}
+{% block title %}¿Cómo usar el sistema?{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static "css/plantilla.css" %}">
+{% endblock estilo %}
+
+{% block content %}
+
+<section class="main">
+    <div class="container-fluid">
+        <div class="row p-4 justify-content-center p-5">
+            <!-- Columna principal que centra todo el contenido -->
+            <div class="col-lg-10 col-md-12">
+                <a href="{% url 'inicio-usuario' %}" class="btn btn-main mt-3">Volver</a>
+
+                <!-- Contenedor para el video principal -->
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>¿Cómo usar el sistema?</h1>
+                    <p>En el siguiente video, te mostramos un recorrido completo por las funcionalidades de nuestro sistema para que puedas aprovecharlo al máximo.</p>
+                    
+                    <!-- Contenedor para ajustar el ancho del video principal -->
+                    <div class="row justify-content-center">
+                        <div class="col-lg-10">
+                            <div class="ratio ratio-16x9 rounded shadow">
+                                <iframe src="https://www.youtube.com/embed/8yttS8dS0R4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fila para videos secundarios e infografía -->
+                <div class="row">
+                    <!-- Columna para los videos secundarios -->
+                    <div class="col-lg-8 mb-4">
+                        <div class="container border border-dark rounded p-4 div-main h-100">
+                            <h3 class="text-center mb-4">Otros videos de interés</h3>
+                            
+                            <!-- Video secundario 1 con texto a la derecha -->
+                            <div class="row align-items-center mb-4">
+                                <div class="col-md-6">
+                                    <div class="ratio ratio-16x9 rounded shadow">
+                                        <video controls src="{% static "vid/videjemplo.mp4" %}"></video>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h4>Cómo registrarse y/o iniciar sesión</h4>
+                                    <p>Aprende a crear tu usuario e ingresar a este para acceder a nuestras funciones.</p>
+                                </div>
+                            </div>
+
+                            <!-- Video secundario 2 con texto a la derecha -->
+                            <div class="row align-items-center mb-4">
+                                <div class="col-md-6">
+                                    <div class="ratio ratio-16x9 rounded shadow">
+                                        <video controls src="{% static "vid/videjemplo.mp4" %}"></video>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h4>Cómo ver y descargar historias clínicas</h4>
+                                    <p>Aprende a navegar por tu historial médico, consultar tus diagnósticos y descargar los documentos importantes con un solo clic.</p>
+                                </div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <div class="ratio ratio-16x9 rounded shadow">
+                                        <video controls src="{% static "vid/videjemplo.mp4" %}"></video>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h4>Gestión de órdenes médicas y de medicamentos</h4>
+                                    <p>Descubre cómo visualizar, descargar y validar tus órdenes médicas y de medicamentos usando el código QR.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Columna para la infografía -->
+                    <div class="col-lg-4 mb-4">
+                        <div class="container border border-dark rounded p-4 div-main h-100 text-center">
+                            <img src="{% static "img/Infografíaunisalud.png" %}" alt="Infografía Médica" class="img-fluid rounded shadow">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

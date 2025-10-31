@@ -1,0 +1,119 @@
+{% extends "plantilla.html" %}
+{% load static %}
+{% block title %}Órdenes Médicamentos{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static "css/custom.css" %}">
+    <link rel="stylesheet" href="{% static "css/medicamentos.css" %}">
+{% endblock estilo %}
+
+{% block auth_button %}
+{# En esta página, reemplazamos el botón de login por el de logout #}
+<li>
+    {# Asumimos que tienes una URL llamada 'logout' para cerrar la sesión #}
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio_unisalud" %}'">
+        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    </button>
+</li>
+{% endblock auth_button %}
+
+{% block content %}
+
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <!-- Columna para el contenido principal -->
+            <div class="col-lg-10 col-md-10">
+                <div>
+                    <a class="btn btn-main btn-nav" href='{% url "inicio-usuario" %}'>Volver</a>
+                    <select name="filtrarome" id="" class="btn btn-main btn-nav">
+                        <option disabled selected value="">Filtrar por</option>
+                        <option value="fecha">Recientes a antiguas</option>
+                        <option value="especialidad">Especialidad</option>
+                        <option value="nombreMedico">Nombre del médico</option>
+                        <option value="estadoOrden">Estado de la orden</option> 
+                    </select>
+                    <a class="btn btn-main btn-nav" href="{% static "docs/omeejemplo.pdf" %}">Descargar PDF orden de medicamentos reciente</a>
+                    <!-- Botón para activar el modal del QR -->
+                    <button type="button" class="btn btn-main btn-nav" data-bs-toggle="modal" data-bs-target="#qrModal">
+                        Generar QR de la orden medica reciente
+                    </button>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-md-10">
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Órden de medicamentos más reciente</h1>
+                    <p>Aquí puede visualizar su orden de medicamentos más reciente, pare ver las demás haga click en el botón "ver historial de ordenes médicas"</p>
+                    <div>
+                        <object data="{% static 'docs/omeejemplo.pdf' %}" type="application/pdf" width="100%" height="500px" class="mb-3"></object>
+                            </div>
+                        <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#historialCompleto" aria-expanded="false" aria-controls="historialCompleto">
+                            Ver historial de ordenes de medicamentos
+                        </button>
+                        <!-- Contenido colapsable con el historial -->
+                        <div class="collapse mt-3" id="historialCompleto">
+                            <div class="card card-body div-main">
+                                <h5 class="card-title">Historial Completo</h5>
+                                <p>A continuación se listan sus ordenes de medicamentos anteriores.</p>
+                                <ul class="list-group list-group-flush itemList">
+                                    <!-- Ejemplo de item. Esto debería generarse con un bucle en Django -->
+                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                        <a href="#">Medicamento para dolor de cabeza y musculoesqueletico - <span>Dra. Maria Torres</span></a>
+                                        <div class="text-nowrap">
+                                            <span class="me-3">Estado: Activa</span>
+                                            <span class="badge bg-primary rounded-pill">28/04/2025</span>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                        <a href="#">Medicamento para infeccion respiratoria - <span>Dr. Juan Perez<</span></a>
+                                        <div class="text-nowrap">
+                                            <span class="me-3">Estado: Pendiente</span>
+                                            <span class="badge bg-primary rounded-pill">16/03/2025</span>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                        <a href="#">Medicamento para control de presion arterial - <span>Dra. Sofia Hernandez</span></a>
+                                        <div class="text-nowrap">
+                                            <span class="me-3">Estado: Vencida</span>
+                                            <span class="badge bg-primary rounded-pill">20/12/2024</span>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                        <a href="#">Medicamento para control del Asma - <span>Dra. Ana Garcia</span></a>
+                                        <div class="text-nowrap">
+                                            <span class="me-3">Estado: Entregada</span>
+                                            <span class="badge bg-primary rounded-pill">13/11/2024</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Modal para el Código QR -->
+<div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content div-main">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qrModalLabel">Código QR de la Orden Médica</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>Presente este código QR en la farmacia para validar su orden.</p>
+                <img src="{% static "img/qrejemplo.png" %}" alt="Código QR de la orden" class="img-fluid rounded">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}

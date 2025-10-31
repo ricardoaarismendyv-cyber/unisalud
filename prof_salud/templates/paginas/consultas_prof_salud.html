@@ -1,0 +1,62 @@
+{% extends "plantilla_ps.html" %}
+{% load static %}
+{% block title %}Turnos{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/turnos.css' %}">
+
+{% endblock estilo %}
+            
+{% block auth_button %}
+{# En esta página, reemplazamos el botón de login por el de logout #}
+<li>
+    {# Enlace funcional a la vista 'logout' (ajustar nombre si es distinto) #}
+    <a class="navButton0 login-btn" href="{% url 'inicio_unisalud' %}">
+        <img class="img-button" src="{% static 'img/log-in.svg' %}" alt="Icono login"> Cerrar Sesión</a>
+</li>
+{% endblock auth_button %}
+
+{% block content %}
+
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <!-- Columna para el contenido principal -->
+            <div class="col-lg-10 col-md-10">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10 col-md-10">
+                        <div class="container border border-dark rounded p-4 my-5 div-main">
+                            <h1>Consultas Pacientes</h1>
+                            <div class="turnos-container">
+                                <div class="turno-card">
+                                    <div class="paciente">
+                                        <a class="btn btn-main btn-nav" href='{% url "inicio_prof_salud" %}'>Ana Rodriguez</a>
+                                    </div>
+                                    <div class="consultorio">Consultorio #3</div>
+                                </div>
+                                <div class="turno-card">
+                                    <div class="paciente">Carlos Méndez</div>
+                                    <div class="consultorio">Consultorio #1</div>
+                                </div>
+                                <div class="turno-card">
+                                    <div class="paciente">Luisa Fernández</div>
+                                    <div class="consultorio">Consultorio #5</div>
+                                </div>
+                                <div class="turno-card">
+                                    <div class="paciente">Jorge Salazar</div>
+                                    <div class="consultorio">Consultorio #2</div>
+                                </div>
+                                <div class="turno-card">
+                                    <div class="paciente">María Gómez</div>
+                                    <div class="consultorio">Consultorio #4</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

@@ -1,0 +1,104 @@
+{% extends "plantilla_admin.html" %}
+{% load static %}
+{% block title %}Órdenes de medicamentos{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock estilo %}
+
+            {% block inicio_btn %}
+            <li>
+                <a class="navButton0" href="{% url 'inicio_unisalud' %}">Inicio</a></li>
+            {% endblock inicio_btn %}
+            
+{% block auth_button %}
+{# En esta página, reemplazamos el botón de login por el de logout #}
+<li>
+    {# Enlace funcional a la vista 'logout' (ajustar nombre si es distinto) #}
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url 'inicio_unisalud' %}'">
+        <img class="img-button" src="{% static 'img/log-in.svg' %}" alt="Icono login"> Cerrar Sesión</button>
+</li>
+{% endblock auth_button %}
+
+{% block content %}
+
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <!-- Columna para el contenido principal -->
+            <div class="col-lg-10 col-md-10">
+                <div>
+                    <a class="btn btn-main btn-nav" href="{% url 'inicio_admin' %}">Volver</a>
+                    <a class="btn btn-main btn-nav" href="{% static 'docs/omeejemplo.pdf' %}">Descargar orden de medicamentos reciente</a>
+                    <!-- Botón para activar el modal del QR -->
+                    <button type="button" class="btn btn-main btn-nav" data-bs-toggle="modal" data-bs-target="#qrModal">
+                        Generar QR de la orden de medicamentos reciente
+                    </button>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-md-10">
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Crear y/o gestionar orden de medicamentos</h1>
+                    <p>Ingrese el número de documento del usuario<input class="mx-3" type="text" name="" id=""> <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#buscarUsuario" aria-expanded="false" aria-controls="buscarUsuario">Buscar</button></p>
+                    <div class="collapse mt-3" id="buscarUsuario">
+                        <div class="card card-body div-main p-2" style="box-shadow: none;">
+                            <h5 class="card-title">Usuario: José Rodriguez</h5>
+                        </div>
+                    
+                        <p>Diligencie o modifique la orden de medicamentos del paciente.</p>
+                        <a class="btn btn-main btn-nav" href="{% static 'docs/omediligencia.pdf' %}">Diligenciar</a>
+                        <a class="btn btn-main btn-nav" href="{% static 'docs/omediligencia.pdf' %}">Modificar</a>
+                        <p>A continuacion se muestra la orden de medicmanetos mas reciente. Recuerde que la información debe ser precisa y completa para garantizar la atención</p>
+                        <div>
+                            <object data="{% static 'docs/ordenmedicaej.pdf' %}" type="application/pdf" width="100%" height="500px" class="mb-3"></object>
+                        </div>
+                        <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#historialMedicamentos" aria-expanded="false" aria-controls="historialMedicamentos">
+                            Ver ordenes de medicamentos
+                        </button>
+                        <!-- Contenido colapsable con el historial -->
+                        <div class="collapse mt-3" id="historialMedicamentos">
+                            <div class="card card-body div-main">
+                                <h5 class="card-title">Historial Completo</h5>
+                                <p>A continuación se listan sus ordenes de medicamentos anteriores.</p>
+                                <ul class="list-group list-group-flush itemList">
+                                    <!-- Ejemplo de item. Esto debería generarse con un bucle en Django -->
+                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                        <a href="{% static 'docs/ordenmedicamhistor.pdf' %}">Medicamento para dolor de cabeza y musculoesqueletico - <span>Dra. Maria Torres</span></a>
+                                        <div class="text-nowrap">
+                                            <span class="me-3">Estado: Activa</span>
+                                            <span class="badge bg-primary rounded-pill">28/04/2025</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Modal para el Código QR -->
+<div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content div-main">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qrModalLabel">Código QR de la Orden Médica</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>Presente este código QR en la farmacia para validar su orden.</p>
+                <img src="{% static 'img/qrejemplo.png' %}" alt="Código QR de la orden" class="img-fluid rounded">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}

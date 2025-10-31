@@ -1,0 +1,24 @@
+
+<section class="main"> <<< esto crea la una seccion donde estara todo el contenido
+
+
+    <div class="container-fluid"> <<< esto crea un container bootstrap, dividiendo la pantalla como si fuera una tabla de 12 columnas
+        <div class="row p-4 justify-content-center p-5"> <<< aqui con "row" se hace una fila p-4 para el padding 4 
+            <!-- Columna para el contenido principal -->
+            <div class="col-lg-10 col-md-10"> <<< aqui con "col"="column"/"lg"="large"/"md"="medium"; se usan 10 columnas de la tabla, se aplica un breakpoint lo cual hara que esta regla se siga en pantallas grandes y medianas
+                <a class="btn btn-main btn-nav" href='{% url "inicio-usuario" %}'>Volver</a> <<< aqui se crea un <a> al cual se le asignan las classes de botones nav para que parezca un boton
+                <a class="btn btn-main btn-nav" href='#'>Escanear código QR de nuevo</a>
+            </div>
+            <div class="row justify-content-center"> <<< aqui se crea un div en otra fila
+                <div class="container border border-dark rounded p-4 my-5 div-main"> <<< se crea de nuevo el 
+                    <h1>Asignamiento de turnos</h1>
+                    <center>
+                        <p>Su turno en [Nombre del centro médico] es el número [Número de turno]</p>
+                        <img src="{% static "img/qrejemplo.png" %}" alt="qrEjemplo">
+                        <p>Recuerde que este número de turno cuenta con verificacion y tiempo limite tras el cual sera eliminado</p>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

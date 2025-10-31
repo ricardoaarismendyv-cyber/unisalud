@@ -1,0 +1,44 @@
+{% extends "plantilla.html" %}
+{% load static %}
+{% block title %}Turnos{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static "css/custom.css" %}">
+
+{% endblock estilo %}
+
+{% block auth_button %}
+{# En esta página, reemplazamos el botón de login por el de logout #}
+<li>
+    {# Asumimos que tienes una URL llamada 'logout' para cerrar la sesión #}
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio_unisalud" %}'">
+        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    </button>
+</li>
+{% endblock auth_button %}
+
+{% block content %}
+
+<section class="main">
+    <div class="container-fluid">
+        <div class="row p-4 justify-content-center p-5">
+            <!-- Columna para el contenido principal -->
+            <div class="col-lg-10 col-md-10">
+                <a class="btn btn-main btn-nav" href='{% url "inicio-usuario" %}'>Volver</a>
+                <a class="btn btn-main btn-nav justify-content-center" href='#'>Escanear código QR de nuevo</a>
+            </div>
+            <div class="row justify-content-center">
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Asignar turno</h1>
+                    <center>
+                        <p>Su turno en [Nombre del centro médico] es el número [Número de turno]</p>
+                        <img src="{% static "img/qrejemplo.png" %}" alt="qrEjemplo">
+                        <p><br>Recuerde que este número de turno cuenta con verificacion y tiempo limite tras el cual sera eliminado</p>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

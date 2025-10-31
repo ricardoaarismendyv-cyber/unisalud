@@ -1,0 +1,58 @@
+{% extends "plantilla_admin.html" %}
+{% load static %}
+{% block title %} Inicio Profesional Salud {% endblock title %}
+
+
+{% block auth_button %}
+<li>
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio_unisalud" %}'">
+        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    </button>
+</li>
+
+{% endblock auth_button %}
+
+{% block content %}
+
+<section class="main">
+    <div class="container-fluid">
+        <div class="row p-4">
+            <!-- Columna para el contenido principal -->
+            <div class="col-md-8" style="padding: 60px 20px;">
+                <h1>Bienvenido! Administrativo [Nombre del profesional]</h1>
+                <div class="container border border-dark rounded p-4 my-5 div-main">    
+                    <h1>Gestión de usuarios</h1>
+                    <p>Acceda para administrar al personal de salud del centro médico, consultar registros de usuarios y supervisar la información general del sistema, garantizando organización y control eficiente.</p>
+                    <a class="btn btn-main" href="{% url 'gestion_admin' %}">Gestión de usuarios</a>
+                </div>
+                <div class="container border border-dark rounded p-4 my-5 div-main">    
+                    <h1>Historia clínica</h1>
+                    <p>Acceda para revisar, actualizar y documentar la información médica, diagnósticos y planes de tratamientos de los usuarios en la Historia Clínica Electrónica (HCE), cumpliendo con la normativa de confidencialidad.</p>
+                    <a class="btn btn-main" href="{% url 'hc_admin' %}">Historias clínicas</a>
+                </div>
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Ordenes Médicas</h1>
+                    <p>Acceda para emitir, revisar y gestionar ordenes médicas (medicamentos, laboratorios, procedimientos) y solicitudes de interconsulta, documentando el plan de tratamiento activo del paciente.</p>
+                    <button type="button" class="btn btn-main" onclick="window.location.href='{% url 'om_admin' %}'">Ordenes médicas</button>
+                </div>
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Ordenes de Medicamentos</h1>
+                    <p>Acceda para prescribir, modificar o suspender medicamentos de algún paciente (incluyendo dosis, vía y frecuencia), verificando las alertas de seguridad y documentando la farmacoterapia actual.</p>
+                    <button type="button" class="btn btn-main" onclick="window.location.href='{% url 'omed_admin' %}'">Ordenes de medicamentos</button>
+                </div>
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Asignar turno</h1>
+                    <p>Asigne turnos con solo un click, de forma rápida y sin demoras. Una interfaz directa y accesible que le permite reservar turnos sin complicaciones, optimizando tu tiempo desde cualquier dispositivo.</p>
+                    <button type="button" class="btn btn-main" onclick="window.location.href='{% url "turnos_admin" %}'">Obtener turno</button>
+                </div>
+            </div>
+            <!-- Columna para las imágenes -->
+            <div class="col-md-4 d-flex flex-column align-items-center justify-content-center">
+                <img src="{% static 'img/doctor.png' %}" alt="Doctor con bata y estetoscopio" class="img-fluid rounded mb-4 pt-4 shadow">
+                <img src="{% static 'img/Infografíaunisalud.png' %}" alt="Infografía médica" class="img-fluid rounded shadow">
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

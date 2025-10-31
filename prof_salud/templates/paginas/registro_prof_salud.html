@@ -1,0 +1,173 @@
+{% extends "plantilla_ps.html" %}
+{% load static %}
+{% block title %}Registrarse{% endblock title %}
+
+{% block content %}
+
+<section class="main" style="padding-top: 30px;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="border border-dark rounded p-4 my-5 div-main">
+                    <div id="confirmacionRegistro" style="display: none; text-align: center;">
+                        <h2 class="text-danger mt-4">¡Gracias!</h2>
+                        <h4>Usted ha sido registrado correctamente, ya puede iniciar sesión.</h4>
+                        <a href="{% url 'login_prof_salud' %}" class="btn btn-main mt-3">Volver a iniciar sesión</a>
+                    </div>
+                    
+                    <form id="registro">
+                        <h1 class="text-center mb-4">Crear una cuenta</h1>
+                        <div class="row">
+                            <!-- Nombres -->
+                            <div class="col-md-6 mb-3">
+                                <label for="primerNombre" class="form-label">Primer Nombre <span style="color:red">*</span></label>
+                                <input type="text" class="form-control" id="primerNombre" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="segundoNombre" class="form-label">Segundo Nombre <span style="color:red">*</span></label>
+                                <input type="text" class="form-control" id="segundoNombre" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Apellidos -->
+                            <div class="col-md-6 mb-3">
+                                <label for="primerApellido" class="form-label">Primer Apellido <span style="color:red">*</span></label>
+                                <input type="text" class="form-control" id="primerApellido" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="segundoApellido" class="form-label">Segundo Apellido <span style="color:red">*</span></label>
+                                <input type="text" class="form-control" id="segundoApellido" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="numeroDocumento" class="form-label">Número de documento <span style="color:red">*</span></label>
+                                <input type="text" class="form-control" id="numeroDocumento" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="tipoDocumento" class="form-label">Tipo de documento <span style="color:red">*</span></label>
+                                <select id="tipoDocumento" class="form-select" required>
+                                    <option selected disabled>Seleccionar...</option>
+                                    <option value="rc">Registro civil de nacimiento</option>
+                                    <option value="ti">Tarjeta de identidad</option>
+                                    <option value="cc">Cédula de ciudadania</option>
+                                    <option value="ce">Cédula de extranjería</option>
+                                </select>
+                            </div>
+                        <div class="row">
+                            <!-- Fecha de Nacimiento y Género -->
+                            <div class="col-md-6 mb-3">
+                                <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento <span style="color:red">*</span></label>
+                                <input type="date" class="form-control" id="fechaNacimiento" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="genero" class="form-label">Género <span style="color:red">*</span></label>
+                                <select id="genero" class="form-select" required>
+                                    <option selected disabled>Seleccionar...</option>
+                                    <option value="masculino">Masculino</option>
+                                    <option value="femenino">Femenino</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Dirección -->
+                        <div class="mb-3">
+                            <label for="direccion" class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="direccion" placeholder="Ej: Calle 5 # 10-15" required>
+                        </div>
+                        <div class="row">
+                            <!-- Teléfonos -->
+                            <div class="col-md-6 mb-3">
+                                <label for="telefono" class="form-label">Número Telefónico</label>
+                                <input type="tel" class="form-control" id="telefono">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="celular" class="form-label">Número de Celular <span style="color:red">*</span></label>
+                                <input type="tel" class="form-control" id="celular" required>
+                            </div>
+                        </div>
+                        <!-- Correo y Contraseñas -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Dirección de Correo Electrónico</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Contraseña <span style="color:red">*</span></label>
+                                <!-- Grupo de input para añadir el botón dentro del campo -->
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="password" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePasswordBtn">Ver</button>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="confirmPassword" class="form-label">Confirmar Contraseña <span style="color:red">*</span></label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="confirmPassword" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePasswordBtnconfirm">Ver</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Términos, reCAPTCHA y Botón -->
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" value="" id="terminos" required>
+                            <label class="form-check-label" for="terminos">
+                                Acepto los <a href="#">Términos y Servicios</a>
+                            </label>
+                        </div>
+                        <div class="mb-3">
+                            <!-- Aquí iría el widget de reCAPTCHA -->
+                            <div  style="display: flex; align-items: center; justify-content: center;">
+                                <img width="330" src="{% static "img/recaptcha.png" %}" alt="">
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-main">Registrarse</button>
+                        </div>
+                        <div class="text-center mt-3">
+                            <p>¿Ya tienes una cuenta? <a href="{% url 'login_prof_salud' %}">Inicia sesión aquí</a></p>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block script %}
+<script>
+    // Espera a que el documento esté completamente cargado
+    document.addEventListener('DOMContentLoaded', function () {
+        // Función reutilizable para manejar la visibilidad de la contraseña
+        function setupPasswordToggle(inputId, buttonId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleButton = document.getElementById(buttonId);
+
+            if (passwordInput && toggleButton) {
+                toggleButton.addEventListener('click', function () {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    this.textContent = type === 'password' ? 'Ver' : 'Ocultar';
+                });
+            }
+        }
+
+        // Aplicar la función a ambos campos de contraseña
+        setupPasswordToggle('password', 'togglePasswordBtn');
+        setupPasswordToggle('confirmPassword', 'togglePasswordBtnconfirm');
+
+        // Manejar el envío del formulario
+        const registroForm = document.getElementById('registro');
+        if (registroForm) {
+            registroForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // Previene que la página se recargue
+                this.style.display = 'none'; // Oculta el formulario
+                document.getElementById('confirmacionRegistro').style.display = 'block'; // Muestra la confirmación
+            });
+        }
+    });
+
+</script>
+{% endblock script %}

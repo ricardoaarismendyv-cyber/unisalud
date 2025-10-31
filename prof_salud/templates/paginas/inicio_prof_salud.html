@@ -1,0 +1,48 @@
+{% extends "plantilla_ps.html" %}
+{% load static %}
+{% block title %} Inicio Profesional Salud {% endblock title %}
+
+
+{% block auth_button %}
+<li>
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "consultas_prof_salud" %}'">
+        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    </button>
+</li>
+
+{% endblock auth_button %}
+
+{% block content %}
+
+<section class="main">
+    <div class="container-fluid">
+        <div class="row p-4">
+            <!-- Columna para el contenido principal -->
+            <div class="col-md-8" style="padding: 60px 20px;">
+                <h1>Bienvenido! Profesional [Nombre del profesional]</h1>
+                <div class="container border border-dark rounded p-4 my-5 div-main">    
+                    <h1>Historia clínica</h1>
+                    <p>Acceda para revisar, actualizar y documentar la información médica, diagnósticos y plan de tratamiento del paciente en la Historia Clínica Electrónica (HCE), cumpliendo con la normativa de confidencialidad.</p>
+                    <a class="btn btn-main" href="{% url 'hc_prof_salud' %}">Historia clínica</a>
+                </div>
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Ordenes Médicas</h1>
+                    <p>Acceda para emitir, revisar y gestionar ordenes médicas (medicamentos, laboratorios, procedimientos) y solicitudes de interconsulta, documentando el plan de tratamiento activo del paciente.</p>
+                    <button type="button" class="btn btn-main" onclick="window.location.href='{% url 'om_prof_salud' %}'">Ordenes médicas</button>
+                </div>
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Ordenes de Medicamentos</h1>
+                    <p>Acceda para prescribir, modificar o suspender medicamentos del paciente (incluyendo dosis, vía y frecuencia), verificando las alertas de seguridad y documentando la farmacoterapia actual.</p>
+                    <button type="button" class="btn btn-main" onclick="window.location.href='{% url 'omed_prof_salud' %}'">Ordenes de medicamentos</button>
+                </div>
+            </div>
+            <!-- Columna para las imágenes -->
+            <div class="col-md-4 d-flex flex-column align-items-center justify-content-center">
+                <img src="{% static 'img/doctor.png' %}" alt="Doctor con bata y estetoscopio" class="img-fluid rounded mb-4 pt-4 shadow">
+                <img src="{% static 'img/Infografíaunisalud.png' %}" alt="Infografía médica" class="img-fluid rounded shadow">
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

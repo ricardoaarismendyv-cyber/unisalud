@@ -1,0 +1,127 @@
+{% extends "plantilla.html" %}
+{% load static %}
+{% block title %}Ordenes Médicas{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static "css/custom.css" %}">
+{% endblock estilo %}
+
+{% block auth_button %}
+{# En esta página, reemplazamos el botón de login por el de logout #}
+<li>
+    {# Asumimos que tienes una URL llamada 'logout' para cerrar la sesión #}
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio_unisalud" %}'">
+        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    </button>
+</li>
+{% endblock auth_button %}
+
+{% block content %}
+
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <!-- Columna para el contenido principal -->
+            <div class="col-lg-10 col-md-10">
+                <div>
+                    <a class="btn btn-main btn-nav" href='{% url "inicio-usuario" %}'>Volver</a>
+                    <select name="filtrarom" id="" class="btn btn-main btn-nav">
+                        <option disabled selected value="">Filtrar por</option>
+                        <option value="fecha">Recientes a antiguas</option>
+                        <option value="especialidad">Especialidad</option>
+                        <option value="nombreMedico">Nombre del médico</option>
+                        <option value="estadoOrden">Estado de la orden</option> 
+                    </select>                    
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-md-10">
+                    <div class="container border border-dark rounded p-4 my-5 div-main">
+                        <h1>Orden médica más reciente</h1>
+                        <p>Aquí puede visualizar su orden médica más reciente, pare ver las demás haga click en el botón "ver historial de ordenes médicas"</p>
+                        <div>
+                        <object data="{% static 'docs/omejemplo.pdf' %}" type="application/pdf" width="100%" height="500px" class="mb-3"></object>
+                            </div>
+                        <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#historialCompleto" aria-expanded="false" aria-controls="historialCompleto">
+                            Ver historial de ordenes médicas
+                        </button>
+                        <a class="btn btn-main btn-nav" href="{% static "docs/omejemplo.pdf" %}">Descargar PDF orden médica reciente</a>   
+                        <!-- Contenido colapsable con el historial -->
+                        <div class="collapse mt-3" id="historialCompleto">
+                            <div class="card card-body div-main">
+                                <h5 class="card-title">Historial Completo</h5>
+                                <p>A continuación se listan sus ordenes medicas anteriores.</p>
+                                <ul class="list-group list-group-flush itemList">
+                                    <!-- Ejemplo de item. Esto debería generarse con un bucle en Django -->
+                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                        <a href="#">Ortopedia y Traumalogia - <span>Dr. Carlo Gomez</span></a>
+                                        <div class="text-nowrap">
+                                            <span>Estado: Vigente</span>
+                                            <span class="badge bg-primary rounded-pill">12/06/2025</span>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                        <a href="#">Dermatologia - <span>Dra. Sofia Ramirez</span></a>
+                                        <div class="text-nowrap">
+                                            <span>Estado:Completada</span>
+                                            <span class="badge bg-primary rounded-pill">05/04/2025</span>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                        <a href="#">Gastroenterologia - <span>Dr. Luis Hernandez</span></a>
+                                        <div class="text-nowrap">
+                                            <span>Estado:Cancelada</span>
+                                            <span class="badge bg-primary rounded-pill">23/12/2024</span>
+                                        </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-md-10">
+                    <div class="container border border-dark rounded p-4 my-5 div-main">
+                        <!-- Contenido resultados de laboratorio -->
+                        <h1>Resultados de Laboratorio más reciente</h1>
+                        <p>Aquí puede visualizar su resultado de laboratorio más reciente, pare ver las demás haga click en el botón "ver historial de resultados de laboratorio"</p>
+                        <div>
+                        <object data="{% static 'docs/ResultadosLaboratorio.pdf' %}" type="application/pdf" width="100%" height="500px" class="mb-3"></object>
+                            </div>
+                        <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#historialResultados" aria-expanded="false" aria-controls="historialResultados">
+                            Ver historial de resultados de laboratorio
+                        </button>
+                        <a class="btn btn-main btn-nav" href="{% static "docs/ResultadosLaboratorio.pdf" %}">Descargar PDF Resultados laboratorio</a>
+                        <!-- Contenido colapsable con el resultados laboratorio -->
+                        <div class="collapse mt-3" id="historialResultados">
+                            <div class="card card-body div-main">
+                                <h5 class="card-title">Historial Resultados Laboratorio</h5>
+                                <p>A continuación se listan sus resultados de laboratorio anteriores.</p>
+                                <ul class="list-group list-group-flush itemList">
+                                    <!-- Ejemplo de item. Esto debería generarse con un bucle en Django -->
+                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                        <a href="#">Ortopedia y Traumalogia - <span>Dr. Carlo Gomez</span></a>
+                                        <div class="text-nowrap">
+                                            <span>Estado: Vigente</span>
+                                            <span class="badge bg-primary rounded-pill">12/06/2025</span>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                        <a href="#">Dermatologia - <span>Dra. Sofia Ramirez</span></a>
+                                        <div class="text-nowrap">
+                                            <span>Estado:Entregada</span>
+                                            <span class="badge bg-primary rounded-pill">05/04/2025</span>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                        <a href="#">Gastroenterologia - <span>Dr. Luis Hernandez</span></a>
+                                        <div class="text-nowrap">
+                                            <span>Estado:Cancelada</span>
+                                            <span class="badge bg-primary rounded-pill">23/12/2024</span>
+                                    </li>
+                                </ul>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

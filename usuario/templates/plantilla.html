@@ -1,0 +1,209 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>{% block title %}{% endblock title %}</title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+
+        <!-- Bootstrap CSS v5.2.1 -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+            crossorigin="anonymous"
+        />
+        {% block estilo %}
+            <link rel="stylesheet" href="{% static 'css/plantilla.css' %}">
+        {% endblock estilo %}
+        <!-- Fuentes de Google: OpenDyslexic para accesibilidad -->
+        <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+    </head>
+
+    <body id="page-body">
+        <header class="mainHeader">
+            <!-- place navbar here -->
+    <nav class="mainNav">
+        <ul class="navMenu">
+            <li><img class="navImg" src="{% static 'img/unisaludLogoHorizontal.jpg'%}" alt="logounisalud"></li>
+            <li>
+                <button type="button" class="navButton1" onclick="window.location.href='{% url "preguntas-frecuentes" %}'">Preguntas frecuentes</button></li>
+            <li>
+                <button type="button" class="navButton1" onclick="window.location.href='{% url "usosistema" %}'">¿Cómo usar el sistema?</button></li>
+            </ul>
+            <ul class="navMenu">
+            <!-- Menú de selección de idioma -->
+            <li class="navLogo seleccionIdioma">
+                <input type="button" id="language-button" class="navButton1" value="Español">
+                <ul id="language-menu" class="menuIdioma">
+                    <li><a href="#">Español</a></li>
+                    <li><a href="#">English</a></li>
+                </ul>
+            </li>
+            <li class="dark-mode-btn"> 
+                <!-- Pasamos las rutas de las imágenes al JS a través de atributos data-* -->
+                <img id="theme-toggle-img" 
+                    src="{% static "img/toggle-left.svg" %}" 
+                    data-toggle-off="{% static 'img/toggle-left.svg' %}"
+                    data-toggle-on="{% static 'img/toggle-right.svg' %}"
+                    alt="toggle-off" style="cursor: pointer;">
+                <img id="moon-icon" src="{% static "img/moon.svg" %}" alt="moon" style="cursor: pointer;">
+            </li>
+            <!-- Contenedor para el menú de accesibilidad -->
+            <li class="navLogo accessibility-container">
+                <img id="accessibility-icon" class="access-button" src="{% static "img/accessibility.svg" %}" alt="Opciones de accesibilidad">
+            </li>
+            {% block auth_button %}
+            {# Este bloque mostrará el botón de Iniciar Sesión por defecto #}
+            <li>
+                <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "login-us" %}'">
+                    <img class="img-button" src="{% static "img/log-in.svg" %}" alt="Icono de login"> Iniciar Sesión</button></li>
+            {% endblock auth_button %} 
+            </ul>
+    </nav>
+    </header>
+        <main>
+            {% block content %}{% endblock content %}
+
+        </main>
+        <footer>
+            
+            <!-- place footer here -->
+            {% block footer %}{% endblock footer %}
+        <div class="footer-bar">
+            <nav class="footer-nav" >
+                <ul  class="footer-menu">
+                    <li>
+                        <a href="{% url "contactanos" %}"><input class="foot-button" type="button" value="¡Contáctanos!"></a>
+                    </li>
+                    <li>
+                        <a href="{% url "buzonsugerencias" %}"><input class="foot-button" type="button" value="Buzón de sugerencias"></a>
+                    </li>
+                </ul>
+                <p>© Copyright 2025 Unisalud</p>
+            </nav>
+        </div>
+
+        <!-- Barra Lateral de Accesibilidad -->
+        <div id="accessibility-sidebar" class="sidebar">
+            <button id="close-sidebar-btn" class="close-sidebar-button">&times;</button>
+            <h2>Opciones de Accesibilidad</h2>
+            <button id="increase-font" class="sidebar-button">Aumentar Tamaño de Letra</button>
+            <button id="decrease-font" class="sidebar-button">Disminuir Tamaño de Letra</button>
+            <button id="dyslexia-font" class="sidebar-button">Fuente para la dislexia</button>
+            <button id="high-contrast" class="sidebar-button">Contraste Alto</button>
+            <button id="reset-accessibility" class="sidebar-button">Restablecer</button>
+        </div>
+
+
+    </footer>
+        <!-- Bootstrap JavaScript Libraries -->
+        <script
+            src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+            crossorigin="anonymous"
+        ></script>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+            integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+            crossorigin="anonymous"
+        ></script>
+
+        <!-- Carga del script de la plantilla -->
+        <script src="{% static 'js/plantilla.js' %}"></script>
+        
+        <!-- Script base de la plantilla (siempre se carga) -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const languageButton = document.getElementById('language-button');
+                const languageMenu = document.getElementById('language-menu');
+
+                if (languageButton && languageMenu) {
+                    languageButton.addEventListener('click', function(event) {
+                        event.stopPropagation(); 
+                        languageMenu.style.display = languageMenu.style.display === 'block' ? 'none' : 'block';
+                    });
+
+                    document.addEventListener('click', function() {
+                        languageMenu.style.display = 'none';
+                    });
+
+                    languageMenu.querySelectorAll('a').forEach(link => {
+                        link.addEventListener('click', function(event) {
+                            event.preventDefault();
+                            languageButton.value = this.textContent;
+                            languageMenu.style.display = 'none';
+                            event.stopPropagation();
+                        });
+                    });
+                }
+            });
+        </script>
+
+        <!-- Bloque para scripts específicos de cada página -->
+        {% block script %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // --- Lógica para la barra lateral de accesibilidad ---
+                const accessibilityIcon = document.getElementById('accessibility-icon');
+                const sidebar = document.getElementById('accessibility-sidebar');
+                const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+
+                if (accessibilityIcon && sidebar && closeSidebarBtn) {
+                    accessibilityIcon.addEventListener('click', function() {
+                        sidebar.style.width = '280px'; // Abre la barra lateral
+                    });
+
+                    closeSidebarBtn.addEventListener('click', function() {
+                        sidebar.style.width = '0'; // Cierra la barra lateral
+                    });
+                }
+
+                // --- Funcionalidad de los botones de accesibilidad ---
+                const body = document.getElementById('page-body');
+                const increaseFontBtn = document.getElementById('increase-font');
+                const decreaseFontBtn = document.getElementById('decrease-font');
+                const dyslexiaFontBtn = document.getElementById('dyslexia-font');
+                const highContrastBtn = document.getElementById('high-contrast');
+                const resetAccessibilityBtn = document.getElementById('reset-accessibility');
+
+                let currentFontSize = parseFloat(window.getComputedStyle(body).fontSize);
+
+                increaseFontBtn.addEventListener('click', function() {
+                    currentFontSize += 1;
+                    body.style.fontSize = currentFontSize + 'px';
+                });
+
+                decreaseFontBtn.addEventListener('click', function() {
+                    currentFontSize -= 1;
+                    body.style.fontSize = currentFontSize + 'px';
+                });
+
+                dyslexiaFontBtn.addEventListener('click', function() {
+                    body.classList.toggle('dyslexia-font');
+                });
+
+                highContrastBtn.addEventListener('click', function() {
+                    body.classList.toggle('high-contrast');
+                });
+
+                resetAccessibilityBtn.addEventListener('click', function() {
+                    // Elimina las clases de accesibilidad
+                    body.classList.remove('high-contrast', 'dyslexia-font');
+                    // Restablece el tamaño de fuente eliminando el estilo en línea
+                    body.style.fontSize = '';
+                    // Actualiza el valor de la fuente actual por si el usuario vuelve a interactuar
+                    currentFontSize = parseFloat(window.getComputedStyle(body).fontSize);
+                });
+            });
+        </script>
+        {% endblock script %}
+        
+    </body>
+</html>

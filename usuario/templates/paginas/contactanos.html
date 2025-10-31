@@ -1,0 +1,37 @@
+{% extends "plantilla.html" %}
+{% load static %}
+{% block title %}Contactanos{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static "css/contactanos.css" %}">
+{% endblock estilo %}
+
+{% block content %}
+
+<section class="main">
+    <div class="container-fluid">
+        <div class="row p-4 justify-content-center p-5">
+            <!-- Columna para el contenido principal -->
+            <div class="col-lg-10 col-md-10">
+                <a href="{% url 'inicio-usuario' %}" class="btn btn-main mt-3">Volver</a>
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                <h1>¿Cómo contactarnos?</h1>
+                    <h4>Puedes contactar a nuestros profesionales o asesores los cuales te brindarán ayuda</h4>
+                    <div class="mt-4 mb-4">
+                        <p class="mb-2">Si deseas enviar un correo y contactar con nuestros asesores, utiliza el botón a continuación:</p>
+                        <a href="mailto:unisaludcontacto@gmail.com" class="btn btn-primary btn-lg custom-contact-btn" role="button">
+                        Enviar Correo de Contacto ✉️
+                        </a>
+                    </div>    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block footer %}
+
+
+{% endblock footer %}

@@ -1,0 +1,107 @@
+{% extends "plantilla_admin.html" %}
+{% load static %}
+{% block title %}Buzon de sugerencias{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static "css/custom.css" %}">
+{% endblock estilo %}
+
+{% block auth_button %}
+{# En esta página, reemplazamos el botón de login por el de logout #}
+<li>
+    {# Asumimos que tienes una URL llamada 'logout' para cerrar la sesión #}
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='#'">
+        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    </button>
+</li>
+{% endblock auth_button %}
+
+{% block content %}
+
+<section class="main" style="margin-top:20px">
+    <div class="container-fluid">
+        <div class="row p-4 justify-content-center p-5">
+            <!-- Columna para el contenido principal -->
+            <div class="col-lg-10 col-md-10">
+            <a href="{% url 'inicio_admin' %}" class="btn btn-main mt-3">Volver</a>
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1 class="mb-4">Buzón de sugerencias</h1>
+                    <!-- Formulario de sugerencias -->
+                    <form id="sugerenciaForm">
+                        <div class="mb-3">
+                            <label for="sugerenciaTexto" class="form-label">Ingrese su reclamo, queja, observación, petición o sugerencia</label>
+                            <textarea class="form-control" id="sugerenciaTexto" name="sugerencia" rows="6"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-main">Enviar Sugerencia</button>
+                    </form>
+                    <h1 class="mt-2 mb-4">Gestionar sugerencias recibidas</h1>
+
+                        <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#historialMedicamentos" aria-expanded="false" aria-controls="historialMedicamentos">
+                            Ver ordenes de medicamentos
+                        </button>
+                        <!-- Contenido colapsable con el historial -->
+                        <div class="collapse mt-3" id="historialMedicamentos">
+                            <div class="card card-body div-main p-2">
+                                <h5 class="card-title">Historial Completo</h5>
+                                <p>A continuación se listan sus ordenes de medicamentos anteriores.</p>
+                                <ul class="list-group list-group-flush itemList">
+                                    <!-- Ejemplo de item. Esto debería generarse con un bucle en Django -->
+                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                        <a href="#">No puedo restablecer mi contraseña</a>
+                                        <div class="text-nowrap">
+                                            <span class="me-3">Juan Esteban Ramirez</span>
+                                            <span class="badge bg-primary">16592781</span>
+                                            <span class="mx-2">Resuelto?</span><input type="checkbox" name="check" id="">
+                                        </div>
+                                    </li>
+
+                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                        <a href="#">El historial clínico no muestra la información completa</a>
+                                        <div class="text-nowrap">
+                                            <span class="me-3">Laura Vanessa Gómez</span>
+                                            <span class="badge bg-primary">16784592</span>
+                                            <span class="mx-2">Resuelto?</span><input type="checkbox" name="check" id="">
+                                        </div>
+                                    </li>
+
+                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                        <a href="#">No recibo notificaciones de mis citas médicas</a>
+                                        <div class="text-nowrap">
+                                            <span class="me-3">Carlos Andrés Torres</span>
+                                            <span class="badge bg-primary">16439210</span>
+                                            <span class="mx-2">Resuelto?</span><input type="checkbox" name="check" id="">
+                                        </div>
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </div>
+                    <!-- Mensaje de confirmación (inicialmente oculto) -->
+                    <div id="confirmacionMensaje" style="display: none; text-align: center;">
+                        <h2 class="text-danger mt-4">¡Gracias!</h2>
+                        <h4>Su sugerencia ha sido enviada correctamente.</h4>
+                        <a href="{% url 'inicio_admin' %}" class="btn btn-main mt-3">Volver al Inicio</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
+
+{% block script %}
+<script>
+    document.getElementById('sugerenciaForm').addEventListener('submit', function(event) {
+        // Previene el envío real del formulario para que la página no se recargue
+        event.preventDefault();
+
+        // Oculta el formulario
+        this.style.display = 'none';
+
+        // Muestra el mensaje de confirmación
+        document.getElementById('confirmacionMensaje').style.display = 'block';
+    });
+</script>
+{% endblock script %}

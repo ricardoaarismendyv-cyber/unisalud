@@ -1,0 +1,55 @@
+{% extends "plantilla.html" %}
+{% load static %}
+{% block title %}Buzon de sugerencias{% endblock title %}
+
+
+{% block content %}
+
+<section class="main">
+    <div class="container-fluid">
+        <div class="row p-4 justify-content-center p-5">
+            <!-- Columna para el contenido principal -->
+            <div class="col-lg-10 col-md-10">
+                <a class="btn btn-main btn-nav" href='{% url "inicio-usuario" %}'>Volver</a>
+            </div>
+            <div class="col-lg-8">
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1 class="mb-4">Buzón de sugerencias</h1>
+                    
+                    <!-- Formulario de sugerencias -->
+                    <form id="sugerenciaForm">
+                        <div class="mb-3">
+                            <label for="sugerenciaTexto" class="form-label">Ingrese su reclamo, queja, observación, petición o sugerencia</label>
+                            <textarea class="form-control" id="sugerenciaTexto" name="sugerencia" rows="6"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-main">Enviar Sugerencia</button>
+                    </form>
+
+                    <!-- Mensaje de confirmación (inicialmente oculto) -->
+                    <div id="confirmacionMensaje" style="display: none; text-align: center;">
+                        <h2 class="text-danger mt-4">¡Gracias!</h2>
+                        <h4>Su sugerencia ha sido enviada correctamente.</h4>
+                        <a href="{% url 'inicio_unisalud' %}" class="btn btn-main mt-3">Volver al Inicio</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
+
+{% block script %}
+<script>
+    document.getElementById('sugerenciaForm').addEventListener('submit', function(event) {
+        // Previene el envío real del formulario para que la página no se recargue
+        event.preventDefault();
+
+        // Oculta el formulario
+        this.style.display = 'none';
+
+        // Muestra el mensaje de confirmación
+        document.getElementById('confirmacionMensaje').style.display = 'block';
+    });
+</script>
+{% endblock script %}

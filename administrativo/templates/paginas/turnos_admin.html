@@ -1,0 +1,82 @@
+{% extends "plantilla_admin.html" %}
+{% load static %}
+{% block title %}Turnos{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static "css/custom.css" %}">
+
+{% endblock estilo %}
+
+{% block auth_button %}
+{# En esta página, reemplazamos el botón de login por el de logout #}
+<li>
+    {# Asumimos que tienes una URL llamada 'logout' para cerrar la sesión #}
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio_unisalud" %}'">
+        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    </button>
+</li>
+{% endblock auth_button %}
+
+{% block content %}
+<section class="main">
+    <div class="container-fluid">
+        <div class="row p-4 justify-content-center p-5">
+            <!-- Columna para el contenido principal -->
+            <div class="col-lg-10 col-md-10">
+                <a class="btn btn-main btn-nav" href='{% url "inicio_admin" %}'>Volver</a>
+                <a class="btn btn-main btn-nav justify-content-center" href='#'>Escanear código QR de nuevo</a>
+            </div>
+            <div class="row justify-content-center">
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Asignar turno a usuario</h1>
+                    <p>
+                        Ingrese el número de documento del usuario
+                        <input class="mx-3" type="text" name="" id="">
+                        <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#buscarUsuario" aria-expanded="false" aria-controls="buscarUsuario">Buscar</button>
+                    </p>
+                    
+                    <div class="collapse mt-3" id="buscarUsuario">
+                        <div class="card card-body div-main p-2" style="box-shadow: none;">
+                            <h5 class="card-title">Usuario: Sharon Gonzalez</h5>
+                        </div>
+
+                        <!-- Grid con dos columnas -->
+                        <div class="row mt-3">
+                            <!-- Columna izquierda: lista de turnos -->
+                            <div class="col-lg-6 col-md-6">
+                                <p>
+                                    Número de turno (no se puede elegir los 3 más cercanos a pasar):
+                                    <select name="turno" id="" class="form-select mt-2">
+                                        <option value="#" selected disabled>Seleccione el número de turno</option>
+                                        <option value="42">42</option>
+                                        <option value="43">43</option>
+                                        <option value="44">44</option>
+                                    </select>
+                                </p>
+                            </div>
+
+                            <!-- Columna derecha: justificación -->
+                            <div class="col-lg-6 col-md-6">
+                                <textarea placeholder="Justifique aquí el motivo" name="justificacion" id="" class="form-control" rows="5"></textarea>
+                            </div>
+                        </div>
+                        <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#generarTurno" aria-expanded="false" aria-controls="generarTurno">Generar turno</button>
+                        <div class="collapse mt-3" id="generarTurno">
+                    
+
+                    <center class="mt-4">
+                        <p>El turno del usuario [Nombre del usuario] en [Nombre del centro médico] es el número [Número de turno].</p>
+                        <p>Este turno tambien se encuentra visible en la cuenta del usuario.</p>
+                        <img src="{% static 'img/qrejemplo.png' %}" alt="qrEjemplo">
+                        <p><br>Recuerde que este número de turno cuenta con verificación y tiempo límite tras el cual será eliminado</p>
+                    </center>
+                </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

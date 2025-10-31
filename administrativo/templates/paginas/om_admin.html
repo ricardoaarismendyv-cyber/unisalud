@@ -1,0 +1,77 @@
+{% extends "plantilla_admin.html" %}
+{% load static %}
+{% block title %}Ordenes Médicas{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock estilo %}
+
+{% block auth_button %}
+{# En esta página, reemplazamos el botón de login por el de logout #}
+<li>
+    {# Enlace funcional a la vista 'logout' (ajustar nombre en urls.py si es distinto) #}
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url 'inicio_unisalud' %}'">
+        <img class="img-button" src="{% static 'img/log-in.svg' %}" alt="Icono login"> Cerrar Sesión</button>
+</li>
+{% endblock auth_button %}
+
+{% block content %}
+
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <!-- Columna para el contenido principal -->
+            <div class="col-lg-10 col-md-10">
+                <div>
+                    <a class="btn btn-main btn-nav" href="{% url 'inicio_admin' %}">Volver</a>
+                    <a class="btn btn-main btn-nav" href="{% static 'docs/omejemplo.pdf' %}">Descargar orden médica reciente</a>   
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-md-10">
+                    <div class="container border border-dark rounded p-4 my-5 div-main">
+                        <h1>Crear y/o gestionar ordenes medicas</h1>
+                        <p>Ingrese el número de documento del usuario<input class="mx-3" type="text" name="" id=""> <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#buscarUsuario" aria-expanded="false" aria-controls="buscarUsuario">Buscar</button></p>
+                        <div class="collapse mt-3" id="buscarUsuario">
+                            <div class="card card-body div-main p-2" style="box-shadow: none;">
+                                <h5 class="card-title">Usuario: Pepito Perez</h5>
+                            </div>
+                    
+                        <h1>Diligencie o modifique la orden medica del paciente.</h1>
+                        <a class="btn btn-main btn-nav" href="{% static 'docs/omdiligencia.pdf' %}">Diligenciar</a>
+                        <a class="btn btn-main btn-nav" href="{% static 'docs/omdiligencia.pdf' %}">Modificar</a>
+                        <p>Por favor diligencie el siguiente formulario para crear la orden médica del paciente.</p>
+                        <p>A continuacion se muestra la orden de medicmanetos mas reciente. Recuerde que la información debe ser precisa y completa para garantizar la atención</p>
+                        <div>
+                        <object data="{% static 'docs/ordenmedicameje.pdf' %}" type="application/pdf" width="100%" height="500px" class="mb-3"></object>
+                            </div>
+                        <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#verOrdenesMedicas" aria-expanded="false" aria-controls="verOrdenesMedicas">
+                            Ver órdenes médicas
+                        </button>
+                        <!-- Contenido colapsable con el historial -->
+                        <div class="collapse mt-3" id="verOrdenesMedicas">
+                            <div class="card card-body div-main">
+                                <h5 class="card-title">Ordenes médicas</h5>
+                                <p>A continuación se muestra su última orden médica.</p>
+                                <ul class="list-group list-group-flush itemList">
+                                    <!-- Ejemplo de item. Esto debería generarse con un bucle en Django -->
+                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                        <a href="{% static 'docs/ordenmhistorial.pdf' %}">Última orden médica</a>
+                                        <div class="text-nowrap">
+                                            <span>Estado:Vigente</span>
+                                            <span class="badge bg-primary rounded-pill">12/06/2025</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

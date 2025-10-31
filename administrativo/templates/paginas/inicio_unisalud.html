@@ -1,0 +1,36 @@
+{% extends 'plantilla.html' %}
+{% load static %}
+
+{% block title %}Inicio | Unisalud{% endblock %}
+
+{% block content %}
+<div class="inicio-container" style="padding: 80px 20px;">
+    <div class="text-center">
+        <h1>Bienvenido a Unisalud</h1>
+        <p>Su plataforma de salud confiable, accesible y segura.</p>
+    </div>
+    <div class="container my-5">
+            <div class="row align-items-center">
+
+            <div class="col-md-5 d-flex flex-column align-items-center">
+                <a href="{% url 'login-us' %}" class="btn btn-primary btn-lg w-75 mb-5" role="button">
+                    Soy Paciente
+                </a>
+                <a href="{% url 'login_prof_salud' %}" class="btn btn-outline-primary btn-lg w-75 mb-5" role="button">
+                    Soy Profesional
+                </a>
+                <a href="{% url 'login_admin' %}" class="btn btn-outline-primary btn-lg w-75 " role="button">
+                    Soy Administrativo
+                </a>
+            </div>
+            <div class="col-md-6 mb-4 mb-md-0">
+                <div style="margin-top: 0;">
+                    <img src="{% static 'img/imageninicio.png' %}" alt="Imagen de salud" 
+                    style="width: 80%; height: auto; border-radius: 30px; box-shadow: 0 4px 8px rgba(55,0,0,0.55);">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

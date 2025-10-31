@@ -1,0 +1,454 @@
+/* Declaración de la fuente para dislexia */
+@font-face {
+    font-family: 'OpenDyslexic';
+    src: url('../font/OpenDyslexic-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+main {
+    padding-bottom: 70px; /* Deja espacio para el footer fijo */
+}
+/* Estilos para la barra de navegación */
+.navbar {
+    background-color: linear-gradient(to right, #750761, #9c1c84);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.navbar.dark-mode {
+    background: linear-gradient(to right, #14124a, #362d6f);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+body{
+    background-color: rgb(222, 247, 243); /* Color de fondo para el modo claro */
+    font-family: 'Montserrat', sans-serif; 
+    font-weight: 400; /* Bold */ 
+    font-size: 20px;
+    transition: background-color 0.3s ease; /* Transición suave */
+}
+
+body.dark-mode {
+    background-color: #121212; /* Color de fondo para el modo oscuro */
+}
+/* css de inicio */
+.main{
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+/*animacion contenedores*/
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.div-main{
+    background-color: #93d0e4; /*formulario de registro*/
+    transition: background-color 0.3s ease;
+    padding: 0px;
+    border-radius: 15px;
+    border: 3px solid #091b57;
+    box-shadow: 0 10px 30px rgba(1.0, 0, 0, 1.3),
+                0 0 10px rgba(35, 35, 196, 0.4) inset;
+                font-weight: bold;
+    animation: fadeUp 0.6s ease-out;
+}
+
+.navButton0, .navButton1, .foot-button, .login-btn {
+    padding: 3.5px 15px;/*de boton contactenos y sugerencias*/
+    color: #091b57;/*color letra de botones contactenos y sugerencias*/
+    background-color: #70e9bd; /*color de fondo de botones contactenos*/
+    cursor: pointer;
+    position: relative;
+    z-index: 0;
+    border-radius: 12px;
+    /*simula profundidad y elevación al pasar el cursor, con una sombra más intensa y desplazamiento vertical.*/
+    transition: 0.2s;
+    font-size: large;
+    font-weight: bold;
+    box-shadow: 0 4px 0 #170c8b, 0 6px 15px rgba(0,0,0,0.3);
+    transform: translateY(0);
+    transition: all 0.3s ease;
+}
+
+/*Boton volver - simula profundidad y elevación al pasar el cursor, con una sombra más intensa y desplazamiento vertical.*/
+.btn-main:hover, .navButton0:hover, .navButton1:hover, .foot-button:hover, .login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 oklab(35.411% -0.01025 -0.21496), 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.btn-main:after {
+    content: "";
+    z-index: -1;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding: 8px 8px;
+    transition: 0.3s;
+    left: 0;
+    top: 0;
+    border-radius: 10px;
+    color: black; /* Asegura que el texto siga siendo legible */
+}
+
+/*titulos en negrita*/
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    color: #0c0758;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.custom-highlight-btn {
+    /* Color de fondo: Puedes usar un color que no sea de Bootstrap si quieres más contraste,
+       o deja el color de 'btn-success' */
+    background-color: #22c4a9; /* Azul brillante como ejemplo */
+    border-color: #0066cc; 
+    color: rgb(230, 239, 238); /* Texto blanco para máximo contraste */
+    font-weight: bold;
+    padding: 10px 40px; /* Un padding generoso lo hace ver más profesional */
+    text-transform: uppercase; /* Mayúsculas para más énfasis */
+    
+    /* ¡El efecto clave para resaltar! Una sombra sutil pero visible */
+    box-shadow: 0 6px 10px rgba(10, 0, 0, 0.25); 
+    
+    /* Transición suave para todos los cambios */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Efecto Hover: Resaltar al pasar el ratón */
+.custom-highlight-btn:hover {
+    /* Oscurecer ligeramente el fondo */
+    background-color: #0066cc;
+    border-color: #0050a3;
+    
+    /* Aumentar la sombra para simular que el botón se "levanta" */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35); 
+    
+    /* Moverlo ligeramente hacia arriba para un efecto 3D */
+    transform: translateY(-3px); 
+}
+
+/* Efecto Active: Feedback al hacer clic */
+.custom-highlight-btn:active {
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    transform: translateY(0); /* Lo devuelve a su posición original */
+}
+/* Estilos para el modo oscuro */
+/* Aplica estilos a .div-main SÓLO SI es descendiente de .dark-mode */
+.dark-mode .div-main {
+background-image: linear-gradient(
+    to right,
+    #333 10%,    /* Azul muy oscuro: Sombra (Sustituye a #444) */
+    #1f1d1d 20%,   /* Azul medio-claro: Tono base (Sustituye a #ccc) */
+    #000000 30%,   /* Blanco: Brillo intenso (Mantenemos el blanco para el reflejo más fuerte) */
+    #1f1d1d 40%,   /* Azul medio: Reflejo (Sustituye a #999) */
+    #333 100%   /* Azul muy oscuro: Sombra final (Sustituye a #444) */
+    ); /* Un color oscuro para el fondo del div */
+    color: #efedf8; /* Un color claro para el texto dentro del div */
+    border-color: #555; /* Un color de borde más oscuro */
+    /*mejora el efecto de elevación y profundidad*/
+    box-shadow:
+        0 10px 30px rgba(255, 255, 255, 0.1),
+        0 0 10px rgba(0, 0, 0, 0.6) inset;
+}
+
+/*titulos en negrita*/
+.dark-mode h1, .dark-mode h2, .dark-mode h3, .dark-mode .btn-main {
+    color: #f1f1f1;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.1);
+}
+
+.dark-mode .div-main .btn-main{
+    color:#000
+}
+
+/* fin css inicio*/
+
+.mainHeader{
+    box-shadow: 0 2px 4px black;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1030; /* Asegura que el header esté por encima de otros contenidos */
+}
+.mainNav{
+    background-color: #094e93; /*fondo barra de navegacion plantilla*/
+    display:flex;
+    justify-content: space-between; /* Distribuye espacio entre los elementos */
+    align-items: center;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 70px;    
+}
+
+.navLogo{
+    margin-right: 15px;
+    margin-left: 15px;
+}
+.navImg{
+    height: 50px;
+    width: auto; /* Permite que el ancho se ajuste automáticamente */
+    vertical-align: middle;
+    margin: 20px;
+}
+
+.navMenu{
+    display: flex; /* Activa Flexbox */
+    align-items: center; /* Centra los elementos verticalmente */
+    list-style: none; /* Quita los puntos de la lista */
+    padding: 0;
+    margin: 0;
+}
+.navMenu li a{
+    text-decoration: none; /* Quita el subrayado de los enlaces */
+    padding: 0px 15px; /* Agrega un poco de espacio entre los elementos */
+    color: rgb(0, 0, 0);
+}
+.navMenu li a button{
+    border-top: 100px;
+}
+
+
+.navButton0:hover, .navButton1:hover, .foot-button:hover{
+    background-color: #c6d09a;
+    padding: 12px 22px;
+    font-size: 20px;
+    box-shadow: 5px 5px 5px 0px #151415;
+    transition: 0.3s;
+}
+
+.login-btn{
+    background-color:#8edfd2;
+}
+.login-btn:hover{
+    background-color: #8fcae6;
+}
+
+.link-secundario {
+    color: #f0d5ce !important; /* Color de marca: Usamos el azul primario para contraste */
+    font-weight: bold;/* Fuente: Negrita para que resalte del texto normal */
+    font-size: 0.5rem; /* Opcional: Aumentar ligeramente el tamaño del texto */
+    transition: color 0.2s ease-in-out;/* Animación: Transición suave para el efecto hover */
+}
+
+/* Efecto Hover: Resaltar al pasar el ratón para dar feedback */
+.link-secundario:hover {
+    /* Oscurecer el color ligeramente */
+    color: #229a76 !important; 
+    
+    /* Asegurar que se mantenga el subrayado o que se haga más notorio */
+    text-decoration: underline; 
+}
+
+.seleccionIdioma{
+    position: relative;
+    display: inline-block;
+}
+
+.menuIdioma{
+    display: none; /*lo oculta por defecto*/
+    position: absolute;
+    background-color: aliceblue;
+    min-width: 120px;
+    box-shadow:0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    list-style: none;
+    padding: 0;
+    margin-top: 5px;
+    border-radius: 5px;
+}
+.menuIdioma li a{
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+.menuIdioma li a:hover {background-color: aqua;}
+
+.nav-spacer{
+    flex-grow: 1;
+}
+
+/* --- Estilos para el Footer --- */
+
+.footer-bar {
+    background-color: #0756a4 ;
+    position: fixed;
+    left: 0;
+    bottom: 0; /* Lo posiciona en la parte inferior */
+    width: 100%;
+    box-shadow: 0 -2px 4px rgba(0.840, 0, 0, 0.842); /* Sombra hacia arriba */
+    z-index: 1000;
+    height: 80px;
+    padding-top: 20px;
+}
+.footer-nav {
+
+    /* Centrar el contenido del footer (botones y texto) */
+    display: flex;
+    flex-direction: column; /* apilar menú y texto uno encima del otro */
+    align-items: center;     /* centrar horizontalmente */
+    justify-content: center; /* centrar verticalmente dentro del footer */
+
+}
+
+.footer-menu {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 20px; /* Espacio entre los botones */
+    justify-content: center; /* Asegura que el grupo de botones de CONTACTENOS y buzon de sugerencias esté centrado */
+}
+
+.foot-button{
+    background-color: /*#8fd38e*/#22c4a9;
+    margin-bottom: 10px;
+    display: inline-block; /* asegura comportamiento de centrado consistente de CONTACTENOS y buzon de sugerencias */
+}
+.foot-button:hover{  /*boton contactanos*/
+    background-color: #80dfbf;
+    box-shadow: 5px 5px 5px 0px  #0d2841;
+}
+.access-button, .dark-mode-btn{
+    transition: transform 0.3s ease;
+}
+.access-button:hover, .dark-mode-btn:hover{
+    cursor: pointer;
+    transform: scale(1.05);
+    transition: 0.3s;
+}
+
+.access-button:hover{
+    box-shadow: 5px 5px 5px 0px  #dce2c3;
+}
+
+.dark-mode-btn:hover{
+    box-shadow: 5px 5px 5px 0px  #00000021;
+}
+/* --- Estilos para el Modal de Accesibilidad --- */
+
+.accessibility-container {
+    position: relative; /* Contenedor para el posicionamiento absoluto del modal */
+}
+
+/* --- Estilos para la Barra Lateral de Accesibilidad --- */
+.sidebar {
+    height: 100%; /* Altura completa */
+    width: 0; /* Ancho inicial 0, se controla con JS */
+    position: fixed;
+    z-index: 2000; /* Por encima de todo */
+    top: 0;
+    right: 0; /* Se posiciona a la derecha */
+    background-color:#aac8ed; /* Color de fondo de la barra */
+    overflow-x: hidden; /* Deshabilita el scroll horizontal */
+    transition: 0.5s; /* Animación de transición */
+    padding-top: 60px; /* Espacio para el botón de cerrar */
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+}
+
+.sidebar h2 {
+    padding: 8px 8px 8px 32px;
+    color: #333;
+    text-align: left;
+}
+
+.sidebar-button {
+    padding: 10px 15px;
+    margin: 5px 25px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #363535;
+    background-color: #e0e0e0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: block;
+    width: calc(100% - 50px); /* Ancho completo menos los márgenes */
+    text-align: left;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.sidebar-button:hover {
+    background-color: #d0d0d0;
+    color: black;
+}
+
+.close-sidebar-button {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    font-size: 36px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color:#8512e2;
+}
+
+.img-button{
+    padding:0px 10px;
+}
+
+
+/* --- Estilos para Accesibilidad --- */
+
+/* Clase para el modo de alto contraste */
+ /* Estilos para el modo de alto contraste */
+body.high-contrast {
+    background-color: #000 !important;
+    color: #fff !important;
+}
+
+body.high-contrast header.mainHeader,
+body.high-contrast .mainNav,
+body.high-contrast footer,
+body.high-contrast .footer-bar,
+body.high-contrast main,
+body.high-contrast .sidebar {
+    background-image: none !important;
+    background-color: #000 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+body.high-contrast .navButton1,
+body.high-contrast .navButton0,
+body.high-contrast .foot-button,
+body.high-contrast .sidebar-button {
+    background-image: none !important;
+    background-color: #222 !important;
+    color: #fff !important;
+    border: 1px solid #fff !important;
+}
+
+body.high-contrast a,
+body.high-contrast button,
+body.high-contrast button:visited,
+body.high-contrast a:visited {
+    color: #ffff00 !important; /* Amarillo para mejor visibilidad de enlaces */
+}
+
+body.high-contrast .div-main{
+    background-image: none;
+    background-color: rgb(248, 172, 32);
+}
+
+body.high-contrast h1{
+    color: red;
+}
+
+/* Aplicación de la fuente para dislexia */
+body.dyslexia-font {
+    font-family: 'OpenDyslexic', sans-serif !important;
+    font-size: 20px;
+}
