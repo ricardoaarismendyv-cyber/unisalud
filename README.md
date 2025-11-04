@@ -54,6 +54,7 @@ def inicio_unisalud(request):
             return redirect('inicio_admin')
     return render(request, 'paginas/inicio_unisalud.html')
     
-    path('', views.inicio_unisalud, name='inicio_unisalud'),-->
+    path('', views.inicio_unisalud, name='inicio_unisalud'),
+    url unisalud     path('', usuario_views.inicio_unisalud, name='inicio_unisalud'),  -->
 Es de anotar que esta se retira,se elimina porque al ingresar el PACIENTE o el PROF-SALUD o el ADMINISTRADOR, debe aparecer el login--> alli deberá estar el registro de los roles
 ________________________________________________________________________
