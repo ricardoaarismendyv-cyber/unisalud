@@ -1,12 +1,25 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import logout
 
 # Create your views here.
 
+def login_prof_salud(request):
+    # Si ya está autenticado, redirige a la página de inicio del profesional
+    if request.user.is_authenticated:
+        return redirect('inicio_prof_salud')  # nombre de ruta corregido
+
+    # Lista mínima de roles para la plantilla (reemplazar por consulta a BD si existe modelo Role)
+    roles = [
+        {'id': 'prof_salud', 'nombre': 'Profesional Salud'},
+        {'id': 'usuario', 'nombre': 'Usuario'},
+        {'id': 'administrativo', 'nombre': 'Administrativo'},
+    ]
+
+    # Renderiza la página de login pasando los roles
+    return render(request, 'paginas/login_prof_salud.html', {'roles': roles})
+
 def inicio_prof_salud(request):
     return render(request, 'paginas/inicio_prof_salud.html') #Vista de inicio para el profesional de salud
-
-def login_prof_salud(request):
-    return render(request, 'paginas/login_prof_salud.html' ) #Vista para el formulario de inicio de sesión
 
 def logout_prof_salud(request):
     logout(request)
