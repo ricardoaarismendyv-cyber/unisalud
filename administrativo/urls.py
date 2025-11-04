@@ -3,9 +3,9 @@ from . import views
 
 
 urlpatterns = [
+    path('', views.login_admin, name='login_admin'),
     path('', views.inicio_unisalud, name='inicio_unisalud'),
     path('inicio_admin/', views.inicio_admin, name='inicio_admin'),
-    path('login_admin/', views.login_admin, name='login_admin'),
     path('historia_clinica/', views.hc_admin, name='hc_admin'),
     path('ordenes_medicas/', views.om_admin, name='om_admin'),
     path('ordenes_medicamentos/', views.omed_admin, name='omed_admin'),
