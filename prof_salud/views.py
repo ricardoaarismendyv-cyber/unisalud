@@ -1,15 +1,6 @@
 from django.shortcuts import render, redirect
 
 # Create your views here.
-def inicio_unisalud(request):
-    if request.user.is_authenticated:
-        if request.user.is_paciente:
-            return redirect('inicio_paciente')
-        elif request.user.is_profesional:
-            return redirect('inicio_profesionalS')
-        elif request.user.is_admin:
-            return redirect('inicio_admin')
-    return render(request, 'paginas/inicio_unisalud.html')
 
 def inicio_prof_salud(request):
     return render(request, 'paginas/inicio_prof_salud.html') #Vista de inicio para el profesional de salud
