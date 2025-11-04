@@ -19,6 +19,9 @@
                                 <label for="roleSelect" class="form-label">Seleccione su rol actual:</label>
                                 <select class="form-select" id="roleSelect" onchange="handleRoleChange(this.value)">
                                     <option value="" selected disabled>Seleccione un rol</option>
+                                    <option value="ps">Profesional Salud</option>
+                                    <option value="us">Usuario</option>
+                                    <option value="ad">Administrativo</option>
                                     {% for rol in roles %}
                                         <option value="{{ rol.id }}">{{ rol.nombre }}</option>
                                     {% endfor %}
