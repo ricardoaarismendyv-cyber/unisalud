@@ -16,10 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-# Importa la vista de inicio. Ajusta 'main' al nombre real de tu aplicación.
-from usuario import views as usuario_views
+from django.views.generic import RedirectView
 
 urlpatterns = [
+    path('', RedirectView.as_view(url='', permanent=False)),
     path('admin/', admin.site.urls),
     path('paciente/', include('usuario.urls')),
     path('profesionalS/', include('prof_salud.urls')),
