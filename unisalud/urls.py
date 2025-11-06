@@ -17,14 +17,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import RedirectView
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('', RedirectView.as_view(url='', permanent=False)),
+    # raíz redirige a la app de paciente (evita url='' que genera bucle/410)
+    path('', RedirectView.as_view(url='/paciente/', permanent=False)),
     path('admin/', admin.site.urls),
     path('paciente/', include('usuario.urls')),
     path('profesionalS/', include('prof_salud.urls')),
     path('administrativo/', include('administrativo.urls')),
+    # usar LoginView directo o descomentar la línea con include si prefieres todas las rutas de auth
+    path('login/', auth_views.LoginView.as_view(), name='login'),  # alternativa: path('accounts/', include('django.contrib.auth.urls')),
 ]
+
 
 
 
