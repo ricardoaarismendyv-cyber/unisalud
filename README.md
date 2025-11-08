@@ -58,3 +58,26 @@ def inicio_unisalud(request):
     url unisalud     path('', usuario_views.inicio_unisalud, name='inicio_unisalud'),  -->
 Es de anotar que esta se retira,se elimina porque al ingresar el PACIENTE o el PROF-SALUD o el ADMINISTRADOR, debe aparecer el login--> alli deberá estar el registro de los roles
 ________________________________________________________________________
+8 de NOVIEMBRE DEL 2025
+CONEXION BD Unisalud
+Se inicia con la conexión de la BD  de unisalud, siguiendo las instrucciones dadas en clase:
+1. pip install pymysql
+2. pip install cryptography :para seguridad en cifrado
+3. settings: Databases:
+'default': {
+    	'ENGINE': 'django.db.backends.mysql',
+    	'NAME': '',  # Nombre de la BD
+    	'USER': 'root',  # Usuario de MySQL
+    	'PASSWORD': 'tu_contraseña',  # Cambia por tu contraseña
+    	'HOST': 'localhost',  # Servidor de BD
+   	    'PORT': '3306',  # Puerto de MySQL (por defecto)
+    }
+4. en _init_py : import pymysql
+                pymysql.install_as_mysqldb()
+5. python manage.py runserver
+6. sale "18 cosas" --> python manage.py migrate --> en BD de mySQL salen las "18 cosas"
+7. python manage.py runserver
+8. Para verificar conexión: python manage.py check --database default
+AGREGAR TABLAS A MODELS
+En la terminal: python manage.py inspectdb xxxx xxxx xxxx xxxx>.\aplication\models.py
+

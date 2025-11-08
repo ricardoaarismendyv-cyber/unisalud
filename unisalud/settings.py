@@ -86,6 +86,17 @@ DATABASES = {
     }
 }
 
+DATABASES = {
+'default': {
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': 'unisaludBD',  # Nombre de la BD
+    'USER': 'admin',  # Usuario de MySQL
+    'PASSWORD': 'unisaludBD*',  # Cambia por tu contraseña
+    'HOST': 'localhost',  # Servidor de BD
+    'PORT': '3306',  # Puerto de MySQL (por defecto)
+    }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
