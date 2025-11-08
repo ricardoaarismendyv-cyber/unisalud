@@ -9,11 +9,29 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="border border-dark rounded p-4 my-5 div-main">
-                <a class="btn btn-main btn-nav" href='{% url "inicio_unisalud" %}'>Volver</a>
                     <!-- Contenedor del formulario de login -->
                     <div id="loginFormContainer">
                         <h1 class="text-center">Inicio de sesión</h1>
                         <section class="mt-4">
+                            <!--OJOOOO Selector de roles -->
+                            <div class="role-selector mb-4">
+                                <label for="roleSelect" class="form-label">Seleccione su rol actual:</label>
+                                <select class="form-select" id="roleSelect" onchange="handleRoleChange(this.value)">
+                                    <option value="" selected disabled>Seleccione un rol</option>
+                                    <option value="ps">Profesional Salud</option>
+                                    <option value="us">Usuario</option>
+                                    <option value="ad">Administrativo</option>
+                                    {% for rol in roles %}
+                                        <option value="{{ rol.id }}">{{ rol.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Mostrar rol actual -->
+                            <div id="currentRole" class="alert alert-info mb-4" style="display: none;">
+                                Rol actual: <span id="roleName"></span>
+                            </div>
+                            <!--FIN SELECTOR ROLES-->
                             <!-- Fila para el tipo de documento -->
                             <div class="row mb-3">
                                 <label for="selectTipoDocumento" class="col-md-4 col-form-label text-md-end">Tipo de documento</label>

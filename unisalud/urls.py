@@ -16,16 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-# Importa la vista de inicio. Ajusta 'main' al nombre real de tu aplicación.
-from usuario import views as usuario_views
+from django.views.generic import RedirectView
+#from django.contrib.auth import views as auth_views
+from prof_salud import views
 
 urlpatterns = [
+    # raíz redirige a la app de paciente (evita url='' que genera bucle/410)
+    #path('', RedirectView.as_view(url='/paciente/', permanent=False)),
     path('admin/', admin.site.urls),
-    path('', usuario_views.inicio_unisalud, name='inicio_unisalud'),  
+    path('', views.login_prof_salud, name='login_prof_salud'),
     path('paciente/', include('usuario.urls')),
     path('profesionalS/', include('prof_salud.urls')),
     path('administrativo/', include('administrativo.urls')),
+    # usar LoginView directo o descomentar la línea con include si prefieres todas las rutas de auth
+    #path('login/', auth_views.LoginView.as_view(), name='login'),  # alternativa: path('accounts/', include('django.contrib.auth.urls')),
 ]
+
 
 
 

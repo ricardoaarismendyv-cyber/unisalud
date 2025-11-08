@@ -22,7 +22,7 @@ main {
 }
 
 body{
-    background-color: rgb(222, 247, 243); /* Color de fondo para el modo claro */
+    background: linear-gradient(to bottom, rgb(134,231,236), #f8f9fa); /*Color de fondo para el modo claro */
     font-family: 'Montserrat', sans-serif; 
     font-weight: 400; /* Bold */ 
     font-size: 20px;

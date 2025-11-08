@@ -11,7 +11,7 @@
 {# En esta página, reemplazamos el botón de login por el de logout #}
 <li>
     {# Enlace funcional a la vista 'logout' (ajustar nombre en urls.py si es distinto) #}
-    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url 'inicio_unisalud' %}'">
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url 'inicio_admin' %}'">
         <img class="img-button" src="{% static 'img/log-in.svg' %}" alt="Icono login"> Cerrar Sesión</button>
 </li>
 {% endblock auth_button %}

@@ -5,9 +5,8 @@ from . import views
 
 
 urlpatterns = [ 
-    path('', views.inicio_unisalud, name='inicio_unisalud'),
+    path('', views.login_prof_salud, name='login_prof_salud'),
     path('inicio_prof_salud/', views.inicio_prof_salud, name='inicio_prof_salud'),
-    path('login_prof_salud/', views.login_prof_salud, name='login_prof_salud'),
     path('logout_prof_salud/', views.logout_prof_salud, name='logout_prof_salud'),
     path('paciente/logout_prof_salud/historia_clinica/', views.hc_prof_salud, name='hc_prof_salud'),
     path('historia_clinica/', views.hc_prof_salud, name='hc_prof_salud'),

@@ -9,14 +9,14 @@
 
             {% block inicio_btn %}
             <li>
-                <a class="navButton0" href="{% url 'inicio_unisalud' %}">Inicio</a></li>
+                <a class="navButton0" href="{% url 'inicio_admin' %}">Inicio</a></li>
             {% endblock inicio_btn %}
             
 {% block auth_button %}
 {# En esta página, reemplazamos el botón de login por el de logout #}
 <li>
     {# Enlace funcional a la vista 'logout' (ajustar nombre si es distinto) #}
-    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url 'inicio_unisalud' %}'">
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url 'inicio_admin' %}'">
         <img class="img-button" src="{% static 'img/log-in.svg' %}" alt="Icono login"> Cerrar Sesión</button>
 </li>
 {% endblock auth_button %}
