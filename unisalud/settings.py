@@ -92,7 +92,7 @@ DATABASES = {
     'NAME': 'unisaludBD',  # Nombre de la BD
     'USER': 'admin',  # Usuario de MySQL
     'PASSWORD': 'unisaludBD*',  # Cambia por tu contraseña
-    'HOST': 'localhost',  # Servidor de BD
+    'HOST': '127.0.0.1',  # Servidor de BD
     'PORT': '3306',  # Puerto de MySQL (por defecto)
     }
 }
