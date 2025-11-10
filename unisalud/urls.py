@@ -24,8 +24,9 @@ urlpatterns = [
     # raíz redirige a la app de paciente (evita url='' que genera bucle/410)
     #path('', RedirectView.as_view(url='/paciente/', permanent=False)),
     path('admin/', admin.site.urls),
-    path('', views.login_prof_salud, name='login_prof_salud'),
-    path('paciente/', include('usuario.urls')),
+    path('', include('inicio.urls')),
+    path('a/', views.login_prof_salud, name='login_prof_salud'),
+    path('usuario/', include('usuario.urls')),
     path('profesionalS/', include('prof_salud.urls')),
     path('administrativo/', include('administrativo.urls')),
     # usar LoginView directo o descomentar la línea con include si prefieres todas las rutas de auth

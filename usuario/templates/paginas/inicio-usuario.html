@@ -6,7 +6,7 @@
 {# En esta página, reemplazamos el botón de login por el de logout #}
 <li>
     {# Asumimos que tienes una URL llamada 'logout' para cerrar la sesión #}
-    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "login-us" %}'">
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio" %}'">
         <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
     </button>
 </li>
@@ -19,6 +19,17 @@
         <div class="row p-4">
             <!-- Columna para el contenido principal -->
             <div class="col-md-8 mt-4" style="padding: 60px 20px;">
+                <div class="mb-3">
+                    <label for="" class="form-label">Roles a elegir</label>
+                    <select
+                        class="form-select form-select-lg"
+                        id="roleSelector"
+                    >
+                        <option value="{% url 'inicio-usuario' %}" selected>Usuario</option>
+                        <option value="{% url 'inicio_prof_salud' %}">Profesional de salud</option>
+                        <option value="{% url 'inicio_admin' %}">Administrativo</option>
+                    </select>
+                </div>
                 <h1>Bienvenido! Paciente [Nombre del paciente]</h1>
                 <div class="container border border-dark rounded p-4 my-5 div-main">
                     <h1>Historia clínica</h1>
@@ -51,3 +62,17 @@
 </section>
 
 {% endblock content %}
+
+{% block script %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelector = document.getElementById('roleSelector');
+    if (roleSelector) {
+        roleSelector.addEventListener('change', function() {
+            window.location.href = this.value;
+        });
+    }
+});
+</script>
+{% endblock script %}

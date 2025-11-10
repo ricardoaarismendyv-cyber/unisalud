@@ -19,6 +19,17 @@
         <div class="row p-4">
             <!-- Columna para el contenido principal -->
             <div class="col-md-8" style="padding: 60px 20px;">
+                <div class="mb-3">
+                    <label for="" class="form-label">Roles a elegir</label>
+                    <select
+                        class="form-select form-select-lg"
+                        id="roleSelector"
+                    >
+                        <option value="{% url 'inicio_admin' %}" selected>Administrativo</option>
+                        <option value="{% url 'inicio-usuario' %}">Usuario</option>
+                        <option value="{% url 'inicio_prof_salud' %}">Profesional de salud</option>
+                    </select>
+                </div>
                 <h1>Bienvenido! Administrativo [Nombre del profesional]</h1>
                 <div class="container border border-dark rounded p-4 my-5 div-main">    
                     <h1>Gestión de usuarios</h1>
@@ -56,3 +67,17 @@
 </section>
 
 {% endblock content %}
+
+{% block script %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelector = document.getElementById('roleSelector');
+    if (roleSelector) {
+        roleSelector.addEventListener('change', function() {
+            window.location.href = this.value;
+        });
+    }
+});
+</script>
+{% endblock script %}
