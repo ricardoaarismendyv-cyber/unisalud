@@ -79,5 +79,5 @@ Se inicia con la conexión de la BD  de unisalud, siguiendo las instrucciones da
 7. python manage.py runserver
 8. Para verificar conexión: python manage.py check --database default
 AGREGAR TABLAS A MODELS
-En la terminal: python manage.py inspectdb xxxx xxxx xxxx xxxx>.\aplication\models.py
+En la terminal: python manage.py inspectdb xxxx xxxx xxxx xxxxOJO DEJAR ESPACIO ANTES>.\aplication\models.py
 
