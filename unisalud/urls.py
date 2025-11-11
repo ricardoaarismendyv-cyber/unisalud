@@ -25,7 +25,6 @@ urlpatterns = [
     #path('', RedirectView.as_view(url='/paciente/', permanent=False)),
     path('admin/', admin.site.urls),
     path('', include('inicio.urls')),
-    path('a/', views.login_prof_salud, name='login_prof_salud'),
     path('usuario/', include('usuario.urls')),
     path('profesionalS/', include('prof_salud.urls')),
     path('administrativo/', include('administrativo.urls')),
