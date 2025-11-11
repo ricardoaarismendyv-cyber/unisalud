@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'usuario',
     'prof_salud',
     'administrativo',
+    'inicio',
 ]
 
 MIDDLEWARE = [

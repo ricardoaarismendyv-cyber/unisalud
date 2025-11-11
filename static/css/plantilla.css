@@ -30,7 +30,7 @@ body{
 }
 
 body.dark-mode {
-    background-color: #121212; /* Color de fondo para el modo oscuro */
+    background: #121212; /* Color de fondo para el modo oscuro */
 }
 /* css de inicio */
 .main{
