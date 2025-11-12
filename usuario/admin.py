@@ -1,8 +1,5 @@
 from django.contrib import admin
-<<<<<<< Updated upstream
 
-# Register your models here.
-=======
 from .models import (
     afiliacion,
     antecedentespaciente,
@@ -50,4 +47,3 @@ models_to_register = [
 
 for model in models_to_register:
     admin.site.register(model)
->>>>>>> Stashed changes

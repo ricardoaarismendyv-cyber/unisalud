@@ -1,9 +1,5 @@
 from django.db import models
 
-<<<<<<< Updated upstream
-# Create your models here.
-=======
-
 class tipoidentificacion(models.Model):
     id_tipo_identificacion = models.AutoField(primary_key=True, db_comment='ID autoincremental')
     identificacion = models.CharField(unique=True, max_length=50, db_comment='Tipo de identificacion: cedula, tarjeta, etc')
@@ -577,4 +573,4 @@ class incapacidad(models.Model):
 
     def __str__(self):
         return f'Incapacidad para {self.id_paciente} del {self.fecha_inicio} al {self.fecha_fin}'
->>>>>>> Stashed changes
+
