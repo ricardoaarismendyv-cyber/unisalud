@@ -21,6 +21,10 @@ class Genero(models.Model):
     id_genero = models.AutoField(primary_key=True, db_comment='ID autoincremental')
     nombre_genero = models.CharField(unique=True, max_length=20, db_comment='Ej: Masculino, Femenino, No Binario, etc')
 
+    
+    def __str__(self):
+        return self.nombre_genero
+    
     class Meta:
         managed = False
         db_table = 'GENERO'
@@ -30,6 +34,10 @@ class GrupoRh(models.Model):
     id_rh = models.AutoField(primary_key=True, db_comment='ID autoincremental')
     tipo_rh = models.CharField(unique=True, max_length=3, db_comment='Ej: A+, B-, etc')
 
+    
+    def __str__(self):
+        return self.tipo_rh
+    
     class Meta:
         managed = False
         db_table = 'GRUPO_RH'
@@ -43,6 +51,9 @@ class EstadoCivil(models.Model):
         managed = False
         db_table = 'ESTADO_CIVIL'
 
+    def __str__(self):
+        return self.nombre_estado
+
 
 class EstratoSocioeconomico(models.Model):
     id_estrato = models.IntegerField(primary_key=True, db_comment='ID del 1 al 6')
@@ -51,6 +62,9 @@ class EstratoSocioeconomico(models.Model):
     class Meta:
         managed = False
         db_table = 'ESTRATO_SOCIOECONOMICO'
+
+    def __str__(self):
+        return f'Estrato {self.id_estrato}'
 
 
 class RegionSalud(models.Model):
@@ -61,6 +75,9 @@ class RegionSalud(models.Model):
     class Meta:
         managed = False
         db_table = 'REGION_SALUD'
+
+    def __str__(self):
+        return self.nombre_region
 
 
 class Departamento(models.Model):
@@ -73,6 +90,9 @@ class Departamento(models.Model):
         managed = False
         db_table = 'DEPARTAMENTO'
 
+    def __str__(self):
+        return self.nombre_departamento
+
 
 class Ciudad(models.Model):
     id_ciudad = models.AutoField(primary_key=True, db_comment='ID autoincremental')
@@ -83,6 +103,9 @@ class Ciudad(models.Model):
     class Meta:
         managed = False
         db_table = 'CIUDAD'
+
+    def __str__(self):
+        return self.nombre_ciudad
 
 
 class RedesSalud(models.Model):
@@ -96,6 +119,9 @@ class RedesSalud(models.Model):
         managed = False
         db_table = 'REDES_SALUD'
 
+    def __str__(self):
+        return self.nombre_red
+
 
 class NivelesAtencion(models.Model):
     id_nivel = models.IntegerField(primary_key=True, db_comment='ID del nivel (1 a 3)')
@@ -105,6 +131,9 @@ class NivelesAtencion(models.Model):
     class Meta:
         managed = False
         db_table = 'NIVELES_ATENCION'
+
+    def __str__(self):
+        return self.nombre_nivel
 
 
 class CentrosMedicos(models.Model):
@@ -128,6 +157,9 @@ class CentrosMedicos(models.Model):
         managed = False
         db_table = 'CENTROS_MEDICOS'
 
+    def __str__(self):
+        return self.nombre_centro
+
 
 class Eps(models.Model):
     id_eps = models.AutoField(primary_key=True, db_comment='ID autoincremental')
@@ -142,6 +174,9 @@ class Eps(models.Model):
         managed = False
         db_table = 'EPS'
 
+    def __str__(self):
+        return self.nombre_eps
+
 
 class TiposAfiliacion(models.Model):
     id_tipo_afiliacion = models.AutoField(primary_key=True, db_comment='ID autoincremental')
@@ -150,6 +185,9 @@ class TiposAfiliacion(models.Model):
     class Meta:
         managed = False
         db_table = 'TIPOS_AFILIACION'
+
+    def __str__(self):
+        return self.nombre_tipo
 
 
 class Especialidades(models.Model):
@@ -161,6 +199,9 @@ class Especialidades(models.Model):
     class Meta:
         managed = False
         db_table = 'ESPECIALIDADES'
+
+    def __str__(self):
+        return self.nombre_especialidad
 
 
 class Medicamentos(models.Model):
@@ -180,6 +221,9 @@ class Medicamentos(models.Model):
         managed = False
         db_table = 'MEDICAMENTOS'
 
+    def __str__(self):
+        return self.nombre_comercial
+
 
 class Servicios(models.Model):
     id_servicio = models.AutoField(primary_key=True, db_comment='ID autoincremental del servicio')
@@ -194,6 +238,9 @@ class Servicios(models.Model):
         managed = False
         db_table = 'SERVICIOS'
 
+    def __str__(self):
+        return self.nombre_servicio
+
 
 class Enfermedades(models.Model):
     id_enfermedad = models.AutoField(primary_key=True, db_comment='ID autoincremental')
@@ -206,6 +253,9 @@ class Enfermedades(models.Model):
         managed = False
         db_table = 'ENFERMEDADES'
 
+    def __str__(self):
+        return self.nombre_enfermedad
+
 
 class EstadoOrden(models.Model):
     id_estado_orden = models.AutoField(primary_key=True, db_comment='ID autoincremental')
@@ -215,6 +265,9 @@ class EstadoOrden(models.Model):
         managed = False
         db_table = 'ESTADO_ORDEN'
 
+    def __str__(self):
+        return self.nombre_estado_orden
+
 
 class TipoOrden(models.Model):
     id_tipo = models.AutoField(primary_key=True, db_comment='ID autoincremental')
@@ -223,6 +276,9 @@ class TipoOrden(models.Model):
     class Meta:
         managed = False
         db_table = 'TIPO_ORDEN'
+
+    def __str__(self):
+        return self.nombre_tipo
 
 
 class Roles(models.Model):
@@ -253,6 +309,9 @@ class Usuarios(models.Model):
         managed = False
         db_table = 'USUARIOS'
 
+    def __str__(self):
+        return self.nombre_usuario
+
 
 class Pacientes(models.Model):
     id_paciente = models.AutoField(primary_key=True, db_comment='ID autoincremental')
@@ -278,6 +337,9 @@ class Pacientes(models.Model):
         managed = False
         db_table = 'PACIENTES'
         unique_together = (('id_tipo_identificacion', 'numero_documento'),)
+
+    def __str__(self):
+        return f'{self.nombre1} {self.apellido1}'
 
 
 class ProfesionalSalud(models.Model):
@@ -324,6 +386,9 @@ class Afiliacion(models.Model):
         managed = False
         db_table = 'AFILIACION'
 
+    def __str__(self):
+        return f'Afiliación de {self.id_paciente} a {self.id_eps}'
+
 
 class DetalleMedicamento(models.Model):
     id_detalle = models.AutoField(primary_key=True, db_comment='ID autoincremental')
@@ -339,6 +404,9 @@ class DetalleMedicamento(models.Model):
         managed = False
         db_table = 'DETALLE_MEDICAMENTO'
         unique_together = (('id_medicamento', 'lote'),)
+
+    def __str__(self):
+        return f'{self.id_medicamento} - Lote: {self.lote}'
 
 
 class Consulta(models.Model):
@@ -421,6 +489,9 @@ class DiagnosticoPaciente(models.Model):
         managed = False
         db_table = 'DIAGNOSTICO_PACIENTE'
 
+    def __str__(self):
+        return f'Diagnóstico para consulta {self.id_consulta}: {self.id_enfermedad}'
+
 
 class Turnos(models.Model):
     id_turno = models.AutoField(primary_key=True, db_comment='ID autoincremental')
@@ -439,6 +510,9 @@ class Turnos(models.Model):
         db_table = 'TURNOS'
         unique_together = (('fecha_hora_turno', 'id_profesional'),)
 
+    def __str__(self):
+        return f'Turno para {self.id_paciente} el {self.fecha_hora_turno}'
+
 
 class AntecedentesPaciente(models.Model):
     id_antecedente = models.AutoField(primary_key=True, db_comment='ID autoincremental')
@@ -452,6 +526,9 @@ class AntecedentesPaciente(models.Model):
     class Meta:
         managed = False
         db_table = 'ANTECEDENTES_PACIENTE'
+
+    def __str__(self):
+        return f'Antecedente de {self.id_paciente}: {self.tipo_antecedente}'
 
 
 class ResultadosLaboratorio(models.Model):
@@ -472,6 +549,9 @@ class ResultadosLaboratorio(models.Model):
         managed = False
         db_table = 'RESULTADOS_LABORATORIO'
 
+    def __str__(self):
+        return f'Resultado de {self.tipo_examen} para {self.id_paciente}'
+
 
 class Incapacidad(models.Model):
     id_incapacidad = models.AutoField(primary_key=True, db_comment='ID autoincremental')
@@ -491,3 +571,6 @@ class Incapacidad(models.Model):
     class Meta:
         managed = False
         db_table = 'INCAPACIDAD'
+
+    def __str__(self):
+        return f'Incapacidad para {self.id_paciente} del {self.fecha_inicio} al {self.fecha_fin}'
