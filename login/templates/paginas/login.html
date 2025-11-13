@@ -1,0 +1,112 @@
+{% extends "plantilla.html" %}
+{% load static %}
+{% block title %}Iniciar Sesión{% endblock title %}
+
+{% block content %}
+
+<section class="main" style="padding-top:30px">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="pt-3 text-center">
+                    <h1>Bienvenido a Unisalud!</h1>
+                    <p>Para ingresar al sistema por favor inicie sesión aquí</p>
+                </div>
+                <div class="border border-dark rounded p-4 my-5 div-main">
+                    <!-- Contenedor del formulario de login -->
+                    <div id="loginFormContainer">
+                        <h1 class="text-center">Inicio de sesión</h1>
+                        <section class="mt-4">
+                            <!-- Fila para el tipo de documento -->
+                            <div class="row mb-3">
+                                <label for="selectTipoDocumento" class="col-md-4 col-form-label text-md-end">Tipo de documento</label>
+                                <div class="col-md-8">
+                                    <select class="form-select">
+                                        <option selected disabled>Selecciona una opción</option>
+                                        <option value="rc">Registro civil de nacimiento</option>
+                                        <option value="ti">Tarjeta de Identidad</option>
+                                        <option value="cc">Cédula de Ciudadanía</option>
+                                        <option value="ce">Cédula de Extranjería</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Fila para el número de documento -->
+                            <div class="row mb-3">
+                                <label for="inputNumeroDocumento" class="col-md-4 col-form-label text-md-end">Número de documento</label>
+                                <div class="col-md-8">
+                                    <input class="form-control" placeholder="Ingresa aquí tu número de documento">
+                                    <div class="form-text">Sin puntos ni comas, solo números</div>
+                                </div>
+                            </div>
+                            <!-- Fila para la contraseña -->
+                            <div class="row mb-3">
+                                <label for="inputPassword" class="col-md-4 col-form-label text-md-end">Contraseña</label>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="password" placeholder="Ingrese aquí su contraseña" required>
+                                        <button class="btn btn-primary" type="button" id="togglePasswordBtn">Ver</button>
+                                    </div>
+                                    <div class="form-text">Debe tener entre 8-20 caracteres.</div>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <a href="#" id="forgotPasswordLink" class="btn btn-sm btn-primary me-2" role="button">Olvidé mi contraseña</a>
+                                </div>
+                            </div>
+                        </section>
+                        <div class="text-center mt-4">
+                            <button type="button" class="btn btn-lg btn-success custom-highlight-btn" onclick="window.location.href='{% url "inicio-usuario" %}'">Iniciar Sesión</button>
+                        </div>
+                        <div class="opciones-secundarias text-center mt-3">
+                            <hr>
+                            <p>¿No tiene una cuenta?
+                                <a href="{% url 'registrarse' %}" class="btn btn-sm btn-primary" role="button">Registrese aquí</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Pantalla de confirmación de contraseña olvidada (oculta por defecto) -->
+                    <div id="passwordResetConfirmation" style="display: none; text-align: center;">
+                        <h2 class="mt-4">Revisa tu correo</h2>
+                        <p style="color:#000">Hemos enviado una contraseña temporal a la dirección de correo electrónico asociada a su cuenta.</p>
+                        <button type="button" class="btn btn-main mt-3" id="backToLoginBtn">Volver al inicio de sesión</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
+
+{% block script %}
+<script>
+// Espera a que el documento esté completamente cargado
+    document.addEventListener('DOMContentLoaded', function() {
+        const passwordInput = document.getElementById('password');
+        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        const backToLoginBtn = document.getElementById('backToLoginBtn');
+        const loginFormContainer = document.getElementById('loginFormContainer');
+        const passwordResetConfirmation = document.getElementById('passwordResetConfirmation');
+
+        togglePasswordBtn.addEventListener('click', function() {
+            // Cambia el tipo del input de password a text y viceversa
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            // Cambia el texto del botón
+            this.textContent = type === 'password' ? 'Ver' : 'Ocultar';
+        });
+
+        forgotPasswordLink.addEventListener('click', function(event) {
+            event.preventDefault(); // Evita que el enlace navegue
+            loginFormContainer.style.display = 'none';
+            passwordResetConfirmation.style.display = 'block';
+        });
+
+        backToLoginBtn.addEventListener('click', function() {
+            passwordResetConfirmation.style.display = 'none';
+            loginFormContainer.style.display = 'block';
+        });
+    });
+</script>
+{% endblock script %}

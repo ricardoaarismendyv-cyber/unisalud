@@ -24,7 +24,7 @@ urlpatterns = [
     # raíz redirige a la app de paciente (evita url='' que genera bucle/410)
     #path('', RedirectView.as_view(url='/paciente/', permanent=False)),
     path('admin/', admin.site.urls),
-    path('', include('inicio.urls')),
+    path('', include('login.urls')),
     path('usuario/', include('usuario.urls')),
     path('profesionalS/', include('prof_salud.urls')),
     path('administrativo/', include('administrativo.urls')),
