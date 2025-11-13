@@ -47,3 +47,4 @@ models_to_register = [
 
 for model in models_to_register:
     admin.site.register(model)
+

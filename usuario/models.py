@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class tipoidentificacion(models.Model):
     id_tipo_identificacion = models.AutoField(primary_key=True, db_comment='ID autoincremental')
     identificacion = models.CharField(unique=True, max_length=50, db_comment='Tipo de identificacion: cedula, tarjeta, etc')
