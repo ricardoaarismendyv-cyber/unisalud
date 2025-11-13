@@ -14,23 +14,24 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Cargar variables de entorno desde .env
-load_dotenv()
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Cargar .env asegurando UTF-8 y forzar codificación cliente Postgres antes de conectar
+load_dotenv(dotenv_path=BASE_DIR / '.env', encoding='utf-8')
+os.environ.setdefault('PGCLIENTENCODING', 'UTF8')
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', '')
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-!l-yc9h$9on^#lc(v6&e7^divqoj%$-o7h4e$-pc^b$ovcq@#7')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', '') == ''
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -45,7 +46,7 @@ INSTALLED_APPS = [
     'usuario',
     'prof_salud',
     'administrativo',
-    'inicio',
+    'login',
 ]
 
 MIDDLEWARE = [
@@ -83,12 +84,12 @@ WSGI_APPLICATION = 'unisalud.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.mysql'),
-        'NAME': os.getenv('DB_NAME', ''),
-        'USER': os.getenv('DB_USER', ''),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', ''),
-        'PORT': os.getenv('DB_PORT', ''),
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql'),
+        'NAME': os.getenv('DB_NAME', 'unisaludBD'),
+        'USER': os.getenv('DB_USER', 'admin'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'unisaludBD*'),
+        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
