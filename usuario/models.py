@@ -279,39 +279,6 @@ class tipoorden(models.Model):
     def __str__(self):
         return self.nombre_tipo
 
-
-class roles(models.Model):
-    id_rol = models.AutoField(primary_key=True, db_comment='ID autoincremental del roles')
-    nombre_rol = models.CharField(unique=True, max_length=50, db_comment='Nombre de los roles: paciente, profesional_salud, laboratorista, recepcionista, admin_centro_medico')
-    descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion de los roles para mayor claridad, opcional')
-
-    class Meta:
-        managed = True
-        db_table = 'roles'
-        verbose_name = 'Rol'
-        verbose_name_plural = 'Roles'
-
-    def __str__(self):
-        return self.nombre_rol
-
-
-class usuarios(models.Model):
-    id_usuario = models.AutoField(primary_key=True, db_comment='ID autoincremental del usuario')
-    id_rol = models.ForeignKey('roles', models.DO_NOTHING, db_column='id_rol', db_comment='Rol asignado para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
-    nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
-    contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
-    email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
-    ultimo_login = models.DateTimeField(blank=True, null=True, db_comment='ultimo inicio de sesion')
-    estado = models.CharField(max_length=9, blank=True, null=True, db_comment='Esta: activo, inactivo,etc')
-
-    class Meta:
-        managed = True
-        db_table = 'usuarios'
-
-    def __str__(self):
-        return self.nombre_usuario
-
-
 class pacientes(models.Model):
     id_paciente = models.AutoField(primary_key=True, db_comment='ID autoincremental')
     id_usuario = models.OneToOneField('usuarios', models.DO_NOTHING, db_column='id_usuario', blank=True, null=True, db_comment='Referencia a la cuenta de USUARIOS')
