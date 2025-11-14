@@ -1,0 +1,21 @@
+1. en setting.py cambiar a DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'X',  # Nombre de la BD
+        'USER': 'X',  # Usuario de postgresql 
+        'PASSWORD': 'contraseña',  # Cambia por tu contraseña
+        'HOST': 'localhost',  # Servidor de BD
+        'PORT': '5432',  # Puerto de postgresql (por defecto)
+    }
+}
+2. en pgAdmin4 crear la base de datos con el nombre respectivo, dejar la base de datos vacia
+3. en models.py crear las clases (tablas) lo cual se podria hacer de dos maneras:
+    1. Crearlas manualmente dentro de models.py
+    
+    Para hacer el segundo paso se requiere que la base de datos contenga unicamente las tablas que se deseen, sin nada de datos insertados en ellas
+    2. Crearlas automaticamente con el comando python manage.py inspectdb, (en caso de que el archivo se genere corrupto, cambiar de UTF-16 a UTF-8, esto se puede hacer buscando donde diga UTF-16 en la barrita pequeña en la parte baja de VScode) copiar todo lo de models.py, guardarlo en un .txt por aparte y eliminar models.py, seguido de esto se vuelve a crear models.py, se elimina la base de datos por completo, se vuelve a crear y se pasan los models copiados en el .txt a models.py
+    
+4. una vez se tenga alguna de las dos, escribir: python manage.py makemigrations   se ejecuta y luego se escribe: python manage.py migrate, esto crea las tablas en la base de datos
+5. para ver si la base de datos esta conectada correctamente se escribe: python manage.py dbshell    esto abrira una cmd (no como aplicacion externa ni nada, sino dentro de la terminal de vscode) donde se escribira: \conninfo para ver a qué base de datos está conectado el proyecto (presionar ENTER para ver más), luego se escribe: \dt  y se podra ver que las tablas se crearon correctamente
+
+5.1 Sí al momento de escribir python manage.py dbshell no se ejecuta correctamente y aparece algun error en rojo, se debe buscar en el icono de busqueda de windows: "variables de entorno virtual" se da click al q aparece, se da en "variables de entorno", se da click en path y en editar, se da click en nuevo y se escribe la dirreccion a la bin de postgresql, algo como esto: "C:\Program Files\PostgreSQL\18\bin" aqui uso la version 18 de postgresql, pero en caso de tener la 16 se veria asi: "C:\Program Files\PostgreSQL\16\bin" y asi con las demas versiones, tras esto se da click en aceptar y se cierra la ventana, una vez hecho esto el comando python manage.py dbshell debe ejecutarse correctamente
