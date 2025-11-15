@@ -85,7 +85,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'unisaludBD',  # Nombre de la BD
         'USER': 'admin',  # Usuario de MySQL
-        'PASSWORD': 'unisaludBD*',  # Cambia por tu contraseña
+        'PASSWORD': '1234',  # Cambia por tu contraseña
         'HOST': 'localhost',  # Servidor de BD
         'PORT': '5432',  # Puerto de MySQL (por defecto)
     }
