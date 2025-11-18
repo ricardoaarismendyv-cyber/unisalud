@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import autenticate, login, logout
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import LoginForm
-from .models import usuarios, roles
+from .models import rol_usuario, roles
 
 #User = get_user_model()
 
@@ -12,7 +12,7 @@ from .models import usuarios, roles
 
 
 #def login(request):
-    #return render(request, 'paginas/login.html' )
+        #return render(request, 'paginas/login.html' )
 
 
 def login_view(request):

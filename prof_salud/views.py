@@ -1,29 +1,23 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from usuarios.models import roles_usuario
-# Create your views here.
+
 
 @login_required
-
 def inicio_prof_salud(request):
-
-    roles_usuario = roles.objects.filter(id_usuario=request.user.id)
-
-    PERMISSIONS = {
-        usuario.nombre_rol: 0,
-    }
-
-    for roles_usuario in roles_usuario:
-        roles = roles_usuario.roles.nombre_rol
-        for module in permissions.keys():
-            current_permission = getattr(roles_usuario, module)
-            if current_permission > PERMISSIONS[module]:
-                PERMISSIONS[module] = current_permission
+    # Obtener el perfil del usuario logueado
+    try:
+        perfil = PerfilUsuario.objects.select_related('id_rol').get(
+            nombre_usuario=request.user.username
+        )
+        rol_nombre = perfil.id_rol.nombre_rol if perfil.id_rol else 'unknown'
+    except PerfilUsuario.DoesNotExist:
+        rol_nombre = 'unknown'
     
+    # Contexto para la plantilla
     context = {
-        'usuarios' : request.user,
-        'PERMISSIONS' : PERMISSIONS
-        'roles_usuario' : [ur.roles.rol_nombre for ur in roles_usuario],
+        'usuarios': request.user,
+        'PERMISSIONS': {},  # Ajusta según tus permisos
+        'rol_usuario': rol_nombre,
     }
 
     return render(request, 'paginas/inicio_prof_salud.html', context) #Vista de inicio para el profesional de salud

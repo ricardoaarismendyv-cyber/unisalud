@@ -49,10 +49,6 @@ INSTALLED_APPS = [
     'login',
 ]
 
-#AUTH_USUARIOS_MODEL = 'usuario.usuarios'
-#LOGIN_URL = '/login/'
-#LOGIN_REDIRECT_URL = 'inicio-usuario/'
-#lOGOUT_REDIRECT_URL = 'login'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -150,3 +146,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
     #'login.backends.UnisaludBackend',
     #'django.contrib.auth.backends.ModelBackend',
 #]
+
+# Indica el modelo de usuario personalizado
+AUTH_USER_MODEL = 'login.usuarios'
+LOGIN_URL = 'login/'
+LOGIN_REDIRECT_URL = 'inicio-usuario/'
+LOGOUT_REDIRECT_URL = 'login'

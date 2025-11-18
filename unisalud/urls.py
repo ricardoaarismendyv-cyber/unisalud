@@ -21,15 +21,11 @@ from django.views.generic import RedirectView
 from prof_salud import views
 
 urlpatterns = [
-    # raíz redirige a la app de paciente (evita url='' que genera bucle/410)
-    #path('', RedirectView.as_view(url='/paciente/', permanent=False)),
     path('admin/', admin.site.urls),
     path('', include('login.urls')),
     path('usuario/', include('usuario.urls')),
     path('profesionalS/', include('prof_salud.urls')),
     path('administrativo/', include('administrativo.urls')),
-    # usar LoginView directo o descomentar la línea con include si prefieres todas las rutas de auth
-    #path('login/', auth_views.LoginView.as_view(), name='login'),  # alternativa: path('accounts/', include('django.contrib.auth.urls')),
 ]
 
 
