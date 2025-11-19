@@ -2,8 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import LoginForm
-from .models import rol_usuario, roles
+
 
 #User = get_user_model()
 
@@ -27,9 +26,9 @@ def login_view(request):
                 if form.is_valid():
                         nombre_usuario = form.cleaned_data.get('nombre_usuario')
                         contrasena = form.cleaned_data.get('contrasena')
-                        usuarios = authenticate(username=nombre_usuario, password=contrasena)
+                        Usuario = authenticate(username=nombre_usuario, password=contrasena)
                         if usuarios is not None:
-                                login(request, usuarios)
+                                login(request, Usuario)
                                 return redirect('inicio-usuario')
                         else:
                                 messages.error(request, 'usuario o contraseña inválidos')
