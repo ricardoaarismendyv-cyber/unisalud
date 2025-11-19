@@ -141,14 +141,5 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Custom authentication backend
-#AUTHENTICATION_BACKENDS = [
-    #'login.backends.UnisaludBackend',
-    #'django.contrib.auth.backends.ModelBackend',
-#]
 
-# Indica el modelo de usuario personalizado
-AUTH_USER_MODEL = 'login.usuarios'
-LOGIN_URL = 'login/'
-LOGIN_REDIRECT_URL = 'inicio-usuario/'
-LOGOUT_REDIRECT_URL = 'login'
+
