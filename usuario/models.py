@@ -302,8 +302,9 @@ class usuarios(models.Model):
     nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
     contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
     email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
-    ultimo_login = models.DateTimeField(blank=True, null=True, db_comment='ultimo inicio de sesion')
     estado = models.CharField(max_length=9, blank=True, null=True, db_comment='Esta: activo, inactivo,etc')
+    documento = models.CharField(max_length=20, blank=True, null=True, db_comment='Numero de documento del usuario')
+    
 
     class Meta:
         managed = True

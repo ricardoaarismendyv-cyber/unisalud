@@ -5,7 +5,7 @@
 {% block auth_button %}
 {# En esta página, reemplazamos el botón de login por el de logout #}
 <li>
-    {# Asumimos que tienes una URL llamada 'logout' para cerrar la sesión #}
+    {# Botón para cerrar la sesión del usuario #}
     <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio" %}'">
         <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
     </button>
@@ -30,7 +30,7 @@
                         <option value="{% url 'inicio_admin' %}">Administrativo</option>
                     </select>
                 </div>
-                <h1>Bienvenido! Paciente [Nombre del paciente]</h1>
+                <h1>Bienvenido! Paciente </h1>
                 <div class="container border border-dark rounded p-4 my-5 div-main">
                     <h1>Historia clínica</h1>
                     <p>Acceda fácilmente a su información médica con una interfaz clara, intuitiva y accesible. Consulta antecedentes, diagnósticos y recomendaciones, con la opción de descargar el historial completo en un solo click.</p>
