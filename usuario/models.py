@@ -1,6 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser #permite un control total sobre cómo se almacenan y gestionan los datos del usuario.
-
 
 class roles(models.Model): 
     PERMISSION_CHOICES =[
@@ -25,49 +23,21 @@ class roles(models.Model):
     def __str__(self):
         return self.nombre_rol
 
-class usuarios(AbstractUser):
+class usuarios(models.Model):
     id_usuario = models.AutoField(primary_key=True, db_comment='ID autoincremental del usuario')
     id_rol = models.ForeignKey('roles', models.DO_NOTHING, db_column='id_rol', db_comment='Rol asignado para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
-    id_tipo_identificacion = models.ForeignKey('tipoidentificacion', models.DO_NOTHING, db_column='id_tipo_identificacion', db_comment='Referencia a TIPO_IDENTIFICACION')
-    #email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
-    #ultimo_login = models.DateTimeField(blank=True, null=True, db_comment='ultimo inicio de sesion')
-    #estado = models.CharField(max_length=9, blank=True, null=True, db_comment='Esta: activo, inactivo,etc')
-    #telefono = models.CharField(max_length=15, blank=True, null=True)
-    cedula = models.IntegerField(max_length=20, unique=True, blank=True, null=True)
-    tarjeta_identidad = models.IntegerField(max_length=20, unique=True, blank=True, null=True)
-    registro_civil = models.IntegerField(max_length=20, unique=True, blank=True, null=True)
-    cedula_extranjeria = models.IntegerField(max_length=20, unique=True, blank=True, null=True)
     nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
     contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
-    #fecha_nacimiento = models.DateField(blank=True, null=True)
-    #rol = models.CharField(max_length=50, blank=True, null=True)
-
-    USERNAME_FIELD = 'nombre_usuario'  # Campo utilizado para autenticación
-    REQUIRED_FIELDS = ['id_rol', 'id_tipo_identificacion']  # Campos obligatorios además de USERNAME_FIELD
-    
-    class Meta:
-        managed = True
-        db_table = 'Usuarios'
-        verbose_name = 'Usuario'
-        verbose_name_plural = 'Usuarios'
-
-    #def __str__(self):
-    #    return f'{self.username} - {self.get_full_name()}'
-
-#OJO Esta tabla no fue creada inicialmente en la BD (SE DEBE INCLUR), esta permite conectar los roles con los usuarios
-class rol_usuario(models.Model):
-    id_usuario = models.ForeignKey(usuarios, on_delete=models.CASCADE)
-    roles = models.ForeignKey(roles, on_delete=models.CASCADE)
+    email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
+    ultimo_login = models.DateTimeField(blank=True, null=True, db_comment='ultimo inicio de sesion')
+    estado = models.CharField(max_length=9, blank=True, null=True, db_comment='Esta: activo, inactivo,etc')
 
     class Meta:
         managed = True
-        db_table = 'rol_usuario'
-        verbose_name = 'rUsuario'
-        verbose_name_plural = 'rolesUsuarios'
-        unique_together = ('id_usuario', 'roles'),
-        
+        db_table = 'usuario'
+
     def __str__(self):
-        return f"{self.id_usuario_usuarios} - {self.roles.nombre_rol}"
+        return f'{self.username} - {self.get_full_name()}'
 
 class tipoidentificacion(models.Model):
     id_tipo_identificacion = models.AutoField(primary_key=True, db_comment='ID autoincremental')
@@ -609,4 +579,3 @@ class incapacidad(models.Model):
 
     def __str__(self):
         return f'Incapacidad para {self.id_paciente} del {self.fecha_inicio} al {self.fecha_fin}'
-
