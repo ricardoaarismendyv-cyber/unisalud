@@ -1,6 +1,7 @@
 from django.db import models
+from django.contrib.auth.hashers import make_password, check_password #para codificar y verificar las contraseñas de forma segura
 
-class roles(models.Model): 
+class Roles(models.Model): 
     PERMISSION_CHOICES =[
         (0, 'No Access'), 
         (1, 'view only'), 
@@ -23,21 +24,30 @@ class roles(models.Model):
     def __str__(self):
         return self.nombre_rol
 
-class usuarios(models.Model):
+class Usuarios(models.Model):
     id_usuario = models.AutoField(primary_key=True, db_comment='ID autoincremental del usuario')
-    id_rol = models.ForeignKey('roles', models.DO_NOTHING, db_column='id_rol', db_comment='Rol asignado para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
+    # no se necesita escribir id_rol en tu modelo, porque Django ya se encarga de añadir el sufijo _id en la tabla
+    # permite el acceso directo: por ej: usuario.rol en lugar de usuario.id_rol
+    rol = models.ForeignKey('Roles', models.DO_NOTHING, db_column='id_rol', db_comment='Rol asignado para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
     nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
     contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
     email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
     ultimo_login = models.DateTimeField(blank=True, null=True, db_comment='ultimo inicio de sesion')
     estado = models.CharField(max_length=9, blank=True, null=True, db_comment='Esta: activo, inactivo,etc')
 
+    def set_password(self, raw_password):
+        self.contrasena = make_password(raw_password) # toma una contraseña en texto plano, la hashea (codifica) y la guarda en el campo
+
+    def check_password(self, raw_password):
+        return check_password(raw_password, self.contrasena) #Compara una contraseña en texto plano con la que está guardada (ya hasheada) en la base de datos y devuelve True si coinciden
+
     class Meta:
         managed = True
-        db_table = 'usuario'
+        db_table = 'Usuarios'
+
 
     def __str__(self):
-        return f'{self.username} - {self.get_full_name()}'
+        return self.nombre_usuario
 
 class tipoidentificacion(models.Model):
     id_tipo_identificacion = models.AutoField(primary_key=True, db_comment='ID autoincremental')
@@ -320,7 +330,7 @@ class tipoorden(models.Model):
 
 class pacientes(models.Model):
     id_paciente = models.AutoField(primary_key=True, db_comment='ID autoincremental')
-    id_usuario = models.OneToOneField('usuarios', models.DO_NOTHING, db_column='id_usuario', blank=True, null=True, db_comment='Referencia a la cuenta de USUARIOS')
+    usuario = models.OneToOneField('Usuarios', models.DO_NOTHING, db_column='id_usuario', blank=True, null=True, db_comment='Referencia a la cuenta de USUARIOS')
     id_tipo_identificacion = models.ForeignKey('tipoidentificacion', models.DO_NOTHING, db_column='id_tipo_identificacion', db_comment='Referencia a TIPO_IDENTIFICACION')
     numero_documento = models.CharField(max_length=20, db_comment='Numero del documento paciente')
     nombre1 = models.CharField(max_length=50, db_comment='Primer nombre paciente')
@@ -349,7 +359,7 @@ class pacientes(models.Model):
 
 class profesionalsalud(models.Model):
     id_profesional = models.AutoField(primary_key=True, db_comment='ID autoincremental')
-    id_usuario = models.OneToOneField('usuarios', models.DO_NOTHING, db_column='id_usuario', db_comment='Referencia a la cuenta de USUARIOS (Obligatorio para personal)')
+    usuario = models.OneToOneField('Usuarios', models.DO_NOTHING, db_column='id_usuario', db_comment='Referencia a la cuenta de USUARIOS (Obligatorio para personal)')
     id_tipo_identificacion = models.ForeignKey('tipoidentificacion', models.DO_NOTHING, db_column='id_tipo_identificacion', db_comment='Referencia a TIPO_IDENTIFICACION')
     numero_documento = models.CharField(max_length=20, db_comment='Numero del documento profesional salud')
     nombre1 = models.CharField(max_length=50, db_comment='Primer nombre profesional salud')
