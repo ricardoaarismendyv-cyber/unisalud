@@ -1,43 +1,44 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout # para manejar la sesión del usuario
 from django.contrib import messages
-
-
-#User = get_user_model()
-
-
-# Create your views here.
-
-
-#def login(request):
-        #return render(request, 'paginas/login.html' )
-
+from usuario.models import Usuarios, pacientes, profesionalsalud
 
 def login_view(request):
-        if request.user.is_authenticated:
-                return redirect('inicio-usuario')
-        """Login tradicional contra tabla usuarios de PostgreSQL.
-        Obtiene el rol y redirige según el rol."""
+    if request.method == 'POST':
+        nombre_usuario = request.POST.get('nombre_usuario')
+        contrasena = request.POST.get('contrasena')
+        try:
+            usuario = Usuarios.objects.get(nombre_usuario=nombre_usuario)
+            if usuario.check_password(contrasena):
+                request.session['id_usuario'] = usuario.id_usuario
+                request.session['nombre_rol'] = usuario.rol.nombre_rol
 
-        if request.method == 'POST':
-        
-                form = LoginForm(request, data=request.POST)
-                if form.is_valid():
-                        nombre_usuario = form.cleaned_data.get('nombre_usuario')
-                        contrasena = form.cleaned_data.get('contrasena')
-                        Usuario = authenticate(username=nombre_usuario, password=contrasena)
-                        if usuarios is not None:
-                                login(request, Usuario)
-                                return redirect('inicio-usuario')
-                        else:
-                                messages.error(request, 'usuario o contraseña inválidos')
-                else:
-                        form = LoginForm()
-                return render(request, 'login/login.html', {'form': form})
+                if usuario.rol.nombre_rol == 'paciente':
+                    try:
+                        paciente = pacientes.objects.get(usuario=usuario)
+                        request.session['id_paciente'] = paciente.id_paciente
+                        return redirect('inicio-usuario')
+                    except pacientes.DoesNotExist:
+                        messages.error(request, 'Este usuario no tiene un perfil de paciente asociado.')
+                        return render(request, 'paginas/login.html')
                 
-@login_required
+                elif usuario.rol.nombre_rol in ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']:
+                    try:
+                        prof_salud = profesionalsalud.objects.get(usuario=usuario)
+                        request.session['id_profesional'] = prof_salud.id_profesional
+                        return redirect('inicio_prof_salud')
+                    except profesionalsalud.DoesNotExist:
+                        messages.error(request, 'Este usuario no tiene un perfil de profesional de salud asociado.')
+                        return render(request, 'paginas/login.html')
+                else:
+                    messages.error(request, 'Rol no reconocido o sin página de inicio definida.')
+            else:
+                messages.error(request, 'Nombre de usuario o contraseña incorrectos.')
+        except Usuarios.DoesNotExist:
+            messages.error(request, 'Nombre de usuario o contraseña incorrectos.')
+    return render(request, 'paginas/login.html')
+
+# para cerrar sesion y redirige al login
 def logout_view(request):
-        logout(request)
-        messages.success(request, 'Has cerrado sesión exitosamente.')
-        return redirect('login')
+    logout(request)
+    return redirect('login')
