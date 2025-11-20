@@ -5,7 +5,7 @@
 
 {% block auth_button %}
 <li>
-    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "consultas_prof_salud" %}'">
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "logout" %}'">
         <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
     </button>
 </li>
@@ -30,7 +30,7 @@
                         <option value="{% url 'inicio_admin' %}">Administrativo</option>
                     </select>
                 </div>
-                <h1>Bienvenido! Profesional [Nombre del profesional]</h1>
+                <h1>Bienvenido, {{ profesional.nombre1 }} {{ profesional.apellido1 }}</h1>
                 <div class="container border border-dark rounded p-4 my-5 div-main">    
                     <h1>Historia clínica</h1>
                     <p>Acceda para revisar, actualizar y documentar la información médica, diagnósticos y plan de tratamiento del paciente en la Historia Clínica Electrónica (HCE), cumpliendo con la normativa de confidencialidad.</p>
@@ -56,41 +56,6 @@
     </div>
 </section>
 
-<script>
-function handleRoleChange(roleId) {
-    const roleName = document.querySelector(`#roleSelect option[value="${roleId}"]`).text;
-    document.getElementById('roleName').textContent = roleName;
-    document.getElementById('currentRole').style.display = 'block';
-    
-    // Aquí puedes agregar una llamada AJAX para actualizar el rol en el backend
-    fetch('/actualizar-rol/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({
-            roleId: roleId
-        })
-    });
-}
-
-// Función auxiliar para obtener el token CSRF
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-</script>
 {% endblock content %}
 
 {% block script %}
