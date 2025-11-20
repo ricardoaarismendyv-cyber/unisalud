@@ -28,6 +28,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelTable(
             name='usuarios',
-            table='usuario',
+            table='usuario', #REVISAR
         ),
     ]
