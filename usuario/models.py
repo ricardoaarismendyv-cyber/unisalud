@@ -3,6 +3,7 @@ from django.db import models
 # aqui cambio los nombres de las clases a tipo CamelCase (nombre pegado con cada primera letra de la palabra en mayuscula)
 #cambio las tablas de db_table a su respectivo en minuscula y un guion bajo
 #cambio las foreignKey para que usen la class adecuada
+#se elimina la class DetallesMedicamento
 class TipoIdentificacion(models.Model):
     id_tipo_identificacion = models.AutoField(primary_key=True, db_comment='ID autoincremental')
     identificacion = models.CharField(unique=True, max_length=50, db_comment='Tipo de identificacion: cedula, tarjeta, etc')
