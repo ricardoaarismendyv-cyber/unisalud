@@ -1,26 +1,22 @@
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from usuario.models import profesionalsalud
 
 
-@login_required
 def inicio_prof_salud(request):
-    # Obtener el perfil del usuario logueado
-    try:
-        perfil = PerfilUsuario.objects.select_related('id_rol').get(
-            nombre_usuario=request.user.username
-        )
-        rol_nombre = perfil.id_rol.nombre_rol if perfil.id_rol else 'unknown'
-    except PerfilUsuario.DoesNotExist:
-        rol_nombre = 'unknown'
-    
-    # Contexto para la plantilla
-    context = {
-        'usuarios': request.user,
-        'PERMISSIONS': {},  # Ajusta según tus permisos
-        'rol_usuario': rol_nombre,
-    }
+        # Verificar si el usuario es un profesional de la salud
+        if request.session.get('nombre_rol') not in ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']:
+                messages.error(request, 'Acceso no autorizado.')
+                return redirect('login')
 
-    return render(request, 'paginas/inicio_prof_salud.html', context) #Vista de inicio para el profesional de salud
+        try:
+                # Obtener el ID del profesional desde la sesión y buscar el objeto
+                profesional_id = request.session.get('id_profesional')
+                profesional = profesionalsalud.objects.get(id_profesional=profesional_id)
+                return render(request, 'paginas/inicio_prof_salud.html', {'profesional': profesional})
+        except profesionalsalud.DoesNotExist:
+                messages.error(request, 'No se encontró el perfil del profesional de salud.')
+                return redirect('login')
 
 def hc_prof_salud(request):
     return render(request, 'paginas/hc_prof_salud.html') #Vista de Historia Clínica para el profesional de salud
@@ -48,4 +44,3 @@ def buzonsugerencias_prof_salud(request):
 
 def contactanos_prof_salud(request):
     return render(request, 'paginas/contactanos_prof_salud.html')
-
