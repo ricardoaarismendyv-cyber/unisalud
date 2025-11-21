@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'usuario',
     'prof_salud',
     'administrativo',
+    'inicio',
 ]
 
 MIDDLEWARE = [
@@ -81,11 +82,14 @@ WSGI_APPLICATION = 'unisalud.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'unisaludBD',  # Nombre de la BD
+        'USER': 'admin',  # Usuario de MySQL
+        'PASSWORD': 'unisaludBD*',  # Cambia por tu contraseña
+        'HOST': 'localhost',  # Servidor de BD
+        'PORT': '5432',  # Puerto de MySQL (por defecto)
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

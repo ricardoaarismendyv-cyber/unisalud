@@ -1,4 +1,4 @@
-{% extends "plantilla_ps.html" %}
+{% extends "plantilla.html" %}
 {% load static %}
 {% block title %}Iniciar Sesión{% endblock title %}
 
@@ -8,36 +8,21 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
+                <div class="pt-3 text-center">
+                    <h1>Bienvenido a Unisalud!</h1>
+                    <p>Para ingresar al sistema porfavor inicie sesión aquí</p>
+                </div>
                 <div class="border border-dark rounded p-4 my-5 div-main">
                     <!-- Contenedor del formulario de login -->
                     <div id="loginFormContainer">
                         <h1 class="text-center">Inicio de sesión</h1>
                         <section class="mt-4">
-                            <!--OJOOOO Selector de roles -->
-                            <div class="role-selector mb-4">
-                                <label for="roleSelect" class="form-label">Seleccione su rol actual:</label>
-                                <select class="form-select" id="roleSelect" onchange="handleRoleChange(this.value)">
-                                    <option value="" selected disabled>Seleccione un rol</option>
-                                    <option value="ps">Profesional Salud</option>
-                                    <option value="us">Usuario</option>
-                                    <option value="ad">Administrativo</option>
-                                    {% for rol in roles %}
-                                        <option value="{{ rol.id }}">{{ rol.nombre }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <!-- Mostrar rol actual -->
-                            <div id="currentRole" class="alert alert-info mb-4" style="display: none;">
-                                Rol actual: <span id="roleName"></span>
-                            </div>
-                            <!--FIN SELECTOR ROLES-->
                             <!-- Fila para el tipo de documento -->
                             <div class="row mb-3">
                                 <label for="selectTipoDocumento" class="col-md-4 col-form-label text-md-end">Tipo de documento</label>
                                 <div class="col-md-8">
                                     <select class="form-select">
-                                        <option selected disabled value>Selecciona una opción</option>
+                                        <option selected disabled>Selecciona una opción</option>
                                         <option value="rc">Registro civil de nacimiento</option>
                                         <option value="ti">Tarjeta de Identidad</option>
                                         <option value="cc">Cédula de Ciudadanía</option>
@@ -60,8 +45,8 @@
                                     <div class="input-group">
                                         <input type="password" class="form-control" id="password" placeholder="Ingrese aquí su contraseña" required>
                                         <button class="btn btn-primary" type="button" id="togglePasswordBtn">Ver</button>
-                                    </div>    
-                                    <div class="form-text">Debe tener entre 8 y 20 caracteres.</div>
+                                    </div>
+                                    <div class="form-text">Debe tener entre 8-20 caracteres.</div>
                                 </div>
                                 <div class="text-center mt-3">
                                     <a href="#" id="forgotPasswordLink" class="btn btn-sm btn-primary me-2" role="button">Olvidé mi contraseña</a>
@@ -69,18 +54,20 @@
                             </div>
                         </section>
                         <div class="text-center mt-4">
-                            <button type="button" class="btn btn-lg btn-success custom-highlight-btn" onclick="window.location.href='{% url "consultas_prof_salud" %}'">Iniciar Sesión</button>
+                            <button type="button" class="btn btn-lg btn-success custom-highlight-btn" onclick="window.location.href='{% url "inicio-usuario" %}'">Iniciar Sesión</button>
                         </div>
                         <div class="opciones-secundarias text-center mt-3">
-                            <p>¿No tiene una cuenta?</hr><a href="{% url 'registro_prof_salud' %}" class="btn btn-sm btn-primary" role="button">Registrese aquí</a></p>
-                            <span class="mx-2"></span>
+                            <hr>
+                            <p>¿No tiene una cuenta?
+                                <a href="{% url 'registrarse' %}" class="btn btn-sm btn-primary" role="button">Registrese aquí</a>
+                            </p>
                         </div>
                     </div>
 
                     <!-- Pantalla de confirmación de contraseña olvidada (oculta por defecto) -->
                     <div id="passwordResetConfirmation" style="display: none; text-align: center;">
                         <h2 class="mt-4">Revisa tu correo</h2>
-                        <p>Hemos enviado una contraseña temporal a la dirección de correo electrónico asociada a su cuenta.</p>
+                        <p style="color:#000">Hemos enviado una contraseña temporal a la dirección de correo electrónico asociada a su cuenta.</p>
                         <button type="button" class="btn btn-main mt-3" id="backToLoginBtn">Volver al inicio de sesión</button>
                     </div>
                 </div>

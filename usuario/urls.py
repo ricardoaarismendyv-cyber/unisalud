@@ -4,8 +4,7 @@ from . import views
 #app_name = 'usuario' : Añadir namespacing (app_name) para evitar colisiones al usar reverse() en plantillas/vistas
 
 urlpatterns = [
-    path('', views.loginus, name='login-us'),
-    path('inicio-us', views.iniciousuario, name='inicio-usuario'),
+    path('', views.iniciousuario, name='inicio-usuario'),
     path('historia-clinica', views.hcusuario, name='hcusuario'),
     path('ordenes-medicas', views.omusuario, name='omusuario'),
     path('ordenes-medicamentos', views.omeusuario, name='omeusuario'),

@@ -1,38 +1,85 @@
-section.main{
-    margin-top:70px;
+/* Variables de colores */
+:root {
+    --primary-color: #2563eb;
+    --primary-light: #3b82f6;
+    --primary-dark: #1d4ed8;
+    --secondary-color: #10b981;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --bg-light: #f8fafc;
+    --white: #ffffff;
+    --border-light: #e5e7eb;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-.btn-nav{
-    margin: 0 15px
+section.main {
+    margin-top: 90px;
 }
 
-.btn-main{
+.btn-nav {
+    margin: 0 15px;
+}
+
+.btn-main {
     margin-bottom: 6px;
 }
 
 .btn-main:focus {
-    background-color: #2268c97c;
-    border-color: black;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    border-color: transparent;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
 }
 
-.div-main{
+.div-main {
     margin-top: 2px;
 }
 
-.itemList a{
-    color: #ffffff; /* Blanco por defecto */
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-
+.itemList a {
+    color: var(--text-dark);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
 }
 
-.itemList a span{
-    color: #ffd700; /* Amarillo dorado para destacar */
+.itemList a:hover {
+    color: var(--primary-color);
 }
 
-.list-group .div-main{
+.itemList a span {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.list-group .div-main {
     box-shadow: none;
-    color: #000000;
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(68, 65, 65, 0.8);
+    color: var(--text-dark);
+    font-weight: 500;
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-light);
+}
+
+/* Cards modernas */
+.card-modern {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Badges modernos */
+.badge-modern {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: var(--white);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
 }

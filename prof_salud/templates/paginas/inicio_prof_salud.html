@@ -19,6 +19,17 @@
         <div class="row p-4">
             <!-- Columna para el contenido principal -->
             <div class="col-md-8" style="padding: 60px 20px;">
+                <div class="mb-3">
+                    <label for="" class="form-label">Roles a elegir</label>
+                    <select
+                        class="form-select form-select-lg"
+                        id="roleSelector"
+                    >
+                        <option value="{% url 'consultas_prof_salud' %}" selected>Profesional de salud</option>
+                        <option value="{% url 'inicio-usuario' %}">Usuario</option>
+                        <option value="{% url 'inicio_admin' %}">Administrativo</option>
+                    </select>
+                </div>
                 <h1>Bienvenido! Profesional [Nombre del profesional]</h1>
                 <div class="container border border-dark rounded p-4 my-5 div-main">    
                     <h1>Historia clínica</h1>
@@ -81,3 +92,17 @@ function getCookie(name) {
 }
 </script>
 {% endblock content %}
+
+{% block script %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelector = document.getElementById('roleSelector');
+    if (roleSelector) {
+        roleSelector.addEventListener('change', function() {
+            window.location.href = this.value;
+        });
+    }
+});
+</script>
+{% endblock script %}
