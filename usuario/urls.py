@@ -13,6 +13,7 @@ urlpatterns = [
     path('uso-del-sistema', views.usosistema, name='usosistema'),
     path('buzon-sugerencias', views.buzonsugerencias, name='buzonsugerencias'),
     path('registrarse', views.registro, name='registrarse'),
-    path('contactanos', views.contactanos, name='contactanos')
+    path('contactanos', views.contactanos, name='contactanos'),
+        path("turno/generar/<uuid:token>/", views.generar_turno, name="generar_turno")
 ]
 

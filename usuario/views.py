@@ -1,5 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from .models import Turno
+import uuid
+from datetime import timedelta
 # Create your views here.
 
 def loginus(request):
@@ -35,3 +39,19 @@ def registro(request):
 
 def contactanos(request):
     return render(request, 'paginas/contactanos.html')
+
+
+def generar_turno(request, token):
+    # Generar turno correlativo
+    ultimo = Turno.objects.last()
+    numero_turno = ultimo.numero + 1 if ultimo else 1
+
+    turno = Turno.objects.create(
+        numero=numero_turno,
+        expiracion=timezone.now() + timedelta(minutes=10)
+    )
+
+    return render(request, "turno_generado.html", {
+        "turno": turno,
+        "centro": "Nombre del centro médico"
+    })

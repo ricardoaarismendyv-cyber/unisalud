@@ -556,3 +556,15 @@ class Incapacidad(models.Model):
     def __str__(self):
         return f'Incapacidad para {self.id_paciente} del {self.fecha_inicio} al {self.fecha_fin}'
 
+from django.db import models
+from django.utils import timezone
+import uuid
+
+class Turno(models.Model):
+    codigo = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    numero = models.PositiveIntegerField()
+    creado = models.DateTimeField(default=timezone.now)
+    expiracion = models.DateTimeField()
+
+    def __str__(self):
+        return f"Turno {self.numero}"
