@@ -2,18 +2,9 @@ from django.db import models
 from django.contrib.auth.hashers import make_password, check_password #para codificar y verificar las contraseñas de forma segura
 
 class Roles(models.Model): 
-    PERMISSION_CHOICES =[
-        (0, 'No Access'), 
-        (1, 'view only'), 
-        (2, 'create and modify'),
-    ]
     id_rol = models.AutoField(primary_key=True, db_comment='ID autoincremental del roles')
     nombre_rol = models.CharField(unique=True, max_length=50, db_comment='Nombre de los roles: paciente, profesional_salud, laboratorista, recepcionista, admin_centro_medico')
     descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion de los roles para mayor claridad, opcional')
-    
-    usuario = models.IntegerField(choices = PERMISSION_CHOICES, default=0) #definir roles 0= a no acceso, 1 ver 2 crear y modificar
-    profesional_salud = models.IntegerField(choices = PERMISSION_CHOICES, default=0)
-    administrativo = models.IntegerField(choices = PERMISSION_CHOICES, default=0)
 
     class Meta:
         managed = True
@@ -26,33 +17,31 @@ class Roles(models.Model):
 
 class Usuarios(models.Model):
     id_usuario = models.AutoField(primary_key=True, db_comment='ID autoincremental del usuario')
-    # no se necesita escribir id_rol en tu modelo, porque Django ya se encarga de añadir el sufijo _id en la tabla
-    # permite el acceso directo: por ej: usuario.rol en lugar de usuario.id_rol
-    rol = models.ForeignKey('Roles', models.DO_NOTHING, db_column='id_rol', db_comment='Rol asignado para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
+    id_rol = models.ForeignKey('Roles', models.DO_NOTHING, db_column='id_rol', db_comment='Rol asignado para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
     nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
     contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
     email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
-    ultimo_login = models.DateTimeField(blank=True, null=True, db_comment='ultimo inicio de sesion')
-    estado = models.CharField(max_length=9, blank=True, null=True, db_comment='Esta: activo, inactivo,etc')
-
-    def set_password(self, raw_password):
-        self.contrasena = make_password(raw_password) # toma una contraseña en texto plano, la hashea (codifica) y la guarda en el campo
-
-    def check_password(self, raw_password):
-        return check_password(raw_password, self.contrasena) #Compara una contraseña en texto plano con la que está guardada (ya hasheada) en la base de datos y devuelve True si coinciden
-
+    
     class Meta:
         managed = True
-        db_table = 'Usuarios'
-
+        db_table = 'usuarios'
 
     def __str__(self):
         return self.nombre_usuario
 
+#manejar contraseñas de forma segura
+#set_password: toma la contraseña en texto plano y la codifica antes de almacenarla en la base de datos.
+    def set_password(self, raw_password):
+        self.contrasena = make_password(raw_password)
+
+#check_password: verifica si la contraseña en texto plano coincide con la contraseña codificada almacenada.
+    def check_password(self, raw_password):
+        return check_password(raw_password, self.contrasena)
+
 class tipoidentificacion(models.Model):
     id_tipo_identificacion = models.AutoField(primary_key=True, db_comment='ID autoincremental')
-    identificacion = models.CharField(unique=True, max_length=50, db_comment='Tipo de identificacion: cedula, tarjeta, etc')
-    nombre_identificacion = models.CharField(max_length=50, db_comment='Nombre de la abreviatura, CC: cedula de ciudadania')
+    identificacion = models.CharField(unique=True, max_length=50, db_comment='Abreviatura del tipo de identificacion: CC, TI, etc')
+    nombre_identificacion = models.CharField(max_length=50, db_comment='Nombre completo del tipo de identificacion: Cédula de Ciudadanía, Tarjeta de Identidad, etc')
     descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion opcional')
 
     class Meta:
