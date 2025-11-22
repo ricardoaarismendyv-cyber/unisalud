@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from usuario.models import profesionalsalud
+from usuario.models import profesionalsalud, Usuarios, Roles, tipoidentificacion, genero, centrosmedicos, especialidades
 
 
 def inicio_prof_salud(request):
@@ -30,9 +30,6 @@ def omed_prof_salud(request):
 def consultas_prof_salud(request):
     return render(request, 'paginas/consultas_prof_salud.html') #Vista de Turnos/Agendamiento para el profesional de salud
 
-def registro_prof_salud(request):
-    return render(request, 'paginas/registro_prof_salud.html') #Vista para el formulario de registro de nuevos usuarios.   
-
 def preguntasfrecuentes_prof_salud(request):
     return render(request, 'paginas/preguntas-frecuentes_prof_salud.html')
 
@@ -44,3 +41,10 @@ def buzonsugerencias_prof_salud(request):
 
 def contactanos_prof_salud(request):
     return render(request, 'paginas/contactanos_prof_salud.html')
+
+def registro_prof_salud(request):
+    context = {
+        'tipos_identificacion': tipoidentificacion.objects.all(),
+        'generos': genero.objects.all(),
+    }
+    return render(request, 'paginas/registro_prof_salud.html', context)
