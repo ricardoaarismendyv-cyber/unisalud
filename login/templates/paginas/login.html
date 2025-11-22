@@ -45,7 +45,7 @@
                                         </div>
                                     </div>
                                     <div class="text-center mt-3">
-                                        <a href="#" id="forgotPasswordLink" class="btn btn-sm btn-primary me-2" role="button">Olvidé mi contraseña</a>
+                                        <a href="{% url 'password_reset' %}" class="btn btn-sm btn-primary me-2" role="button">Olvidé mi contraseña</a>
                                     </div>
                                 </div>
                             </section>
@@ -59,13 +59,6 @@
                                 <a href="{% url 'registrarse' %}" class="btn btn-sm btn-primary" role="button">Registrese aquí</a>
                             </p>
                         </div>
-                    </div>
-
-                    <!-- Pantalla de confirmación de contraseña olvidada (oculta por defecto) -->
-                    <div id="passwordResetConfirmation" style="display: none; text-align: center;">
-                        <h2 class="mt-4">Revisa tu correo</h2>
-                        <p style="color:#000">Hemos enviado una contraseña temporal a la dirección de correo electrónico asociada a su cuenta.</p>
-                        <button type="button" class="btn btn-main mt-3" id="backToLoginBtn">Volver al inicio de sesión</button>
                     </div>
                 </div>
             </div>
@@ -81,10 +74,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         const passwordInput = document.getElementById('password');
         const togglePasswordBtn = document.getElementById('togglePasswordBtn');
-        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-        const backToLoginBtn = document.getElementById('backToLoginBtn');
-        const loginFormContainer = document.getElementById('loginFormContainer');
-        const passwordResetConfirmation = document.getElementById('passwordResetConfirmation');
 
         togglePasswordBtn.addEventListener('click', function() {
             // Cambia el tipo del input de password a text y viceversa
@@ -92,17 +81,6 @@
             passwordInput.setAttribute('type', type);
             // Cambia el texto del botón
             this.textContent = type === 'password' ? 'Ver' : 'Ocultar';
-        });
-
-        forgotPasswordLink.addEventListener('click', function(event) {
-            event.preventDefault(); // Evita que el enlace navegue
-            loginFormContainer.style.display = 'none';
-            passwordResetConfirmation.style.display = 'block';
-        });
-
-        backToLoginBtn.addEventListener('click', function() {
-            passwordResetConfirmation.style.display = 'none';
-            loginFormContainer.style.display = 'block';
         });
     });
 </script>
