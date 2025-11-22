@@ -11,9 +11,9 @@ def login_view(request):
             usuario = Usuarios.objects.get(nombre_usuario=nombre_usuario)
             if usuario.check_password(contrasena):
                 request.session['id_usuario'] = usuario.id_usuario
-                request.session['nombre_rol'] = usuario.rol.nombre_rol
+                request.session['nombre_rol'] = usuario.id_rol.nombre_rol # Corregido: La relación es a través de id_rol
 
-                if usuario.rol.nombre_rol == 'paciente':
+                if usuario.id_rol.nombre_rol == 'paciente': # Corregido: La relación es a través de id_rol
                     try:
                         paciente = pacientes.objects.get(usuario=usuario)
                         request.session['id_paciente'] = paciente.id_paciente
@@ -22,7 +22,7 @@ def login_view(request):
                         messages.error(request, 'Este usuario no tiene un perfil de paciente asociado.')
                         return render(request, 'paginas/login.html')
                 
-                elif usuario.rol.nombre_rol in ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']:
+                elif usuario.id_rol.nombre_rol in ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']: # Corregido: La relación es a través de id_rol
                     try:
                         prof_salud = profesionalsalud.objects.get(usuario=usuario)
                         request.session['id_profesional'] = prof_salud.id_profesional
