@@ -74,13 +74,13 @@ def registro(request):
 
         # Se crea el Usuario con rol paciente
         try:
+            #busca el rol paciente
             rol_paciente = Roles.objects.get(nombre_rol='paciente')
-            
+            #Asigna al nuevo usuario el rol paciente
             nuevo_usuario = Usuarios(
                 nombre_usuario=nombre_usuario,
                 email=email,
                 id_rol=rol_paciente, #se asigna el rol paciente
-                estado='activo'
             )
             nuevo_usuario.set_password(contrasena) # Hashear (huella digital, identificador unico, asegura la integridad de los datos) y guardar contraseña
             nuevo_usuario.save()
@@ -103,7 +103,7 @@ def registro(request):
                 direccion=request.POST.get('direccion'),
                 telefono=request.POST.get('telefono'),    
                 celular=request.POST.get('celular'),
-                correo_electronico=email # Corregido: El campo se llama correo_electronico en el modelo
+                correo_electronico=email 
             )
 
             messages.success(request, '¡Registro exitoso! Ahora puedes iniciar sesión.')
