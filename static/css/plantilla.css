@@ -49,8 +49,8 @@ body {
 }
 
 body.dark-mode {
-    background: #121212;
-    color: #e5e7eb;
+    background: #121212 !important;
+    color: #e5e7eb !important;
 }
 
 /* css de inicio */
