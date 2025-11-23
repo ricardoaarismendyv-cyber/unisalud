@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from .models import *
 # Create your views here.
 
 def loginus(request):
@@ -35,3 +36,9 @@ def registro(request):
 
 def contactanos(request):
     return render(request, 'paginas/contactanos.html')
+
+
+def pacientes(request): 
+    pacientes=Pacientes.objects.all()
+    #print(estudiantes)
+    return render(request, "estudiantes/materias.html", {'pacientes':pacientes}) 
