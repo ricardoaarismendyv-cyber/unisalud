@@ -1,5 +1,5 @@
 from django.contrib import admin
-# indica al administrador Django la contraseña segura-hash
+#indica al administrador Django la contraseña segura-hash
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import (
     afiliacion,
