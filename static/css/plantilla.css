@@ -179,7 +179,7 @@ h1, h2, h3, h4, h5, h6 {
 .dark-mode .welcome-section,
 .dark-mode .role-selector {
     /* se Usa un color transparente para que el fondo del body se vea */
-    background-color:#1f2937 !important; 
+    background-color:#070c14!important; 
     color: var(--text-darkmode);
 }
 
@@ -221,6 +221,28 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* fin css inicio*/
+/* Solo para referencia, */
+.dark-mode { 
+    --text-darkmode: #e5e7eb; /* Texto claro */
+    --bg-dark: #e5e7eb;       /* Fondo oscuro para el body */
+    --bg-card: #e5e7eb;       /* Nuevo fondo para contenedores */
+    --border-dark: #e5e7eb;
+}
+
+
+.dark-mode .feature-card {
+    /* Aplicar fondo oscuro para las tarjetas (Historia Clínica, Turnos, etc.) */
+    background-color: var(--bg-card); 
+    border-color: var(--border-dark);
+    box-shadow: 0 4px 6px -1px rgba(119, 21, 21, 0.4);
+    color: var(--text-darkmode); /* Asegura el texto claro */
+}
+
+/* --- 4. Oscurecer el Selector de Roles y Labels --- */
+.dark-mode .form-label {
+    color: var(--text-darkmode);
+}
+
 
 .mainHeader {
     box-shadow: var(--shadow);
