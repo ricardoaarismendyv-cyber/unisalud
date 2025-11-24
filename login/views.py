@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout # para manejar la sesión del usuario
 from django.contrib import messages
-from usuario.models import Usuarios, pacientes, profesionalsalud
+from usuario.models import Usuarios, Pacientes, ProfesionalSalud
 
 def login_view(request):
     if request.method == 'POST':
@@ -15,19 +15,19 @@ def login_view(request):
 
                 if usuario.id_rol.nombre_rol == 'paciente': # Corregido: La relación es a través de id_rol
                     try:
-                        paciente = pacientes.objects.get(usuario=usuario)
+                        paciente = Pacientes.objects.get(id_usuario=usuario)
                         request.session['id_paciente'] = paciente.id_paciente
                         return redirect('inicio-usuario')
-                    except pacientes.DoesNotExist:
+                    except Pacientes.DoesNotExist:
                         messages.error(request, 'Este usuario no tiene un perfil de paciente asociado.')
                         return render(request, 'paginas/login.html')
                 
                 elif usuario.id_rol.nombre_rol in ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']: # Corregido: La relación es a través de id_rol
                     try:
-                        prof_salud = profesionalsalud.objects.get(usuario=usuario)
+                        prof_salud = ProfesionalSalud.objects.get(usuario=usuario)
                         request.session['id_profesional'] = prof_salud.id_profesional
                         return redirect('inicio_prof_salud')
-                    except profesionalsalud.DoesNotExist:
+                    except ProfesionalSalud.DoesNotExist:
                         messages.error(request, 'Este usuario no tiene un perfil de profesional de salud asociado.')
                         return render(request, 'paginas/login.html')
                 else:
