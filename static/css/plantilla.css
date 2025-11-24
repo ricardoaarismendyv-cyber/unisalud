@@ -173,6 +173,53 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--white);
 }
 
+/* Oscurecer la sección de bienvenida y selector de roles */
+.dark-mode .col-lg-8, 
+.dark-mode .col-md-12,
+.dark-mode .welcome-section,
+.dark-mode .role-selector {
+    /* se Usa un color transparente para que el fondo del body se vea */
+    background-color: transparent !important; 
+    color: var(--text-darkmode);
+}
+
+.dark-mode .welcome-title, 
+.dark-mode .patient-name,
+.dark-mode .welcome-subtitle {
+    color: var(--text-darkmode) !important;
+}
+
+* La columna principal que contiene el texto de bienvenida y las tarjetas */
+.dark-mode .col-lg-8 {
+    background-color: transparent !important;
+}
+
+/* El contenedor principal de Bootstrap */
+.dark-mode .container-fluid {
+    background-color: black !important;
+    color: var(--text-darkmode); /* Aplicar color de texto claro */
+}
+
+/* 2. Oscurecer el Selector de Roles */
+.dark-mode .role-selector {
+    background-color: transparent !important; 
+}
+
+.dark-mode .form-label {
+    color: var(--text-darkmode) !important;
+}
+
+.dark-mode .form-select {
+    /* Usamos un color oscuro diferente para darle profundidad al formulario */
+    background-color: #1f2937 !important; 
+    color: var(--text-darkmode) !important;
+    border-color: #374151 !important;
+}
+
+.dark-mode .form-select option {
+    background-color: #1f2937 !important;
+}
+
 /* fin css inicio*/
 
 .mainHeader {
