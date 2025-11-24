@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from login.decorators import role_required
-from .models import pacientes, Usuarios, Roles, tipoidentificacion, genero
+from .models import Pacientes, Usuarios, Roles, TipoIdentificacion, Genero
 from django.contrib import messages
 
 @role_required(allowed_roles=['paciente'])
@@ -8,9 +8,9 @@ def inicio_usuario(request):
     try:
         # Obtener el ID del paciente desde la sesión
         paciente_id = request.session.get('id_paciente')
-        paciente = pacientes.objects.get(id_paciente=paciente_id)
+        paciente = Pacientes.objects.get(id_paciente=paciente_id)
         return render(request, 'paginas/inicio-usuario.html', {'paciente': paciente})
-    except pacientes.DoesNotExist:
+    except Pacientes.DoesNotExist:
         messages.error(request, 'No se encontró el perfil del paciente.')
         return redirect('login')
 
@@ -43,8 +43,8 @@ def buzonsugerencias(request):
 # Registror nuevos usuarios-pacientes
 def registro(request):
     # Cargar datos para los <select> del formulario
-    tipos_id = tipoidentificacion.objects.all()
-    generos = genero.objects.all()
+    tipos_id = TipoIdentificacion.objects.all()
+    generos = Genero.objects.all()
     context = {
         'tipos_identificacion': tipos_id,
         'generos': generos
@@ -87,10 +87,10 @@ def registro(request):
 
             # Para crear el Perfil del Paciente 
             # Se obtienen de las llaves foráneas.
-            tipo_id_obj = tipoidentificacion.objects.get(id_tipo_identificacion=request.POST.get('tipoDocumento'))
-            genero_obj = genero.objects.get(id_genero=request.POST.get('genero'))
+            tipo_id_obj = TipoIdentificacion.objects.get(id_tipo_identificacion=request.POST.get('tipoDocumento'))
+            genero_obj = Genero.objects.get(id_genero=request.POST.get('genero'))
 
-            pacientes.objects.create(
+            Pacientes.objects.create(
                 usuario=nuevo_usuario,
                 nombre1=request.POST.get('primerNombre'),
                 nombre2=request.POST.get('segundoNombre'),

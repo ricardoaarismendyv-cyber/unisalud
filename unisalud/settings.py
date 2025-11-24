@@ -85,15 +85,14 @@ WSGI_APPLICATION = 'unisalud.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql'),
-        'NAME': os.getenv('DB_NAME', 'unisaludBD'),
-        'USER': os.getenv('DB_USER', 'admin'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'unisaludBD*'),
-        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'unisaludBD',  # Nombre de la BD
+        'USER': 'admin',  # Usuario de MySQL
+        'PASSWORD': 'unisaludBD*',  # Cambia por tu contraseña
+        'HOST': 'localhost',  # Servidor de BD
+        'PORT': '5432',  # Puerto de MySQL (por defecto)
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

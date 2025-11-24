@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from usuario.models import profesionalsalud, Usuarios, Roles, tipoidentificacion, genero, centrosmedicos, especialidades
+from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades
 
 
 def inicio_prof_salud(request):
@@ -12,9 +12,9 @@ def inicio_prof_salud(request):
         try:
                 # Obtener el ID del profesional desde la sesión y buscar el objeto
                 profesional_id = request.session.get('id_profesional')
-                profesional = profesionalsalud.objects.get(id_profesional=profesional_id)
+                profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
                 return render(request, 'paginas/inicio_prof_salud.html', {'profesional': profesional})
-        except profesionalsalud.DoesNotExist:
+        except ProfesionalSalud.DoesNotExist:
                 messages.error(request, 'No se encontró el perfil del profesional de salud.')
                 return redirect('login')
 
@@ -44,7 +44,7 @@ def contactanos_prof_salud(request):
 
 def registro_prof_salud(request):
     context = {
-        'tipos_identificacion': tipoidentificacion.objects.all(),
-        'generos': genero.objects.all(),
+        'tipos_identificacion': TipoIdentificacion.objects.all(),
+        'generos': Genero.objects.all(),
     }
     return render(request, 'paginas/registro_prof_salud.html', context)
