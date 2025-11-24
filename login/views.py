@@ -11,9 +11,9 @@ def login_view(request):
             usuario = Usuarios.objects.get(nombre_usuario=nombre_usuario)
             if usuario.check_password(contrasena):
                 request.session['id_usuario'] = usuario.id_usuario
-                request.session['nombre_rol'] = usuario.id_rol.nombre_rol # Corregido: La relación es a través de id_rol
+                request.session['nombre_rol'] = usuario.id_rol.nombre_rol 
 
-                if usuario.id_rol.nombre_rol == 'paciente': # Corregido: La relación es a través de id_rol
+                if usuario.id_rol.nombre_rol == 'paciente':
                     try:
                         paciente = pacientes.objects.get(usuario=usuario)
                         request.session['id_paciente'] = paciente.id_paciente
