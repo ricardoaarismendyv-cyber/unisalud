@@ -29,7 +29,7 @@ class Usuarios(models.Model):
     def __str__(self):
         return self.nombre_usuario
 
-#manejar contraseñas de forma segura
+#manejar contraseñas de forma segura hash
 #set_password: toma la contraseña en texto plano y la codifica antes de almacenarla en la base de datos.
     def set_password(self, raw_password):
         self.contrasena = make_password(raw_password)
