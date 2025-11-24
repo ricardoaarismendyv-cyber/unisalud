@@ -1,5 +1,6 @@
 from django.contrib import admin
-
+# indica al administrador Django la contraseña segura-hash
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import (
     afiliacion,
     antecedentespaciente,
@@ -42,8 +43,11 @@ models_to_register = [
     estadocivil, estadoorden, estratosocioeconomico, genero, gruporh, incapacidad, # Mantener estos si son los nombres correctos
     medicamentos, nivelesatencion, ordenmedica, pacientes, profesionalsalud, # Mantener estos si son los nombres correctos
     redessalud, regionsalud, resultadoslaboratorio, Roles, servicios, # Mantener estos si son los nombres correctos
-    tipoidentificacion, tipoorden, tiposafiliacion, turnos, Usuarios
+    tipoidentificacion, tipoorden, tiposafiliacion, turnos
 ]
 
 for model in models_to_register:
     admin.site.register(model)
+
+# Registramos el modelo Usuarios usando nuestra clase personalizada
+admin.site.register(Usuarios, UsuariosAdmin)
