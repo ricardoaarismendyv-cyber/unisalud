@@ -43,7 +43,7 @@ models_to_register = [
     estadocivil, estadoorden, estratosocioeconomico, genero, gruporh, incapacidad, # Mantener estos si son los nombres correctos
     medicamentos, nivelesatencion, ordenmedica, pacientes, profesionalsalud, # Mantener estos si son los nombres correctos
     redessalud, regionsalud, resultadoslaboratorio, Roles, servicios, # Mantener estos si son los nombres correctos
-    tipoidentificacion, tipoorden, tiposafiliacion, turnos
+    tipoidentificacion, tipoorden, tiposafiliacion, turnos, Usuarios,
 ]
 
 for model in models_to_register:
