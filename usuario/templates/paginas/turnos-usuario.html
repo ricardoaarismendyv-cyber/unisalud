@@ -33,7 +33,7 @@
                     <h1>Asignar turno</h1>
                     <center>
                         <p>Su turno en [Nombre del centro médico] es el número [Número de turno]</p>
-                        <img src="{% static "img/qrejemplo.png" %}" alt="qrEjemplo">
+                        <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR del turno" width="220">
                         <p><br>Recuerde que este número de turno cuenta con verificacion y tiempo limite tras el cual sera eliminado</p>
                     </center>
                 </div>

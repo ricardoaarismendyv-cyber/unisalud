@@ -557,14 +557,36 @@ class Incapacidad(models.Model):
         return f'Incapacidad para {self.id_paciente} del {self.fecha_inicio} al {self.fecha_fin}'
 
 from django.db import models
-from django.utils import timezone
-import uuid
+from django.core.files.base import ContentFile
+import qrcode
+from io import BytesIO
+
+from django.db import models
+from django.core.files.base import ContentFile
+import qrcode
+from io import BytesIO
 
 class Turno(models.Model):
-    codigo = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    numero = models.PositiveIntegerField()
-    creado = models.DateTimeField(default=timezone.now)
-    expiracion = models.DateTimeField()
+    codigo = models.CharField(max_length=20, unique=True)  # Ej: "TURNO-001"
+    qr = models.ImageField(upload_to="turnos/qr/", blank=True, null=True)
 
     def __str__(self):
-        return f"Turno {self.numero}"
+        return self.codigo
+
+    def generar_qr(self):
+        """
+        Genera el QR a partir del código del turno.
+        """
+        qr_img = qrcode.make(self.codigo)
+        buffer = BytesIO()
+        qr_img.save(buffer, format="PNG")
+        nombre_archivo = f"qr_turno_{self.codigo}.png"
+        self.qr.save(nombre_archivo, ContentFile(buffer.getvalue()), save=False)
+
+    def save(self, *args, **kwargs):
+        # Guardar primero para asegurar que el objeto tiene ID
+        super().save(*args, **kwargs)
+        # Generar QR si no existe
+        if not self.qr:
+            self.generar_qr()
+            super().save(*args, **kwargs)

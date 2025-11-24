@@ -29,6 +29,7 @@ urlpatterns = [
     path('usuario/', include('usuario.urls')),
     path('profesionalS/', include('prof_salud.urls')),
     path('administrativo/', include('administrativo.urls')),
+    path('usuario/', include('usuario.urls')),
     # usar LoginView directo o descomentar la línea con include si prefieres todas las rutas de auth
     #path('login/', auth_views.LoginView.as_view(), name='login'),  # alternativa: path('accounts/', include('django.contrib.auth.urls')),
 ]

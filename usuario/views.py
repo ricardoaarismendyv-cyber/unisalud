@@ -22,8 +22,32 @@ def omusuario(request):
 def omeusuario(request):
     return render(request, 'paginas/orden-medicamentos-usuario.html')
 
+# views.py
+import qrcode
+import base64
+from io import BytesIO
+import uuid
+from django.shortcuts import render
+from .models import Turno  # si quieres guardarlo en BD
+
 def turnosusuario(request):
-    return render(request, 'paginas/turnos-usuario.html')
+    # Generar un turno único
+    turno = str(uuid.uuid4())[:8]  # Ej: 'a1b2c3d4'
+
+    # Crear el QR del turno
+    qr = qrcode.make(turno)
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+    # Opcional: guardar en la base de datos
+    # Turno.objects.create(usuario=request.user, codigo=turno, fecha=timezone.now())
+
+    return render(request, 'paginas/turnos-usuario.html', {
+        "turno": turno,
+        "qr_base64": qr_base64
+    })
+
 
 def preguntasfrecuentes(request):
     return render(request, 'paginas/preguntas-frecuentes.html')
@@ -40,18 +64,3 @@ def registro(request):
 def contactanos(request):
     return render(request, 'paginas/contactanos.html')
 
-
-def generar_turno(request, token):
-    # Generar turno correlativo
-    ultimo = Turno.objects.last()
-    numero_turno = ultimo.numero + 1 if ultimo else 1
-
-    turno = Turno.objects.create(
-        numero=numero_turno,
-        expiracion=timezone.now() + timedelta(minutes=10)
-    )
-
-    return render(request, "turno_generado.html", {
-        "turno": turno,
-        "centro": "Nombre del centro médico"
-    })
