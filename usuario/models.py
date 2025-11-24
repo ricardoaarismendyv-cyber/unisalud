@@ -556,10 +556,6 @@ class Incapacidad(models.Model):
     def __str__(self):
         return f'Incapacidad para {self.id_paciente} del {self.fecha_inicio} al {self.fecha_fin}'
 
-from django.db import models
-from django.core.files.base import ContentFile
-import qrcode
-from io import BytesIO
 
 from django.db import models
 from django.core.files.base import ContentFile

@@ -38,5 +38,28 @@ def usosistema_admin(request):
 def contactanos_admin(request):
     return render(request, 'paginas/contactanos_admin.html')
 
+
+# views.py
+import qrcode
+import base64
+from io import BytesIO
+import uuid
+from django.shortcuts import render
+from usuario.models import Turno  # si quieres guardarlo en BD
+
+
+import random
+
 def turnos_admin(request):
-    return render(request, 'paginas/turnos_admin.html')
+    turno = random.randint(1000, 9999)  # Número entre 1000 y 9999
+
+    qr = qrcode.make(str(turno))
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+    return render(request, 'paginas/turnos_admin.html', {
+        "turno": turno,
+        "qr_base64": qr_base64
+    })
+

@@ -30,23 +30,21 @@ import uuid
 from django.shortcuts import render
 from .models import Turno  # si quieres guardarlo en BD
 
-def turnosusuario(request):
-    # Generar un turno único
-    turno = str(uuid.uuid4())[:8]  # Ej: 'a1b2c3d4'
+import random
 
-    # Crear el QR del turno
-    qr = qrcode.make(turno)
+def turnosusuario(request):
+    turno = random.randint(1000, 9999)  # Número entre 1000 y 9999
+
+    qr = qrcode.make(str(turno))
     buffer = BytesIO()
     qr.save(buffer, format="PNG")
     qr_base64 = base64.b64encode(buffer.getvalue()).decode()
-
-    # Opcional: guardar en la base de datos
-    # Turno.objects.create(usuario=request.user, codigo=turno, fecha=timezone.now())
 
     return render(request, 'paginas/turnos-usuario.html', {
         "turno": turno,
         "qr_base64": qr_base64
     })
+
 
 
 def preguntasfrecuentes(request):

@@ -68,7 +68,7 @@
                     <center class="mt-4">
                         <p>El turno del usuario [Nombre del usuario] en [Nombre del centro médico] es el número [Número de turno].</p>
                         <p>Este turno tambien se encuentra visible en la cuenta del usuario.</p>
-                        <img src="{% static 'img/qrejemplo.png' %}" alt="qrEjemplo">
+                        <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR del turno" width="220">
                         <p><br>Recuerde que este número de turno cuenta con verificación y tiempo límite tras el cual será eliminado</p>
                     </center>
                 </div>
