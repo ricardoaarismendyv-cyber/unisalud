@@ -1,6 +1,6 @@
 from django.contrib import admin
-#indica al administrador Django la contraseña segura-hash
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm # Formularios que heredan de los formularios base de Django, estos formularios piden la contraseña dos veces para confirmarla y manejan el hasheo de la contraseña automáticamente
+from django import forms
 from .models import (
     Afiliacion,
     AntecedentesPaciente,
@@ -35,14 +35,37 @@ from .models import (
     Usuarios,
 )
 
-# Se define una clase Admin: UsuariosAdmin para el modelo Usuarios, con el fin de que el panel administracion sepa que la contraseña no debe mostrarse en texto plano
-class UsuariosAdmin(BaseUserAdmin):
-    # Campos que se mostrarán en la lista de usuarios, para mejorar la usabilidad en el panel de administración
+# se usan formularios personalizados para manejar la creación de usuarios y el hasheo de contraseñas
+class CustomUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = Usuarios
+        fields = ('nombre_usuario', 'email', 'id_rol')
+# # Formularios que heredan de los formularios base de Django, estos formularios piden la contraseña dos veces para confirmarla y manejan el hasheo de la contraseña automáticamente
+class CustomUserChangeForm(UserChangeForm):
+    class Meta:
+        model = Usuarios
+        fields = ('nombre_usuario', 'email', 'id_rol')
+
+class UsuariosAdmin(admin.ModelAdmin):
+    # Formularios para creación y edición de usuarios en el panel administrativo
+    form = CustomUserChangeForm
+    add_form = CustomUserCreationForm
+
+    # Campos a mostrar en la lista
     list_display = ('nombre_usuario', 'email', 'id_rol')
-    # Campos por los que se podrá buscar, para mejorar la usabilidad en el panel de administración
+    # Campos para búsqueda
     search_fields = ('nombre_usuario', 'email')
-    # Campos que no son editables directamente en el admin (la contraseña se maneja aparte)
-    readonly_fields = ()
+    # Filtros en la barra lateral
+    list_filter = ('id_rol',)
+    
+    # Define los campos que se mostrarán en el formulario de creación/edición
+    # La contraseña no se incluye aquí porque los formularios base la manejan por separado
+    fieldsets = (
+        (None, {'fields': ('nombre_usuario', 'email', 'id_rol')}),
+    )
+    add_fieldsets = (
+        (None, {'fields': ('nombre_usuario', 'email', 'id_rol', 'password', 'password2')}),
+    )
 
 models_to_register = [
     Afiliacion, AntecedentesPaciente, CentrosMedicos, Ciudad, Consulta, Departamento,
