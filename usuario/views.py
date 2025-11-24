@@ -6,10 +6,13 @@ from django.contrib import messages
 @role_required(allowed_roles=['paciente'])
 def inicio_usuario(request):
     try:
-        # Obtener el ID del paciente desde la sesión
         paciente_id = request.session.get('id_paciente')
+        if not paciente_id:
+            # Si no hay id_paciente en la sesión, es un error de acceso.
+            messages.error(request, 'No tienes permiso para acceder a esta página. Se requiere un perfil de paciente.')
+            return redirect('login')
         paciente = Pacientes.objects.get(id_paciente=paciente_id)
-        return render(request, 'paginas/inicio-usuario.html', {'paciente': paciente})
+        return render(request, 'paginas/inicio-usuario.html', {'paciente': paciente, 'roles': request.session.get('roles', [])})
     except Pacientes.DoesNotExist:
         messages.error(request, 'No se encontró el perfil del paciente.')
         return redirect('login')
@@ -76,14 +79,14 @@ def registro(request):
         try:
             #busca el rol paciente
             rol_paciente = Roles.objects.get(nombre_rol='paciente')
-            #Asigna al nuevo usuario el rol paciente
+            #Crea el nuevo usuario
             nuevo_usuario = Usuarios(
                 nombre_usuario=nombre_usuario,
                 email=email,
-                id_rol=rol_paciente, #se asigna el rol paciente
             )
             nuevo_usuario.set_password(contrasena) # Hashear (huella digital, identificador unico, asegura la integridad de los datos) y guardar contraseña
             nuevo_usuario.save()
+            nuevo_usuario.roles.add(rol_paciente) # Asigna el rol paciente usando la relación ManyToMany
 
             # Para crear el Perfil del Paciente 
             # Se obtienen de las llaves foráneas.
