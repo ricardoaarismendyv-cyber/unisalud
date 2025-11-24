@@ -149,59 +149,7 @@
         <!-- Bloque para scripts específicos de cada página -->
         {% block script %}
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // --- Lógica para la barra lateral de accesibilidad ---
-                const accessibilityIcon = document.getElementById('accessibility-icon');
-                const sidebar = document.getElementById('accessibility-sidebar');
-                const closeSidebarBtn = document.getElementById('close-sidebar-btn');
-
-                if (accessibilityIcon && sidebar && closeSidebarBtn) {
-                    accessibilityIcon.addEventListener('click', function() {
-                        sidebar.style.width = '280px'; // Abre la barra lateral
-                    });
-
-                    closeSidebarBtn.addEventListener('click', function() {
-                        sidebar.style.width = '0'; // Cierra la barra lateral
-                    });
-                }
-
-                // --- Funcionalidad de los botones de accesibilidad ---
-                const body = document.getElementById('page-body');
-                const increaseFontBtn = document.getElementById('increase-font');
-                const decreaseFontBtn = document.getElementById('decrease-font');
-                const dyslexiaFontBtn = document.getElementById('dyslexia-font');
-                const highContrastBtn = document.getElementById('high-contrast');
-                const resetAccessibilityBtn = document.getElementById('reset-accessibility');
-
-                let currentFontSize = parseFloat(window.getComputedStyle(body).fontSize);
-
-                increaseFontBtn.addEventListener('click', function() {
-                    currentFontSize += 1;
                     body.style.fontSize = currentFontSize + 'px';
-                });
-
-                decreaseFontBtn.addEventListener('click', function() {
-                    currentFontSize -= 1;
-                    body.style.fontSize = currentFontSize + 'px';
-                });
-
-                dyslexiaFontBtn.addEventListener('click', function() {
-                    body.classList.toggle('dyslexia-font');
-                });
-
-                highContrastBtn.addEventListener('click', function() {
-                    body.classList.toggle('high-contrast');
-                });
-
-                resetAccessibilityBtn.addEventListener('click', function() {
-                    // Elimina las clases de accesibilidad
-                    body.classList.remove('high-contrast', 'dyslexia-font');
-                    // Restablece el tamaño de fuente eliminando el estilo en línea
-                    body.style.fontSize = '';
-                    // Actualiza el valor de la fuente actual por si el usuario vuelve a interactuar
-                    currentFontSize = parseFloat(window.getComputedStyle(body).fontSize);
-                });
-            });
         </script>
         {% endblock script %}
         
