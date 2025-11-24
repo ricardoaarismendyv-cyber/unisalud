@@ -15,7 +15,7 @@ def login_view(request):
 
                 if usuario.id_rol.nombre_rol == 'paciente': # Corregido: La relación es a través de id_rol
                     try:
-                        paciente = Pacientes.objects.get(id_usuario=usuario)
+                        paciente = Pacientes.objects.get(usuario=usuario)
                         request.session['id_paciente'] = paciente.id_paciente
                         return redirect('inicio-usuario')
                     except Pacientes.DoesNotExist:
