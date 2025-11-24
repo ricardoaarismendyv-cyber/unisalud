@@ -53,6 +53,11 @@ body.dark-mode {
     color: #e5e7eb !important;
 }
 
+main.dark-mode{
+        background: #000 !important;
+    color: #e5e7eb !important;
+}
+
 /* css de inicio */
 .main {
     margin-top: 40px;
