@@ -84,3 +84,8 @@ _______________________________________________
 10-11 de noviembre
 - se conecta BD en models prof_salud y usuario. Tener en cuenta que para conectar la otra aplicacion, en este caso 'usuario' se realizo copiar-pegar.
 - Se trae el archivo sql de la BD unisalud a vscode: No olvidar que los cambios realizados aquí, se deben hacer en MySQL también --> al exportar o importar (server data import o data export) se debe escoger entre las opciones para exportar: Structure and data - export to self-contained file: escoger donde guardar - start export. Para importar: import from self-contained file - default target schema (escoger el nombre de la BD en vscode) - dump structure and data - start import. Cuando se realiza no deben aparecer errores.
+ARCHIVO .ENV
+- Crear carpete -env
+- Al inicio de settings, despues de import os se coloca: from dotenv import load_dotenv
+- Se copia y pega la seguridad, la BD al .env
+- luego en settings se coloca getenv, borrando los datos importantes para que quede oculto de verdad

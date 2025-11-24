@@ -1,29 +1,22 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import logout
+from django.contrib import messages
+from usuario.models import profesionalsalud, Usuarios, Roles, tipoidentificacion, genero, centrosmedicos, especialidades
 
-# Create your views here.
-
-def login_prof_salud(request):
-    # Si ya está autenticado, redirige a la página de inicio del profesional
-    if request.user.is_authenticated:
-        return redirect('inicio_prof_salud')  # nombre de ruta corregido
-
-    # Lista mínima de roles para la plantilla (reemplazar por consulta a BD si existe modelo Role)
-    roles = [
-        {'id': 'prof_salud', 'nombre': 'Profesional Salud'},
-        {'id': 'usuario', 'nombre': 'Usuario'},
-        {'id': 'administrativo', 'nombre': 'Administrativo'},
-    ]
-
-    # Renderiza la página de login pasando los roles
-    return render(request, 'paginas/login_prof_salud.html', {'roles': roles})
 
 def inicio_prof_salud(request):
-    return render(request, 'paginas/inicio_prof_salud.html') #Vista de inicio para el profesional de salud
+        # Verificar si el usuario es un profesional de la salud
+        if request.session.get('nombre_rol') not in ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']:
+                messages.error(request, 'Acceso no autorizado.')
+                return redirect('login')
 
-def logout_prof_salud(request):
-    logout(request)
-    return redirect('inicio_prof_salud') #Redirige a la página de inicio general tras cerrar sesión.
+        try:
+                # Obtener el ID del profesional desde la sesión y buscar el objeto
+                profesional_id = request.session.get('id_profesional')
+                profesional = profesionalsalud.objects.get(id_profesional=profesional_id)
+                return render(request, 'paginas/inicio_prof_salud.html', {'profesional': profesional})
+        except profesionalsalud.DoesNotExist:
+                messages.error(request, 'No se encontró el perfil del profesional de salud.')
+                return redirect('login')
 
 def hc_prof_salud(request):
     return render(request, 'paginas/hc_prof_salud.html') #Vista de Historia Clínica para el profesional de salud
@@ -37,9 +30,6 @@ def omed_prof_salud(request):
 def consultas_prof_salud(request):
     return render(request, 'paginas/consultas_prof_salud.html') #Vista de Turnos/Agendamiento para el profesional de salud
 
-def registro_prof_salud(request):
-    return render(request, 'paginas/registro_prof_salud.html') #Vista para el formulario de registro de nuevos usuarios.   
-
 def preguntasfrecuentes_prof_salud(request):
     return render(request, 'paginas/preguntas-frecuentes_prof_salud.html')
 
@@ -52,3 +42,9 @@ def buzonsugerencias_prof_salud(request):
 def contactanos_prof_salud(request):
     return render(request, 'paginas/contactanos_prof_salud.html')
 
+def registro_prof_salud(request):
+    context = {
+        'tipos_identificacion': tipoidentificacion.objects.all(),
+        'generos': genero.objects.all(),
+    }
+    return render(request, 'paginas/registro_prof_salud.html', context)

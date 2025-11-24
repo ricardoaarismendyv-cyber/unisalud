@@ -5,9 +5,7 @@ from . import views
 
 
 urlpatterns = [ 
-    path('', views.login_prof_salud, name='login_prof_salud'),
     path('inicio_prof_salud/', views.inicio_prof_salud, name='inicio_prof_salud'),
-    path('logout_prof_salud/', views.logout_prof_salud, name='logout_prof_salud'),
     path('paciente/logout_prof_salud/historia_clinica/', views.hc_prof_salud, name='hc_prof_salud'),
     path('historia_clinica/', views.hc_prof_salud, name='hc_prof_salud'),
     path('ordenes_medicas/', views.om_prof_salud, name='om_prof_salud'),
@@ -16,6 +14,5 @@ urlpatterns = [
     path('preguntas-frecuentes', views.preguntasfrecuentes_prof_salud, name='preguntas-frecuentes_prof_salud'),
     path('uso-del-sistema', views.usosistema_prof_salud, name='usosistema_prof_salud'),
     path('buzon-sugerencias', views.buzonsugerencias_prof_salud, name='buzonsugerencias_prof_salud'),
-    path('registrarse/', views.registro_prof_salud, name='registro_prof_salud'),
     path('contactanos', views.contactanos_prof_salud, name='contactanos_prof_salud')
 ]
