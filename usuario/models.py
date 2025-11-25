@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password #para codificar y verificar las contraseñas de forma segura
+from django.template.loader import render_to_string  # soporte plantilla PDF para HC
+from xhtml2pdf import pisa  # motor conversión HTML → PDF
+from io import BytesIO  # buffer en memoria GUARDAR PDF
 
 
 # aqui cambio los nombres de las clases a tipo CamelCase (nombre pegado con cada primera letra de la palabra en mayuscula)
@@ -22,13 +25,10 @@ class Roles(models.Model):
 
 class Usuarios(models.Model):
     id_usuario = models.AutoField(primary_key=True, db_comment='ID autoincremental del usuario')
-    id_rol = models.ForeignKey('Roles', models.DO_NOTHING, db_column='id_rol', db_comment='Rol asignado para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
-    nombre_usuario = models.CharField(unique=True, max_length=150, db_comment='Nombre de usuario para login')
-    contrasena = models.CharField(max_length=128, db_comment='Contraseña codificada para login')
-    email = models.EmailField(unique=True, max_length=254, db_comment='Correo electrónico del usuario')
-    
-    USERNAME_FIELD = 'nombre_usuario'
-    REQUIRED_FIELDS = ['email']
+    roles = models.ManyToManyField('Roles', db_comment='Roles asignados para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
+    nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
+    contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
+    email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
     
     class Meta:
         managed = True
@@ -437,6 +437,28 @@ class Consulta(models.Model):
 
     def __str__(self):
         return f'Consulta {self.id_consulta} - {self.id_paciente}'
+
+    # NUEVO: generar PDF en memoria
+    def generate_pdf(self):
+        html = render_to_string(
+            'pdf/consulta_pdf.html',
+            {'consulta': self, 'paciente': self.id_paciente, 'profesional': self.id_profesional}
+        )
+        pdf_buffer = BytesIO()
+        pisa.CreatePDF(html, dest=pdf_buffer)
+        return pdf_buffer.getvalue()
+
+    # opcional: guarda el PDF físico dentro de MEDIA_ROOT/historial/
+    def save_pdf_file(self, storage_path='historial'):
+        from django.conf import settings
+        import os
+        pdf_bytes = self.generate_pdf()
+        filename = f'consulta_{self.id_consulta}.pdf'
+        full_dir = os.path.join(settings.MEDIA_ROOT, storage_path)
+        os.makedirs(full_dir, exist_ok=True)
+        with open(os.path.join(full_dir, filename), 'wb') as f:
+            f.write(pdf_bytes)
+        return f'{storage_path}/{filename}'
 
 
 class OrdenMedica(models.Model):

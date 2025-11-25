@@ -11,25 +11,36 @@ def login_view(request):
             usuario = Usuarios.objects.get(nombre_usuario=nombre_usuario)
             if usuario.check_password(contrasena):
                 request.session['id_usuario'] = usuario.id_usuario
-                request.session['nombre_rol'] = usuario.id_rol.nombre_rol 
-
-                if usuario.id_rol.nombre_rol == 'paciente':
-                    try:
-                        paciente = Pacientes.objects.get(id_usuario=usuario)
-                        request.session['id_paciente'] = paciente.id_paciente
-                        return redirect('inicio-usuario')
-                    except Pacientes.DoesNotExist:
-                        messages.error(request, 'Este usuario no tiene un perfil de paciente asociado.')
-                        return render(request, 'paginas/login.html')
                 
-                elif usuario.id_rol.nombre_rol in ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']: # Corregido: La relación es a través de id_rol
+                # Obtenemos una lista de los nombres de los roles del usuario
+                roles_usuario = [rol.nombre_rol for rol in usuario.roles.all()]
+                request.session['roles'] = roles_usuario
+
+                # Intentamos cargar el perfil de paciente si el rol existe
+                if 'paciente' in roles_usuario:
+                    try:
+                        paciente = Pacientes.objects.get(usuario=usuario)
+                        request.session['id_paciente'] = paciente.id_paciente
+                    except Pacientes.DoesNotExist:
+                        messages.warning(request, 'El usuario tiene el rol de paciente, pero no un perfil de paciente asociado.')
+
+                # Intentamos cargar el perfil profesional si el rol existe
+                roles_profesionales = ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']
+                if any(rol in roles_profesionales for rol in roles_usuario):
                     try:
                         prof_salud = ProfesionalSalud.objects.get(usuario=usuario)
                         request.session['id_profesional'] = prof_salud.id_profesional
-                        return redirect('inicio_prof_salud')
                     except ProfesionalSalud.DoesNotExist:
-                        messages.error(request, 'Este usuario no tiene un perfil de profesional de salud asociado.')
-                        return render(request, 'paginas/login.html')
+                        messages.warning(request, 'El usuario tiene un rol profesional, pero no un perfil de profesional de salud asociado.')
+
+                # Priorizamos roles de personal de salud
+                if any(rol in roles_profesionales for rol in roles_usuario):
+                    if 'id_profesional' in request.session:
+                        return redirect('inicio_prof_salud')
+                # Si no es profesional, verificamos si es paciente
+                elif 'paciente' in roles_usuario:
+                    if 'id_paciente' in request.session:
+                        return redirect('inicio-usuario')
                 else:
                     messages.error(request, 'Rol no reconocido o sin página de inicio definida.')
             else:
