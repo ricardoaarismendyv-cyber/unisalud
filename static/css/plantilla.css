@@ -105,6 +105,23 @@ main.dark-mode{
     gap: 8px;
 }
 
+.dark-mode .navButton0, .navButton1, .foot-button, .login-btn {
+    padding: 12px 24px;
+    color: var(#1e293b);
+    background: linear-gradient(135deg, var(#1e293b));
+    cursor: pointer;
+    position: relative;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
 .navButton0:hover, .navButton1:hover, .foot-button:hover, .login-btn:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-hover);
@@ -152,7 +169,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .custom-highlight-btn:hover {
-    background: linear-gradient(135deg, #0d9c6d, var(--secondary-color));
+    background: linear-gradient(135deg, #1f2937, var(--secondary-color));
     box-shadow: var(--shadow-hover);
     transform: translateY(-2px);
 }
@@ -260,6 +277,17 @@ h1, h2, h3, h4, h5, h6 {
     height: 70px;
 }
 
+.dark-mode .mainNav{
+    background: linear-gradient(135deg,#1f2937, #19212d) !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 70px;
+}
+
 .navLogo {
     margin-right: 15px;
     margin-left: 15px;
@@ -348,7 +376,28 @@ h1, h2, h3, h4, h5, h6 {
     padding-top: 20px;
 }
 
+.dark-mode .footer-bar {
+    background: linear-gradient(135deg, #1f2937, #19212d) !important;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    height: 80px;
+    padding-top: 20px;
+}
+
+
 .footer-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.dark-mode .footer-nav{
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -379,6 +428,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .access-button, .dark-mode-btn {
     transition: transform 0.3s ease;
+    color: white;
 }
 
 .access-button:hover, .dark-mode-btn:hover {

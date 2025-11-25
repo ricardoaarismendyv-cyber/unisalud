@@ -23,6 +23,8 @@
         {% endblock estilo %}
         <!-- Fuentes de Google: OpenDyslexic para accesibilidad -->
         <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+        <link rel="stylesheet" href="{% static 'css/plantilla.css' %}">
+
     </head>
 
     <body id="page-body">
@@ -54,6 +56,7 @@
                     alt="toggle-off" style="cursor: pointer;">
                 <img id="moon-icon" src="{% static "img/moon.svg" %}" alt="moon" style="cursor: pointer;">
             </li>
+            
             <!-- Contenedor para el menú de accesibilidad -->
             <li class="navLogo accessibility-container">
                 <img id="accessibility-icon" class="access-button" src="{% static "img/accessibility.svg" %}" alt="Opciones de accesibilidad">
