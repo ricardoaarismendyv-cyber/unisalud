@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from login.decorators import role_required
 from .models import Pacientes, Usuarios, Roles, TipoIdentificacion, Genero
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from usuario.models import Consulta
 
 @role_required(allowed_roles=['paciente'])
 def inicio_usuario(request):
@@ -19,7 +21,9 @@ def inicio_usuario(request):
 
 @role_required(allowed_roles=['paciente'])
 def hcusuario(request):
-    return render(request, 'paginas/historia-clinica-usuario.html')
+    paciente = getattr(request.user, 'paciente', None) #para lo del pdf
+    consultas = Consulta.objects.filter(id_paciente=paciente).order_by('-fecha_programada') if paciente else []
+    return render(request, 'paginas/historia-clinica-usuario.html', {'consultas': consultas})
 
 @role_required(allowed_roles=['paciente'])
 def omusuario(request):
