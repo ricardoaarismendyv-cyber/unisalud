@@ -11,6 +11,7 @@ def inicio_usuario(request):
             # Si no hay id_paciente en la sesión, es un error de acceso.
             messages.error(request, 'No tienes permiso para acceder a esta página. Se requiere un perfil de paciente.')
             return redirect('login')
+        request.session['active_role'] = 'paciente' # <--- AÑADIR ESTA LÍNEA
         paciente = Pacientes.objects.get(id_paciente=paciente_id)
         return render(request, 'paginas/inicio-usuario.html', {'paciente': paciente, 'roles': request.session.get('roles', [])})
     except Pacientes.DoesNotExist:

@@ -1,10 +1,14 @@
 from django.shortcuts import render, redirect
+from login.decorators import role_required
+from django.contrib import messages
 
 # Create your views here.
+ALLOWED_ADMIN_ROLES = ['admin_centro_medico']
 
 def login_admin(request):
     return render(request, 'paginas/login_admin.html')
 
+@role_required(allowed_roles=ALLOWED_ADMIN_ROLES)
 def inicio_admin(request):
     return render(request, 'paginas/inicio_admin.html')
 
@@ -40,3 +44,6 @@ def contactanos_admin(request):
 
 def turnos_admin(request):
     return render(request, 'paginas/turnos_admin.html')
+    request.session['active_role'] = 'admin_centro_medico' # <--- AÑADIR ESTA LÍNEA
+    # Aquí puedes añadir lógica para buscar el perfil del admin si es necesario
+    return render(request, 'paginas/inicio_admin.html', {'roles': request.session.get('roles', [])})
