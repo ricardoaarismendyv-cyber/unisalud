@@ -14,5 +14,6 @@ urlpatterns = [
     path('preguntas-frecuentes', views.preguntasfrecuentes_prof_salud, name='preguntas-frecuentes_prof_salud'),
     path('uso-del-sistema', views.usosistema_prof_salud, name='usosistema_prof_salud'),
     path('buzon-sugerencias', views.buzonsugerencias_prof_salud, name='buzonsugerencias_prof_salud'),
-    path('contactanos', views.contactanos_prof_salud, name='contactanos_prof_salud')
+    path('contactanos', views.contactanos_prof_salud, name='contactanos_prof_salud'),
+    path('consulta/<int:consulta_id>/pdf/', views.consulta_pdf, name='consulta_pdf'),
 ]
