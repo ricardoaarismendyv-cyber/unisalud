@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password #para codificar y verificar las contraseñas de forma segura
 
+
 # aqui cambio los nombres de las clases a tipo CamelCase (nombre pegado con cada primera letra de la palabra en mayuscula)
 #cambio las tablas de db_table a su respectivo en minuscula y un guion bajo
 #cambio las foreignKey para que usen la class adecuada
@@ -22,9 +23,12 @@ class Roles(models.Model):
 class Usuarios(models.Model):
     id_usuario = models.AutoField(primary_key=True, db_comment='ID autoincremental del usuario')
     id_rol = models.ForeignKey('Roles', models.DO_NOTHING, db_column='id_rol', db_comment='Rol asignado para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
-    nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
-    contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
-    email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
+    nombre_usuario = models.CharField(unique=True, max_length=150, db_comment='Nombre de usuario para login')
+    contrasena = models.CharField(max_length=128, db_comment='Contraseña codificada para login')
+    email = models.EmailField(unique=True, max_length=254, db_comment='Correo electrónico del usuario')
+    
+    USERNAME_FIELD = 'nombre_usuario'
+    REQUIRED_FIELDS = ['email']
     
     class Meta:
         managed = True
@@ -370,7 +374,7 @@ class ProfesionalSalud(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'profesional_salud'
+        db_table = 'profesionalsalud'  # Sin guion bajo
         unique_together = (('id_tipo_identificacion', 'numero_documento'),)
         verbose_name = 'Profesional de Salud'
         verbose_name_plural = 'Profesionales de Salud'
