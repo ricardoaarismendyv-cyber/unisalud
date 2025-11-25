@@ -174,18 +174,27 @@ h1, h2, h3, h4, h5, h6 {
     color: #f1f5f9;
 }
 
-.dark-mode .div-main .btn-main {
-    color: var(--white);
+/*Tarjeta de caracterizacion en modo oscuro*/
+.dark-mode .feature-card {
+    background-color: #1e293b !important; /* azul gris oscuro */
+    border-color: #334155 !important;
+    color: #e2e8f0 !important; /* texto claro */
 }
 
-/* Oscurecer la sección de bienvenida y selector de roles */
-.dark-mode .col-lg-8, 
-.dark-mode .col-md-12,
-.dark-mode .welcome-section,
-.dark-mode .role-selector {
-    /* se Usa un color transparente para que el fondo del body se vea */
-    background-color:#070c14!important; 
-    color: var(--text-darkmode);
+.dark-mode .feature-card h3 {
+    color: #f8fafc !important;
+}
+
+.dark-mode .feature-card p {
+    color: #cbd5e1 !important;
+}
+
+.dark-mode .feature-icon {
+    background: linear-gradient(135deg, #3b82f6, #0ea5e9) !important;
+}
+
+.dark-mode .div-main .btn-main {
+    color: var(--white);
 }
 
 .dark-mode .welcome-title, 
@@ -194,7 +203,7 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--text-darkmode) !important;
 }
 
-* La columna principal que contiene el texto de bienvenida y las tarjetas */
+/* La columna principal que contiene el texto de bienvenida y las tarjetas */
 .dark-mode .col-lg-8 {
     background-color: transparent !important;
 }
@@ -226,28 +235,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* fin css inicio*/
-/* Solo para referencia, */
 .dark-mode { 
     --text-darkmode: #e5e7eb; /* Texto claro */
-    --bg-dark: #e5e7eb;       /* Fondo oscuro para el body */
-    --bg-card: #e5e7eb;       /* Nuevo fondo para contenedores */
-    --border-dark: #e5e7eb;
 }
-
-
-.dark-mode .feature-card {
-    /* Aplicar fondo oscuro para las tarjetas (Historia Clínica, Turnos, etc.) */
-    background-color: var(--bg-card); 
-    border-color: var(--border-dark);
-    box-shadow: 0 4px 6px -1px rgba(119, 21, 21, 0.4);
-    color: var(--text-darkmode); /* Asegura el texto claro */
-}
-
-/* --- 4. Oscurecer el Selector de Roles y Labels --- */
-.dark-mode .form-label {
-    color: var(--text-darkmode);
-}
-
 
 .mainHeader {
     box-shadow: var(--shadow);
