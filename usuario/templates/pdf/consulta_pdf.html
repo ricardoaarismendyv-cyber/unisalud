@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 12px; }
+h1 { text-align:center; font-size:18px; }
+.section { margin-bottom:12px; }
+.label { font-weight:bold; }
+.box { border:1px solid #444; padding:8px; margin-top:4px; }
+table { width:100%; border-collapse:collapse; }
+td { vertical-align:top; padding:4px; }
+hr { margin:12px 0; }
+</style>
+</head>
+<body>
+<h1>Historia Clínica</h1>
+<hr>
+<div class="section">
+  <div class="label">Paciente:</div>
+  <div class="box">
+    {{ paciente.nombre1 }} {{ paciente.nombre2|default:'' }} {{ paciente.apellido1 }} {{ paciente.apellido2|default:'' }}<br>
+    Documento: {{ paciente.id_tipo_identificacion.identificacion }} {{ paciente.numero_documento }}<br>
+    Género: {{ paciente.id_genero.nombre_genero }}<br>
+    Fecha Nac.: {{ paciente.fecha_nacimiento }}
+  </div>
+</div>
+
+<div class="section">
+  <div class="label">Profesional:</div>
+  <div class="box">
+    {{ profesional.nombre1 }} {{ profesional.apellido1 }}<br>
+    Especialidad: {{ profesional.id_especialidad.nombre_especialidad|default:'No aplica' }}
+  </div>
+</div>
+
+<div class="section">
+  <div class="label">Datos de la consulta:</div>
+  <div class="box">
+    Fecha programada: {{ consulta.fecha_programada }}<br>
+    Fecha atención: {{ consulta.fecha_atencion|default:'Pendiente' }}<br>
+    Estado: {{ consulta.estado|default:'N/A' }}
+  </div>
+</div>
+
+<div class="section">
+  <div class="label">Motivo de consulta:</div>
+  <div class="box">{{ consulta.motivo_consulta|default:'(Sin registro)' }}</div>
+</div>
+
+<div class="section">
+  <div class="label">Anamnesis:</div>
+  <div class="box">{{ consulta.anamnesis|default:'(Sin registro)' }}</div>
+</div>
+
+<div class="section">
+  <div class="label">Examen físico:</div>
+  <div class="box">{{ consulta.examen_fisico|default:'(Sin registro)' }}</div>
+</div>
+
+<div class="section">
+  <div class="label">Signos vitales:</div>
+  <table border="1">
+    <tr>
+      <td>FC: {{ consulta.frecuencia_cardiaca|default:'-' }}</td>
+      <td>FR: {{ consulta.frecuencia_respiratoria|default:'-' }}</td>
+      <td>T: {{ consulta.temperatura|default:'-' }}</td>
+      <td>SpO2: {{ consulta.saturacion_oxigeno|default:'-' }}</td>
+    </tr>
+    <tr>
+      <td>PA Sist.: {{ consulta.presion_arterial_sistolica|default:'-' }}</td>
+      <td>PA Diast.: {{ consulta.presion_arterial_diastolica|default:'-' }}</td>
+      <td>Peso: {{ consulta.peso|default:'-' }}</td>
+      <td>Talla: {{ consulta.talla|default:'-' }}</td>
+    </tr>
+    <tr>
+      <td colspan="4">IMC: {{ consulta.imc|default:'-' }}</td>
+    </tr>
+  </table>
+</div>
+
+<div class="section">
+  <div class="label">Hábitos:</div>
+  <div class="box">
+    Fumador: {{ consulta.habitos_fumador|default:'-' }} |
+    Alcohol: {{ consulta.habitos_alcohol|default:'-' }} |
+    Ejercicio: {{ consulta.habitos_ejercicio|default:'-' }}
+  </div>
+</div>
+
+<div class="section">
+  <div class="label">Revisión por sistemas:</div>
+  <div class="box">{{ consulta.revision_sistemas|default:'(Sin registro)' }}</div>
+</div>
+
+<div class="section">
+  <div class="label">Impresión diagnóstica:</div>
+  <div class="box">{{ consulta.impresion_diagnostica|default:'(Sin registro)' }}</div>
+</div>
+
+<div class="section">
+  <div class="label">Plan de tratamiento:</div>
+  <div class="box">{{ consulta.plan_tratamiento|default:'(Sin registro)' }}</div>
+</div>
+
+<div class="section">
+  <div class="label">Notas adicionales:</div>
+  <div class="box">{{ consulta.notas_adicionales|default:'(Sin registro)' }}</div>
+</div>
+
+<div class="section" style="text-align:right;font-size:10px;">
+  Generado: {{ consulta.creado_en|default:'-' }}
+</div>
+</body>
+</html>
