@@ -36,7 +36,7 @@ def login_view(request):
                 # Priorizamos roles de personal de salud
                 if any(rol in roles_profesionales for rol in roles_usuario):
                     if 'id_profesional' in request.session:
-                        return redirect('inicio_prof_salud')
+                        return redirect('profesionalS/turnos/')
                 # Si no es profesional, verificamos si es paciente
                 elif 'paciente' in roles_usuario:
                     if 'id_paciente' in request.session:
