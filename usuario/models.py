@@ -25,7 +25,8 @@ class Roles(models.Model):
 
 class Usuarios(models.Model):
     id_usuario = models.AutoField(primary_key=True, db_comment='ID autoincremental del usuario')
-    roles = models.ManyToManyField('Roles', db_comment='Roles asignados para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
+    # Quitar db_comment del ManyToManyField (no tiene efecto)
+    roles = models.ManyToManyField('Roles', related_name='usuarios_con_rol')
     nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
     contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
     email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
