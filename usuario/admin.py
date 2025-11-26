@@ -39,12 +39,12 @@ from .models import (
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = Usuarios
-        fields = ('nombre_usuario', 'email', 'id_rol')
+        fields = ('nombre_usuario', 'email', 'roles')
 # # Formularios que heredan de los formularios base de Django, estos formularios piden la contraseña dos veces para confirmarla y manejan el hasheo de la contraseña automáticamente
 class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = Usuarios
-        fields = ('nombre_usuario', 'email', 'id_rol')
+        fields = ('nombre_usuario', 'email', 'roles')
 
 class UsuariosAdmin(admin.ModelAdmin):
     # Formularios para creación y edición de usuarios en el panel administrativo
@@ -52,19 +52,19 @@ class UsuariosAdmin(admin.ModelAdmin):
     add_form = CustomUserCreationForm
 
     # Campos a mostrar en la lista
-    list_display = ('nombre_usuario', 'email', 'id_rol')
+    list_display = ('nombre_usuario', 'email', 'roles')
     # Campos para búsqueda
     search_fields = ('nombre_usuario', 'email')
     # Filtros en la barra lateral
-    list_filter = ('id_rol',)
+    list_filter = ('roles',)
     
     # Define los campos que se mostrarán en el formulario de creación/edición
     # La contraseña no se incluye aquí porque los formularios base la manejan por separado
     fieldsets = (
-        (None, {'fields': ('nombre_usuario', 'email', 'id_rol')}),
+        (None, {'fields': ('nombre_usuario', 'email', 'roles')}),
     )
     add_fieldsets = (
-        (None, {'fields': ('nombre_usuario', 'email', 'id_rol', 'password', 'password2')}),
+        (None, {'fields': ('nombre_usuario', 'email', 'roles', 'password', 'password2')}),
     )
 
 models_to_register = [
@@ -79,4 +79,4 @@ for model in models_to_register:
     admin.site.register(model)
 
 # Registramos el modelo Usuarios usando nuestra clase personalizada
-admin.site.register(Usuarios, UsuariosAdmin) #inscribe el modelo Usuarios en el admin de Django con la configuración definida en UsuariosAdmin, es decir Quiero administrar mi modelo Usuarios en el panel de administración, y quiero que uses la configuración personalizada definida en la clase UsuariosAdmin para hacerlo
+# admin.site.register(Usuarios, UsuariosAdmin) #inscribe el modelo Usuarios en el admin de Django con la configuración definida en UsuariosAdmin, es decir Quiero administrar mi modelo Usuarios en el panel de administración, y quiero que uses la configuración personalizada definida en la clase UsuariosAdmin para hacerlo
