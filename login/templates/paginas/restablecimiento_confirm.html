@@ -1,0 +1,35 @@
+{% extends "plantilla.html" %}
+{% load static %}
+{% block title %}Ingresar Nueva Contraseña{% endblock title %}
+
+{% block content %}
+<section class="main" style="padding-top:30px">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="border border-dark rounded p-4 my-5 div-main">
+                    <h1 class="text-center">Establecer Nueva Contraseña</h1>
+                    {% if validlink %}
+                        <p class="text-center mt-3">Por favor, ingresa tu nueva contraseña dos veces para verificar que la has escrito correctamente.</p>
+                        <form method="POST">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-lg btn-success custom-highlight-btn">Cambiar mi contraseña</button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <p class="alert alert-danger text-center mt-3">
+                            El enlace para restablecer la contraseña no es válido, posiblemente porque ya ha sido utilizado. 
+                            Por favor, solicita un nuevo restablecimiento de contraseña.
+                        </p>
+                        <div class="text-center">
+                            <a href="{% url 'password_reset' %}" class="btn btn-main">Solicitar nuevo enlace</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

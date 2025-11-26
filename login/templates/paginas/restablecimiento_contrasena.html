@@ -1,0 +1,31 @@
+{% extends "plantilla.html" %}
+{% load static %}
+{% block title %}Restablecer Contraseña{% endblock title %}
+
+{% block content %}
+<section class="main" style="padding-top:30px">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="border border-dark rounded p-4 my-5 div-main">
+                    <h1 class="text-center">Restablecer Contraseña</h1>
+                    <p class="text-center mt-3">
+                        ¿Olvidaste tu contraseña? Ingresa tu dirección de correo electrónico a continuación y te enviaremos las instrucciones para establecer una nueva.
+                    </p>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_email" class="form-label">Correo Electrónico:</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-lg btn-success custom-highlight-btn">Enviar Correo</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

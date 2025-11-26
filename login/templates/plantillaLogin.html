@@ -61,7 +61,7 @@
             {% block auth_button %}
             {# Este bloque mostrará el botón de Iniciar Sesión por defecto #}
             <li>
-                <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "login" %}'">
+                <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "login-us" %}'">
                     <img class="img-button" src="{% static "img/log-in.svg" %}" alt="Icono de login"> Iniciar Sesión</button></li>
             {% endblock auth_button %} 
             </ul>

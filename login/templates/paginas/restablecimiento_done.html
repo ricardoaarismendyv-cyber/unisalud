@@ -1,0 +1,21 @@
+{% extends "plantilla.html" %}
+{% load static %}
+{% block title %}Correo Enviado{% endblock title %}
+
+{% block content %}
+<section class="main" style="padding-top:30px">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="border border-dark rounded p-4 my-5 div-main text-center">
+                    <h1>Revisa tu correo</h1>
+                    <p class="mt-3">
+                        Te hemos enviado un correo electrónico con las instrucciones para restablecer tu contraseña. Si no lo encuentras, revisa tu carpeta de spam.
+                    </p>
+                    <a href="{% url 'login' %}" class="btn btn-main mt-3">Volver al inicio de sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

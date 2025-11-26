@@ -1,13 +1,51 @@
 from django.db import models
+from django.contrib.auth.hashers import make_password, check_password #para codificar y verificar las contraseñas de forma segura
 
 # aqui cambio los nombres de las clases a tipo CamelCase (nombre pegado con cada primera letra de la palabra en mayuscula)
 #cambio las tablas de db_table a su respectivo en minuscula y un guion bajo
 #cambio las foreignKey para que usen la class adecuada
 #se elimina la class DetallesMedicamento
+class Roles(models.Model): 
+    id_rol = models.AutoField(primary_key=True, db_comment='ID autoincremental del roles')
+    nombre_rol = models.CharField(unique=True, max_length=50, db_comment='Nombre de los roles: paciente, profesional_salud, laboratorista, recepcionista, admin_centro_medico')
+    descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion de los roles para mayor claridad, opcional')
+
+    class Meta:
+        managed = True
+        db_table = 'roles'
+        verbose_name = 'Rol'
+        verbose_name_plural = 'Roles'
+
+    def __str__(self):
+        return self.nombre_rol
+
+class Usuarios(models.Model):
+    id_usuario = models.AutoField(primary_key=True, db_comment='ID autoincremental del usuario')
+    roles = models.ManyToManyField('Roles', db_comment='Roles asignados para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
+    nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
+    contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
+    email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
+    
+    class Meta:
+        managed = True
+        db_table = 'usuarios'
+
+    def __str__(self):
+        return self.nombre_usuario
+
+#manejar contraseñas de forma segura
+#set_password: toma la contraseña en texto plano y la codifica antes de almacenarla en la base de datos.
+    def set_password(self, raw_password):
+        self.contrasena = make_password(raw_password)
+
+#check_password: verifica si la contraseña en texto plano coincide con la contraseña codificada almacenada.
+    def check_password(self, raw_password):
+        return check_password(raw_password, self.contrasena)
+
 class TipoIdentificacion(models.Model):
     id_tipo_identificacion = models.AutoField(primary_key=True, db_comment='ID autoincremental')
-    identificacion = models.CharField(unique=True, max_length=50, db_comment='Tipo de identificacion: cedula, tarjeta, etc')
-    nombre_identificacion = models.CharField(max_length=50, db_comment='Nombre de la abreviatura, CC: cedula de ciudadania')
+    identificacion = models.CharField(unique=True, max_length=50, db_comment='Abreviatura del tipo de identificacion: CC, TI, etc')
+    nombre_identificacion = models.CharField(max_length=50, db_comment='Nombre completo del tipo de identificacion: Cédula de Ciudadanía, Tarjeta de Identidad, etc')
     descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion opcional')
 
     class Meta:
@@ -281,41 +319,9 @@ class TipoOrden(models.Model):
         return self.nombre_tipo
 
 
-class Roles(models.Model):
-    id_rol = models.AutoField(primary_key=True, db_comment='ID autoincremental del roles')
-    nombre_rol = models.CharField(unique=True, max_length=50, db_comment='Nombre de los roles: paciente, profesional_salud, laboratorista, recepcionista, admin_centro_medico')
-    descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion de los roles para mayor claridad, opcional')
-
-    class Meta:
-        managed = True
-        db_table = 'roles'
-        verbose_name = 'Rol'
-        verbose_name_plural = 'Roles'
-
-    def __str__(self):
-        return self.nombre_rol
-
-
-class Usuarios(models.Model):
-    id_usuario = models.AutoField(primary_key=True, db_comment='ID autoincremental del usuario')
-    id_rol = models.ForeignKey('Roles', models.DO_NOTHING, db_column='id_rol', db_comment='Rol asignado para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
-    nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
-    contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
-    email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
-    estado = models.CharField(max_length=9, blank=True, null=True, db_comment='Esta: activo, inactivo,etc')
-    
-
-    class Meta:
-        managed = True
-        db_table = 'usuarios'
-
-    def __str__(self):
-        return self.nombre_usuario
-
-
 class Pacientes(models.Model):
     id_paciente = models.AutoField(primary_key=True, db_comment='ID autoincremental')
-    id_usuario = models.OneToOneField('usuarios', models.DO_NOTHING, db_column='id_usuario', blank=True, null=True, db_comment='Referencia a la cuenta de USUARIOS')
+    usuario = models.OneToOneField('Usuarios', on_delete=models.CASCADE, related_name='paciente', blank=True, null=True, db_comment='Referencia a la cuenta de USUARIOS')
     id_tipo_identificacion = models.ForeignKey('TipoIdentificacion', models.DO_NOTHING, db_column='id_tipo_identificacion', db_comment='Referencia a TIPO_IDENTIFICACION')
     numero_documento = models.CharField(max_length=20, db_comment='Numero del documento paciente')
     nombre1 = models.CharField(max_length=50, db_comment='Primer nombre paciente')
@@ -344,7 +350,7 @@ class Pacientes(models.Model):
 
 class ProfesionalSalud(models.Model):
     id_profesional = models.AutoField(primary_key=True, db_comment='ID autoincremental')
-    id_usuario = models.OneToOneField('usuarios', models.DO_NOTHING, db_column='id_usuario', db_comment='Referencia a la cuenta de USUARIOS (Obligatorio para personal)')
+    usuario = models.OneToOneField('Usuarios', on_delete=models.CASCADE, related_name='profesional_salud', db_comment='Referencia a la cuenta de USUARIOS (Obligatorio para personal)')
     id_tipo_identificacion = models.ForeignKey('TipoIdentificacion', models.DO_NOTHING, db_column='id_tipo_identificacion', db_comment='Referencia a TIPO_IDENTIFICACION')
     numero_documento = models.CharField(max_length=20, db_comment='Numero del documento profesional salud')
     nombre1 = models.CharField(max_length=50, db_comment='Primer nombre profesional salud')

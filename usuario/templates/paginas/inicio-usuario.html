@@ -4,7 +4,7 @@
 
 {% block auth_button %}
 <li>
-    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio" %}'">
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "login" %}'">
         <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
     </button>
 </li>
@@ -18,19 +18,27 @@
             <!-- Columna para el contenido principal -->
             <div class="col-lg-8 col-md-12 mt-4">
                 <div class="welcome-section mb-5">
-                    <h1 class="welcome-title">Bienvenido, <span class="patient-name">[Nombre del paciente]</span></h1>
+                    <h1 class="welcome-title">Bienvenido, <span class="patient-name">{{ paciente.nombre1 }} {{ paciente.apellido1 }}</span></h1>
                     <p class="welcome-subtitle">Gestiona tu salud de manera fácil y segura</p>
                 </div>
 
                 <!-- Selector de roles -->
+                {% if request.session.roles|length > 1 %}
                 <div class="role-selector mb-5">
                     <label for="roleSelector" class="form-label">Roles disponibles</label>
                     <select class="form-select form-select-lg" id="roleSelector">
-                        <option value="{% url 'inicio-usuario' %}" selected>Usuario</option>
-                        <option value="{% url 'consultas_prof_salud' %}">Profesional de salud</option>
-                        <option value="{% url 'inicio_admin' %}">Administrativo</option>
+                        {% if 'paciente' in request.session.roles %}
+                            <option value="{% url 'inicio-usuario' %}" selected>Paciente</option>
+                        {% endif %}
+                        {% if 'profesional_salud' in request.session.roles or 'laboratorista' in request.session.roles or 'recepcionista' in request.session.roles %}
+                            <option value="{% url 'inicio_prof_salud' %}">Profesional de salud</option>
+                        {% endif %}
+                        {% if 'admin_centro_medico' in request.session.roles %}
+                            <option value="{% url 'inicio_admin' %}">Administrativo</option>
+                        {% endif %}
                     </select>
                 </div>
+                {% endif %}
 
                 <div class="row">
                     <!-- Historia Clínica -->

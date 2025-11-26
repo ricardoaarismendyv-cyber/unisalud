@@ -13,99 +13,113 @@
                     <div id="confirmacionRegistro" style="display: none; text-align: center;">
                         <h2 class="text-danger mt-4">¡Gracias!</h2>
                         <h4>Usted ha sido registrado correctamente, ya puede iniciar sesión.</h4>
-                        <a href="{% url 'inicio' %}" class="btn btn-main mt-3">Volver a iniciar sesión</a>
+                        <a href="{% url 'login' %}" class="btn btn-main mt-3">Volver a iniciar sesión</a>
                     </div>
                     
-                    <form id="registro">
+                    <form id="registro" method="POST" action="{% url 'registrarse' %}">
+                        {% csrf_token %}
                         <h1 class="text-center mb-4">Crear una cuenta</h1>
+
+                        <!-- Muestra mensajes de error o éxito -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} text-center" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
                         <div class="row">
                             <!-- Nombres -->
                             <div class="col-md-6 mb-3">
                                 <label for="primerNombre" class="form-label">Primer Nombre <span style="color:red">*</span></label>
-                                <input type="text" class="form-control" id="primerNombre" required>
+                                <input type="text" class="form-control" id="primerNombre" name="primerNombre" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="segundoNombre" class="form-label">Segundo Nombre <span style="color:red">*</span></label>
-                                <input type="text" class="form-control" id="segundoNombre" required>
+                                <label for="segundoNombre" class="form-label">Segundo Nombre</label>
+                                <input type="text" class="form-control" id="segundoNombre" name="segundoNombre">
                             </div>
                         </div>
                         <div class="row">
                             <!-- Apellidos -->
                             <div class="col-md-6 mb-3">
                                 <label for="primerApellido" class="form-label">Primer Apellido <span style="color:red">*</span></label>
-                                <input type="text" class="form-control" id="primerApellido" required>
+                                <input type="text" class="form-control" id="primerApellido" name="primerApellido" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="segundoApellido" class="form-label">Segundo Apellido <span style="color:red">*</span></label>
-                                <input type="text" class="form-control" id="segundoApellido" required>
+                                <label for="segundoApellido" class="form-label">Segundo Apellido</label>
+                                <input type="text" class="form-control" id="segundoApellido" name="segundoApellido">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="numeroDocumento" class="form-label">Número de documento <span style="color:red">*</span></label>
-                                <input type="text" class="form-control" id="numeroDocumento" required placeholder="Sin puntos ni comas">
+                                <input type="text" class="form-control" id="numeroDocumento" name="numeroDocumento" required placeholder="Sin puntos ni comas">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="tipoDocumento" class="form-label">Tipo de documento <span style="color:red">*</span></label>
-                                <select id="tipoDocumento" class="form-select" required>
-                                    <option selected disabled>Seleccionar...</option>
-                                    <option value="rc">Registro civil de nacimiento</option>
-                                    <option value="ti">Tarjeta de identidad</option>
-                                    <option value="cc">Cédula de ciudadania</option>
-                                    <option value="ce">Cédula de extranjería</option>
+                                <select id="tipoDocumento" name="tipoDocumento" class="form-select" required>
+                                    <option value="" selected disabled>Seleccionar...</option>
+                                    {% for tipo in tipos_identificacion %}
+                                    <option value="{{ tipo.id_tipo_identificacion }}">{{ tipo.nombre_identificacion }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         <div class="row">
                             <!-- Fecha de Nacimiento y Género -->
                             <div class="col-md-6 mb-3">
                                 <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento <span style="color:red">*</span></label>
-                                <input type="date" class="form-control" id="fechaNacimiento" required>
+                                <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="genero" class="form-label">Género <span style="color:red">*</span></label>
-                                <select id="genero" class="form-select" required>
-                                    <option selected disabled>Seleccionar...</option>
-                                    <option value="masculino">Masculino</option>
-                                    <option value="femenino">Femenino</option>
-                                    <option value="otro">Otro</option>
+                                <select id="genero" name="genero" class="form-select" required>
+                                    <option value="" selected disabled>Seleccionar...</option>
+                                    {% for g in generos %}
+                                    <option value="{{ g.id_genero }}">{{ g.nombre_genero }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
                         <!-- Dirección -->
                         <div class="mb-3">
                             <label for="direccion" class="form-label">Dirección</label>
-                            <input type="text" class="form-control" id="direccion" placeholder="Ej: Calle 5 # 10-15">
+                            <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Ej: Calle 5 # 10-15">
                         </div>
                         <div class="row">
                             <!-- Teléfonos -->
                             <div class="col-md-6 mb-3">
                                 <label for="telefono" class="form-label">Número Telefónico</label>
-                                <input type="tel" class="form-control" id="telefono">
+                                <input type="tel" class="form-control" id="telefono" name="telefono">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="celular" class="form-label">Número de Celular <span style="color:red">*</span></label>
-                                <input type="tel" class="form-control" id="celular" required>
+                                <input type="tel" class="form-control" id="celular" name="celular" required>
                             </div>
                         </div>
-                        <!-- Correo y Contraseñas -->
+                        <!-- Usuario, Correo y Contraseñas -->
+                        <div class="mb-3">
+                            <label for="nombre_usuario" class="form-label">Nombre de Usuario <span style="color:red">*</span></label>
+                            <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario" required>
+                        </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Dirección de Correo Electrónico <span style="color:red">*</span></label>
-                            <input type="email" class="form-control" id="email" required>
+                            <input type="email" class="form-control" id="email" name="email" required>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="password" class="form-label">Contraseña <span style="color:red">*</span></label>
                                 <!-- Grupo de input para añadir el botón dentro del campo -->
                                 <div class="input-group">
-                                    <input type="password" class="form-control" id="password" required>
-                                    <button class="btn btn-primary" type="button" id="togglePasswordBtn">Ver</button>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePasswordBtn">Ver</button>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="confirmPassword" class="form-label">Confirmar Contraseña <span style="color:red">*</span></label>
                                 <div class="input-group">
-                                    <input type="password" class="form-control" id="confirmPassword" required>
-                                    <button class="btn btn-primary" type="button" id="togglePasswordBtnconfirm">Ver</button>
+                                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePasswordBtnconfirm">Ver</button>
                                 </div>
                             </div>
                         </div>
@@ -126,7 +140,7 @@
                             <button type="submit" class="btn btn-main" style="color:#000">Registrarse</button>
                         </div>
                         <div class="text-center mt-3">
-                            <p>¿Ya tienes una cuenta? <a href="{% url 'inicio' %}">Inicia sesión aquí</a></p>
+                            <p>¿Ya tienes una cuenta? <a href="{% url 'login' %}">Inicia sesión aquí</a></p>
                         </div>
                     </form>
                 </div>
@@ -157,16 +171,6 @@
         // Aplicar la función a ambos campos de contraseña
         setupPasswordToggle('password', 'togglePasswordBtn');
         setupPasswordToggle('confirmPassword', 'togglePasswordBtnconfirm');
-
-        // Manejar el envío del formulario
-        const registroForm = document.getElementById('registro');
-        if (registroForm) {
-            registroForm.addEventListener('submit', function(event) {
-                event.preventDefault(); // Previene que la página se recargue
-                this.style.display = 'none'; // Oculta el formulario
-                document.getElementById('confirmacionRegistro').style.display = 'block'; // Muestra la confirmación
-            });
-        }
     });
 
 </script>
