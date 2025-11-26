@@ -1,13 +1,21 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from .models import Turno
 import uuid
 from datetime import timedelta
 # Create your views here.
 from login.decorators import role_required
-from .models import Pacientes, Usuarios, Roles, TipoIdentificacion, Genero
+from .models import Pacientes, Usuarios, Roles, TipoIdentificacion, Genero, Turnos
 from django.contrib import messages
+import qrcode
+import base64
+from io import BytesIO
+import uuid
+from django.shortcuts import render
+from .models import Turnos  # si quieres guardarlo en BD
+import string
+from .utils import generar_siguiente_turno
+
 
 @role_required(allowed_roles=['paciente'])
 def inicio_usuario(request):
@@ -36,28 +44,42 @@ def omeusuario(request):
     return render(request, 'paginas/orden-medicamentos-usuario.html')
 
 # views.py
-import qrcode
-import base64
-from io import BytesIO
-import uuid
-from django.shortcuts import render
-from .models import Turno  # si quieres guardarlo en BD
-
-import random
 
 @role_required(allowed_roles=['paciente'])
 def turnosusuario(request):
-    turno = random.randint(1000, 9999)  # Número entre 1000 y 9999
+    from .utils import generar_siguiente_turno
+    from django.utils.timezone import now
 
-    qr = qrcode.make(str(turno))
+    letra, numero = generar_siguiente_turno()
+
+    # Crear QR con el turno
+    turno_str = f"{letra}{numero:03d}"
+    qr = qrcode.make(turno_str)
     buffer = BytesIO()
     qr.save(buffer, format="PNG")
     qr_base64 = base64.b64encode(buffer.getvalue()).decode()
 
+    # Guardar el turno en la base de datos
+    nuevo_turno = Turnos.objects.create(
+        id_paciente_id=1,          # Cambia según tu flujo
+        id_profesional_id=1,       # Cambia según tu flujo
+        id_centro_medico_id=1,     # Cambia según tu flujo
+        estado="pendiente",
+        fecha_hora_turno=now(),
+        solicitud_turno="ONLINE",
+        categoria_turno="General",
+        modulo_asignado="Recepción",
+        letra=letra,
+        numero=numero
+    )
+
     return render(request, 'paginas/turnos-usuario.html', {
-        "turno": turno,
-        "qr_base64": qr_base64
+        "turno": turno_str,
+        "qr_base64": qr_base64,
+        "registro": nuevo_turno
     })
+
+
 
 
 

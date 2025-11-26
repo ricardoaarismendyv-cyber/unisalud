@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password #para codificar y verificar las contraseñas de forma segura
-
+from django.core.files.base import ContentFile
+import qrcode
+from io import BytesIO
 # aqui cambio los nombres de las clases a tipo CamelCase (nombre pegado con cada primera letra de la palabra en mayuscula)
 #cambio las tablas de db_table a su respectivo en minuscula y un guion bajo
 #cambio las foreignKey para que usen la class adecuada
@@ -485,12 +487,19 @@ class Turnos(models.Model):
     id_paciente = models.ForeignKey('Pacientes', models.DO_NOTHING, db_column='id_paciente', db_comment='Referencia a PACIENTES')
     id_profesional = models.ForeignKey('ProfesionalSalud', models.DO_NOTHING, db_column='id_profesional', db_comment='Referencia a PROFESIONAL_SALUD')
     id_centro_medico = models.ForeignKey('CentrosMedicos', models.DO_NOTHING, db_column='id_centro_medico', db_comment='Referencia a CENTROS_MEDICOS')
-    estado = models.CharField(max_length=10, blank=True, null=True, db_comment='Esta: programada, atendido, etc')
+    estado = models.CharField(max_length=10, blank=True, null=True, db_comment='Estado: programada, atendido, etc')
     fecha_hora_turno = models.DateTimeField(db_comment='Fecha y hora de la asignacion del turno')
     solicitud_turno = models.CharField(max_length=8, blank=True, null=True, db_comment='Solicitado a partir de los 10m del centro medico')
     categoria_turno = models.CharField(max_length=19, blank=True, null=True, db_comment='El paciente escoge la opcion')
-    modulo_asignado = models.CharField(max_length=100, blank=True, null=True, db_comment='Modulo asignado: Facturacion, Laboratorios, Atencion, etc')
+    mo
+dulo_asignado = models.CharField(max_length=100, blank=True, null=True, db_comment='Modulo asignado: Facturacion, Laboratorios, Atencion, etc')
     creado_en = models.DateTimeField(blank=True, null=True, db_comment='Fecha de registro')
+
+    # 🔵 CAMPOS NUEVOS PARA TURNOS ORDENADOS
+    letra = models.CharField(max_length=1, db_comment='Letra del turno (A-Z)')
+    numero = models.IntegerField(db_comment='Número secuencial del turno')
+
+    creado = models.DateTimeField(auto_now_add=True, db_comment='Fecha de creación del registro')
 
     class Meta:
         managed = True
@@ -498,7 +507,7 @@ class Turnos(models.Model):
         unique_together = (('fecha_hora_turno', 'id_profesional'),)
 
     def __str__(self):
-        return f'Turno para {self.id_paciente} el {self.fecha_hora_turno}'
+        return f"{self.letra}{self.numero:03d}"
 
 
 class AntecedentesPaciente(models.Model):
@@ -562,33 +571,3 @@ class Incapacidad(models.Model):
     def __str__(self):
         return f'Incapacidad para {self.id_paciente} del {self.fecha_inicio} al {self.fecha_fin}'
 
-
-from django.db import models
-from django.core.files.base import ContentFile
-import qrcode
-from io import BytesIO
-
-class Turno(models.Model):
-    codigo = models.CharField(max_length=20, unique=True)  # Ej: "TURNO-001"
-    qr = models.ImageField(upload_to="turnos/qr/", blank=True, null=True)
-
-    def __str__(self):
-        return self.codigo
-
-    def generar_qr(self):
-        """
-        Genera el QR a partir del código del turno.
-        """
-        qr_img = qrcode.make(self.codigo)
-        buffer = BytesIO()
-        qr_img.save(buffer, format="PNG")
-        nombre_archivo = f"qr_turno_{self.codigo}.png"
-        self.qr.save(nombre_archivo, ContentFile(buffer.getvalue()), save=False)
-
-    def save(self, *args, **kwargs):
-        # Guardar primero para asegurar que el objeto tiene ID
-        super().save(*args, **kwargs)
-        # Generar QR si no existe
-        if not self.qr:
-            self.generar_qr()
-            super().save(*args, **kwargs)
