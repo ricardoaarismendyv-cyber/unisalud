@@ -50,11 +50,15 @@
             <li class="dark-mode-btn"> 
                 <!-- Pasamos las rutas de las imágenes al JS a través de atributos data-* -->
                 <img id="theme-toggle-img" 
-                    src="{% static "img/toggle-left (2).svg" %}" 
-                    data-toggle-off="{% static 'img/toggle-left (2).svg' %}"
+                    src="{% static "img/toggle-left.svg" %}" 
+                    data-toggle-off="{% static 'img/toggle-left.svg' %}"
                     data-toggle-on="{% static 'img/toggle-right (2).svg' %}"
                     alt="toggle-off" style="cursor: pointer;">
-                <img id="moon-icon" src="{% static "img/moon.svg" %}" alt="moon" style="cursor: pointer;">
+                <img id="theme-toggle-img"
+                src="{% static "img/moon (1).svg" %}" 
+                data-toggle-off="{% static "img/moon (1).svg" %}"  
+                data-toggle-on="{% static "img/moon.svg" %}" 
+                alt="Selector de tema" style="cursor: pointer;">
             </li>
             
             <!-- Contenedor para el menú de accesibilidad -->

@@ -243,12 +243,12 @@ h1, h2, h3, h4, h5, h6 {
 .dark-mode .form-select {
     /* Usamos un color oscuro diferente para darle profundidad al formulario */
     background-color: white !important; 
-    color: var(--text-darkmode black) !important;
+    color: var(--text-darkmode rgb(255, 249, 249)) !important;
     border-color: #374151 !important;
 }
 
 .dark-mode .form-select option {
-    background-color: #1f2937 !important;
+    background-color: #8ab5f2 !important;
 }
 
 /* fin css inicio*/
