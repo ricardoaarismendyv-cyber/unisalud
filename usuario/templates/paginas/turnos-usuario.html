@@ -26,13 +26,13 @@
             <!-- Columna para el contenido principal -->
             <div class="col-lg-10 col-md-10">
                 <a class="btn btn-main btn-nav" href='{% url "inicio-usuario" %}'>Volver</a>
-                <a class="btn btn-main btn-nav justify-content-center" href='#'>Escanear código QR de nuevo</a>
+                <a class="btn btn-main btn-nav justify-content-center".href='{% url "turnos-usuario" %}'>Escanear código QR de nuevo</a>
             </div>
             <div class="row justify-content-center">
                 <div class="container border border-dark rounded p-4 my-5 div-main">
                     <h1>Asignar turno</h1>
                     <center>
-                        <p>Su turno en [Nombre del centro médico] es el número [Número de turno]</p>
+                        <p>Su turno en {{ centro_medico }} es el número {{ turno }}</p>
                         <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR del turno" width="220">
                         <p><br>Recuerde que este número de turno cuenta con verificacion y tiempo limite tras el cual sera eliminado</p>
                     </center>
