@@ -3,6 +3,13 @@ from login.decorators import role_required
 from django.contrib import messages
 from usuario.models import TipoIdentificacion, Genero, Pacientes, Usuarios, Roles, ProfesionalSalud, CentrosMedicos  # Importar modelos necesarios
 from django.contrib.auth.hashers import make_password # Para encriptar la contraseña
+import qrcode
+import base64
+from io import BytesIO
+import uuid
+from django.shortcuts import render
+from usuario.models import Turnos
+import string
 
 # Create your views here.
 ALLOWED_ADMIN_ROLES = ['admin_centro_medico']
@@ -145,8 +152,56 @@ def usosistema_admin(request):
 def contactanos_admin(request):
     return render(request, 'paginas/contactanos_admin.html')
 
+
+# views.py# si quieres guardarlo en BD
+
 def turnos_admin(request):
     return render(request, 'paginas/turnos_admin.html')
     request.session['active_role'] = 'admin_centro_medico' # <--- AÑADIR ESTA LÍNEA
     # Aquí puedes añadir lógica para buscar el perfil del admin si es necesario
     return render(request, 'paginas/inicio_admin.html', {'roles': request.session.get('roles', [])})
+    # Generar el siguiente turno ordenado
+    turno_obj = generar_turno()
+    turno = f"{turno_obj.letra}{turno_obj.numero:03d}"
+
+    # Crear QR
+    qr = qrcode.make(turno)
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+    return render(request, 'paginas/turnos-usuario.html', {
+        "turno": turno,
+        "qr_base64": qr_base64
+    })
+
+# utils.py
+import string
+from usuario.models import Turnos
+
+def generar_turno():
+    # Si no hay turnos previos, comenzar en A001
+    ultimo = Turnos.objects.order_by('-id').first()
+
+    if not ultimo:
+        return Turnos.objects.create(letra="A", numero=1)
+
+    letra = ultimo.letra
+    numero = ultimo.numero
+
+    # Si el número llega a 999 → pasar a siguiente letra
+    if numero >= 999:
+        letras = list(string.ascii_uppercase)
+        pos = letras.index(letra)
+
+        # Si llega a Z999 → reiniciar A001
+        if pos == len(letras) - 1:
+            letra = "A"
+        else:
+            letra = letras[pos + 1]
+
+        numero = 1
+    else:
+        numero += 1
+
+    return Turnos.objects.create(letra=letra, numero=numero)

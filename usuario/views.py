@@ -1,4 +1,9 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+import uuid
+from datetime import timedelta
+# Create your views here.
 from login.decorators import role_required
 from .models import Pacientes, Usuarios, Roles, TipoIdentificacion, Genero, ProfesionalSalud, CentrosMedicos, Especialidades
 from django.contrib import messages
@@ -6,6 +11,18 @@ from django.contrib.auth.decorators import login_required
 from usuario.models import Consulta, OrdenMedica
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from .models import Pacientes, Usuarios, Roles, TipoIdentificacion, Genero, Turnos
+from django.contrib import messages
+import qrcode
+import base64
+from io import BytesIO
+import uuid
+from django.shortcuts import render
+from .models import Turnos  # si quieres guardarlo en BD
+import string
+from django.urls import reverse
+
+
 
 @role_required(allowed_roles=['paciente'])
 def inicio_usuario(request):
@@ -115,9 +132,85 @@ def omeusuario(request):
         messages.error(request, 'No se encontró tu perfil de paciente.')
         return redirect('login')
 
+# views.py
+
 @role_required(allowed_roles=['paciente'])
 def turnosusuario(request):
-    return render(request, 'paginas/turnos-usuario.html')
+
+    # Si ya hay un turno guardado en la sesión
+    if request.session.get("turno_id"):
+        try:
+            turno_existente = Turnos.objects.get(id_turno=request.session["turno_id"])
+            
+            # Generar el QR del mismo turno
+            qr = qrcode.make(turno_existente.solicitud_turno)
+            buffer = BytesIO()
+            qr.save(buffer, format="PNG")
+            qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+            return render(request, 'paginas/turnos-usuario.html', {
+                "turno": turno_existente.solicitud_turno,
+                "qr_base64": qr_base64,
+            })
+        except Turnos.DoesNotExist:
+            # Si el turno no existe, continúa para crear uno nuevo
+            pass
+
+    # --- Usuario con o sin login ---
+    paciente = request.user.paciente if request.user.is_authenticated and hasattr(request.user, "paciente") else None
+
+    # --- Inicializar letra y número ---
+    if "letra" not in request.session:
+        request.session["letra"] = "A"
+    if "numero" not in request.session:
+        request.session["numero"] = 1
+
+    letra = request.session["letra"]
+    numero = request.session["numero"]
+
+    turno_texto = f"{letra}{numero:03d}"
+
+    # --- Crear turno nuevo ---
+    nuevo_turno = Turnos.objects.create(
+        id_paciente=paciente,
+        id_profesional_id=1,
+        id_centro_medico_id=1,
+        estado="pendiente",
+        fecha_hora_turno=timezone.now(),
+        solicitud_turno=turno_texto,
+        categoria_turno="General",
+        modulo_asignado="Recepción",
+        letra=letra,
+        numero=numero
+    )
+
+    # Guardar ID del turno en sesión (clave principal)
+    request.session["turno_id"] = nuevo_turno.id_turno
+
+    # --- Actualizar letra y número siguiente turno ---
+    if numero < 999:
+        request.session["numero"] += 1
+    else:
+        import string
+        letras = list(string.ascii_uppercase)
+        pos = letras.index(letra)
+        request.session["letra"] = letras[pos + 1] if pos < 25 else "A"
+        request.session["numero"] = 1
+
+    # --- Generar QR del turno ---
+    qr = qrcode.make(turno_texto)
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+    return render(request, 'paginas/turnos-usuario.html', {
+        "turno": turno_texto,
+        "qr_base64": qr_base64,
+    })
+    
+
+
+
 
 # Las siguientes vistas pueden ser públicas, no requieren login
 def preguntasfrecuentes(request):

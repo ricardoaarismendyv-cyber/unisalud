@@ -7,7 +7,9 @@ urlpatterns = [
     path('', views.inicio_usuario, name='inicio-usuario'),
     
     # Historia clínica
-    path('historia-clinica/', views.hcusuario, name='hcusuario'),    path('registrar-consulta/', views.registrar_consulta, name='registrar-consulta'),    path('registrar-consulta/', views.registrar_consulta, name='registrar-consulta'),
+    path('historia-clinica/', views.hcusuario, name='hcusuario'),   
+    path('registrar-consulta/', views.registrar_consulta, name='registrar-consulta'),    
+    path('registrar-consulta/', views.registrar_consulta, name='registrar-consulta'),
     
     # Órdenes médicas (paciente)
     #path('ordenes-medicas/', views.omusuario, name='omusuario'),
@@ -23,4 +25,10 @@ urlpatterns = [
     path('buzon-sugerencias/', views.buzonsugerencias, name='buzon-sugerencias'),
     path('registrarse/', views.registro, name='registro'),
     path('contactanos/', views.contactanos, name='contactanos'),
+    path('ordenes-medicas', views.omusuario, name='omusuario'),
+    path('ordenes-medicamentos', views.omeusuario, name='omeusuario'),
+    path('qr_turno/', views.turnosusuario, name='turnos-usuario'),
+    
+    #path('registrarse', views.registro, name='registrarse'),
+    
 ]
