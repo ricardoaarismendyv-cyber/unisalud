@@ -173,7 +173,7 @@ h1, h2, h3, h4, h5, h6 {
 .custom-highlight-btn {
     background: linear-gradient(135deg, var(--secondary-color), #34d399);
     border: none;
-    color: var(--white);
+    color: var(--black);
     font-weight: 600;
     padding: 12px 32px;
     text-transform: uppercase;
