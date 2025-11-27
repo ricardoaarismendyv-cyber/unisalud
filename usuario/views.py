@@ -14,7 +14,7 @@ import uuid
 from django.shortcuts import render
 from .models import Turnos  # si quieres guardarlo en BD
 import string
-from .utils import generar_siguiente_turno
+
 
 
 @role_required(allowed_roles=['paciente'])
@@ -47,7 +47,6 @@ def omeusuario(request):
 
 @role_required(allowed_roles=['paciente'])
 def turnosusuario(request):
-    from .utils import generar_siguiente_turno
     from django.utils.timezone import now
 
     letra, numero = generar_siguiente_turno()

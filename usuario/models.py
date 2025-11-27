@@ -491,23 +491,14 @@ class Turnos(models.Model):
     fecha_hora_turno = models.DateTimeField(db_comment='Fecha y hora de la asignacion del turno')
     solicitud_turno = models.CharField(max_length=8, blank=True, null=True, db_comment='Solicitado a partir de los 10m del centro medico')
     categoria_turno = models.CharField(max_length=19, blank=True, null=True, db_comment='El paciente escoge la opcion')
-    mo
-dulo_asignado = models.CharField(max_length=100, blank=True, null=True, db_comment='Modulo asignado: Facturacion, Laboratorios, Atencion, etc')
-    creado_en = models.DateTimeField(blank=True, null=True, db_comment='Fecha de registro')
-
-    # 🔵 CAMPOS NUEVOS PARA TURNOS ORDENADOS
-    letra = models.CharField(max_length=1, db_comment='Letra del turno (A-Z)')
-    numero = models.IntegerField(db_comment='Número secuencial del turno')
-
-    creado = models.DateTimeField(auto_now_add=True, db_comment='Fecha de creación del registro')
+    modulo_asignado = models.CharField(max_length=100, blank=True, null=True, db_comment='Modulo asignado: Facturacion, Laboratorios, Atencion, etc')
 
     class Meta:
         managed = True
         db_table = 'turnos'
         unique_together = (('fecha_hora_turno', 'id_profesional'),)
 
-    def __str__(self):
-        return f"{self.letra}{self.numero:03d}"
+
 
 
 class AntecedentesPaciente(models.Model):
