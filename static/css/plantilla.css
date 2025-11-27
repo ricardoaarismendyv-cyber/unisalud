@@ -7,20 +7,17 @@
 }
 
 
-/* Variables de colores, se guarda el color el una variable para que sea mas facil acceder al color, solo a traves de la variable sin tener que repetir el # con el color */
+/* Variables de colores */
 :root {
     --primary-color: #3971eb;
     --primary-light: #3b82f6;
     --primary-dark: #3964d8;
-    --secondary-color: #10b981;
+    --secondary-color: #3971eb,;
     --accent-color: #8b5cf6;
     --text-dark: #1f2937;
     --text-light: #6b7280;
-    --text-darkmode: #e5e7eb;
     --bg-light: #f8fafc;
-    --bg-dark: #01060a;
     --white: #ffffff;
-    --black: #000000;
     --border-light: #e5e7eb;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -51,14 +48,28 @@ body {
     color: var(--text-dark);
 }
 
-/* toda clase que tenga un nombre y luego el .darkmode pegado quiere decir que debe cumplir con tener ambas clases para que sucedan estos cambios*/
-body.dark-mode { 
-    background: linear-gradient(135deg, var(--bg-dark) 0%, var(--black) 100%) !important;
-    color:var(--text-darkmode);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-weight: 400;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
+body.dark-mode {
+    background: #101418 !important;
+    color: #e5e7eb !important;
+}
+
+main.dark-mode{
+        background: #000 !important;
+    color: #e5e7eb !important;
+}
+
+/* Iconos de moon, toggle y accesibility negros cuando NO esta activado el modo oscuro */
+#theme-toggle-img,
+#moon-icon,
+#accessibility-icon {
+    filter: brightness(0) invert(0);
+}
+
+/* Iconos blancos cuando esta activado el modo oscuro */
+.dark-mode #theme-toggle-img,
+.dark-mode #moon-icon,
+.dark-mode #accessibility-icon {
+    filter: brightness(0) invert(1); 
 }
 
 /* css de inicio */
@@ -108,6 +119,23 @@ body.dark-mode {
     gap: 8px;
 }
 
+.dark-mode .navButton0, .navButton1, .foot-button, .login-btn {
+    padding: 12px 24px;
+    color: var(#1e293b);
+    background: linear-gradient(135deg, var(#1e293b));
+    cursor: pointer;
+    position: relative;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
 .navButton0:hover, .navButton1:hover, .foot-button:hover, .login-btn:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-hover);
@@ -138,14 +166,14 @@ body.dark-mode {
 /*titulos en negrita*/
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
-    color: var(--text-dark);
+    color: var(--text-white);
     margin-bottom: 1rem;
 }
 
 .custom-highlight-btn {
     background: linear-gradient(135deg, var(--secondary-color), #34d399);
     border: none;
-    color: var(--white);
+    color: var(--black);
     font-weight: 600;
     padding: 12px 32px;
     text-transform: uppercase;
@@ -155,7 +183,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .custom-highlight-btn:hover {
-    background: linear-gradient(135deg, #0d9c6d, var(--secondary-color));
+    background: linear-gradient(135deg, #1f2937, var(--secondary-color));
     box-shadow: var(--shadow-hover);
     transform: translateY(-2px);
 }
@@ -177,11 +205,70 @@ h1, h2, h3, h4, h5, h6 {
     color: #f1f5f9;
 }
 
+/*Tarjeta de caracterizacion en modo oscuro*/
+.dark-mode .feature-card {
+    background-color: #1e293b !important; /* azul gris oscuro */
+    border-color: #334155 !important;
+    color: #e2e8f0 !important; /* texto claro */
+}
+
+.dark-mode .feature-card h3 {
+    color: #f8fafc !important;
+}
+
+.dark-mode .feature-card p {
+    color: #cbd5e1 !important;
+}
+
+.dark-mode .feature-icon {
+    background: linear-gradient(135deg, #3b82f6, #0ea5e9) !important;
+}
+
 .dark-mode .div-main .btn-main {
     color: var(--white);
 }
 
+.dark-mode .welcome-title, 
+.dark-mode .patient-name,
+.dark-mode .welcome-subtitle {
+    color: var(--text-darkmode) !important;
+}
+
+/* La columna principal que contiene el texto de bienvenida y las tarjetas */
+.dark-mode .col-lg-8 {
+    background-color: transparent !important;
+}
+
+/* El contenedor principal de Bootstrap */
+.dark-mode .container-fluid {
+    background-color: #46414164 !important;
+    color: var(--text-darkmode); /* Aplicar color de texto claro */
+}
+
+/* 2. Oscurecer el Selector de Roles */
+.dark-mode .role-selector {
+    background-color: transparent !important; 
+}
+
+.dark-mode .form-label {
+    color: var(--text-darkmode) !important;
+}
+
+.dark-mode .form-select {
+    /* Usamos un color oscuro diferente para darle profundidad al formulario */
+    background-color: white !important; 
+    color: var(--text-darkmode rgb(255, 249, 249)) !important;
+    border-color: #374151 !important;
+}
+
+.dark-mode .form-select option {
+    background-color: #8ab5f2 !important;
+}
+
 /* fin css inicio*/
+.dark-mode { 
+    --text-darkmode: #e5e7eb; /* Texto claro */
+}
 
 .mainHeader {
     box-shadow: var(--shadow);
@@ -195,6 +282,17 @@ h1, h2, h3, h4, h5, h6 {
 
 .mainNav {
     background: linear-gradient(135deg, #92b4ff, #93bcff);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 70px;
+}
+
+.dark-mode .mainNav{
+    background: linear-gradient(135deg, #0d1117, #1e3a8a) !important;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -292,7 +390,29 @@ h1, h2, h3, h4, h5, h6 {
     padding-top: 20px;
 }
 
+.dark-mode .footer-bar {
+    background: linear-gradient(135deg, #0d1117, #1e3a8a) !important;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    height: 80px;
+    padding-top: 20px;
+}
+
+
 .footer-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.dark-mode .footer-nav{
+    background: linear-gradient(135deg, #0d1117, #1e3a8a);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -309,7 +429,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .foot-button {
-    background: linear-gradient(135deg, var(--secondary-color), #34d399);
+    background: linear-gradient(135deg, #3964d8);
     margin-bottom: 10px;
     display: inline-flex;
     align-items: center;
@@ -317,12 +437,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .foot-button:hover {
-    background: linear-gradient(135deg, #0d9c6d, var(--secondary-color));
+    background: linear-gradient(135deg, #255ed8);
     box-shadow: var(--shadow-hover);
 }
 
 .access-button, .dark-mode-btn {
     transition: transform 0.3s ease;
+    color: white;
 }
 
 .access-button:hover, .dark-mode-btn:hover {
@@ -420,7 +541,7 @@ body.high-contrast .footer-bar,
 body.high-contrast main,
 body.high-contrast .sidebar {
     background-image: none !important;
-    background-color: #000 !important;
+    background-color: black!important;
     color: #fff !important;
     border-color: #fff !important;
 }
