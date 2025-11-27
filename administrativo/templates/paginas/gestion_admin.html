@@ -31,6 +31,16 @@
                 <div class="col-lg-12 col-md-12">
                     <div class="container border border-dark rounded p-4 my-5 div-main">
                         <h1>Gestion de usuarios</h1>
+                        
+                        <!-- Muestra mensajes de error o éxito (movido aquí para visibilidad) -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} text-center mt-3" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
                         <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#agregarUsuario" aria-expanded="false" aria-controls="agregarUsuario">Agregar usuario</button>
                         <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#eliminarProf" aria-expanded="false" aria-controls="eliminarProf">Eliminar profesional de salud</button>
                         <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#modificarUsuario" aria-expanded="false" aria-controls="modificarUsuario">Modificar información de usuario</button>
@@ -39,17 +49,7 @@
                             <div class="card card-body div-main p-4">
                                 <form id="formAgregarUsuario" method="POST" action="{% url 'agregar_usuario' %}">
                                     {% csrf_token %}
-                                    <h5>Agregar nuevo usuario</h5>
-                                    
-                                    <!-- Muestra mensajes de error o éxito -->
-                                    {% if messages %}
-                                        {% for message in messages %}
-                                            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} text-center" role="alert">
-                                                {{ message }}
-                                            </div>
-                                        {% endfor %}
-                                    {% endif %}
-
+                                    <h5>Agregar nuevo usuario</h5>                                    
                                     <div class="row">
                                         <!-- Nombres -->
                                         <div class="col-md-6 mb-3">
@@ -142,9 +142,6 @@
                                         <button type="submit" class="btn btn-success mt-2">Guardar usuario</button>
                                     </div>
                                 </form>
-                                <div id="mensaje-exito-agregar" class="alert alert-success mt-3 d-none" role="alert">
-                                    ✅ Usuario registrado con éxito.
-                                </div>
                             </div>
                         </div>
                         <div class="collapse mt-3" id="eliminarProf">
@@ -218,39 +215,28 @@
                         </div>
                         <div class="collapse mt-3" id="agregarProf">
                             <div class="card card-body div-main p-4">
-                                <form id="formAgregarProf" method="POST" action="">
+                                <form id="formAgregarProfesional" method="POST" action="">
                                     {% csrf_token %}
                                     <h5>Agregar nuevo profesional de la salud</h5>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <input class="form-control my-2" type="text" name="nombres" placeholder="Nombres" required>
+                                            <input class="form-control my-2" type="text" name="documento" placeholder="Documento de identidad" required>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <input class="form-control my-2" type="text" name="apellidos" placeholder="Apellidos" required>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <input class="form-control my-2" type="text" name="documento_identidad" placeholder="Documento de identidad" required>
-                                        </div>
+
+
                                         <div class="col-md-6 mb-3">
                                             <input class="form-control my-2" type="text" name="especialidad" placeholder="Especialidad" required>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <input class="form-control my-2" type="text" name="telefono" placeholder="Teléfono">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <input class="form-control my-2" type="email" name="email" placeholder="Correo electrónico" required>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <input class="form-control my-2" type="password" name="password" placeholder="Contraseña" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <input class="form-control my-2" type="password" name="confirm_password" placeholder="Confirmar contraseña" required>
+                                            <label for="centroMedico" class="form-label">Centro Médico <span style="color:red">*</span></label>
+                                            <select name="centroMedico" id="centroMedico" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar centro médico...</option>
+                                                {% for centro in centros_medicos %}
+                                                <option value="{{ centro.id_centro_medico }}">{{ centro.nombre_centro }}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                     </div>
                                     <button type="submit" class="btn btn-success mt-2">Registrar profesional</button>
@@ -303,15 +289,8 @@
 
 {% endblock content %}
 {% block script %}
+{{ block.super }} {# Asegura que cualquier script de la plantilla base se mantenga #}
 <script>
-    function mostrarExito(idAlerta) {
-        // Esta función ya no es necesaria para enviar el formulario,
-        // pero puedes usarla para mostrar mensajes de éxito que lleguen desde el backend.
-        // const alerta = document.getElementById(idAlerta);
-        // alerta.classList.remove("d-none");  // Muestra la alerta
-        // setTimeout(() => {
-        //     alerta.classList.add("d-none"); // Oculta la alerta después de 5 segundos
-        // }, 5000);
-    }
+    // La función mostrarExito ya no es necesaria con el sistema de mensajes de Django
 </script>
 {% endblock script %}

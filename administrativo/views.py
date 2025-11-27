@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from login.decorators import role_required
 from django.contrib import messages
-from usuario.models import TipoIdentificacion, Genero, Pacientes, Usuarios, Roles, ProfesionalSalud  # Importar modelos necesarios
+from usuario.models import TipoIdentificacion, Genero, Pacientes, Usuarios, Roles, ProfesionalSalud, CentrosMedicos  # Importar modelos necesarios
 from django.contrib.auth.hashers import make_password # Para encriptar la contraseña
 
 # Create your views here.
@@ -15,7 +15,15 @@ def inicio_admin(request):
     return render(request, 'paginas/inicio_admin.html')
 
 def gestion_admin(request):
-    return render(request, 'paginas/gestion_admin.html')
+    # 1. Consultar la base de datos para obtener los datos necesarios
+    tipos_id = TipoIdentificacion.objects.all()
+    generos = Genero.objects.all()
+    centros_medicos = CentrosMedicos.objects.all()
+    # 2. Crear un diccionario de contexto para pasar los datos a la plantilla
+    context = {'tipos_identificacion': tipos_id, 'generos': generos, 'centros_medicos': centros_medicos}
+    # 3. Renderizar la plantilla pasándole el contexto
+    return render(request, 'paginas/gestion_admin.html', context)
+
 def hc_admin(request):
     return render(request, 'paginas/hc_admin.html')
 
@@ -25,7 +33,7 @@ def buzonsugerencias_admin(request):
 def agregar_usuario(request):
     if request.method == 'POST':
         # Lógica para procesar el formulario de registro de usuario
-        if 'primerNombre' in request.POST: # Identificador para saber que es el form de registro
+        # No es necesario el if 'primerNombre' in request.POST aquí, ya que esta vista es específica para agregar_usuario
             primer_nombre = request.POST.get('primerNombre')
             segundo_nombre = request.POST.get('segundoNombre', '')
             primer_apellido = request.POST.get('primerApellido')
@@ -81,10 +89,8 @@ def agregar_usuario(request):
             
             return redirect('gestion_admin')
             # --- FIN DE LA CORRECCIÓN ---
-
-    tipos_id = TipoIdentificacion.objects.all()
-    generos = Genero.objects.all()
-    return render(request, 'paginas/gestion_admin.html', {'tipos_identificacion': tipos_id, 'generos': generos})
+    # Si es una petición GET a esta URL, redirigimos a la página principal de gestión
+    return redirect('gestion_admin')
 
 def eliminar_profesional(request):
     if request.method == 'POST':
@@ -119,10 +125,6 @@ def eliminar_profesional(request):
     context = {'tipos_identificacion': tipos_id, 'generos': generos}
     return render(request, 'paginas/gestion_admin.html', context)
 
-
-def modificar_usuario(request):
-    if request.method == 'POST':
-        documento = request.POST.get('documento')
 
 
 def hc_admin(request):

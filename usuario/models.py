@@ -247,12 +247,10 @@ class Especialidades(models.Model):
 
 class Medicamentos(models.Model):
     id_medicamento = models.AutoField(primary_key=True, db_comment='ID autoincremental')
-    nombre_comercial = models.CharField(max_length=200, db_comment='Nombre comercial medicamento')
     nombre_generico = models.CharField(max_length=200, blank=True, null=True, db_comment='Nombre generico medicamento')
     principio_activo = models.CharField(max_length=100, blank=True, null=True, db_comment='Principio activo medicamento')
     concentracion = models.CharField(max_length=50, blank=True, null=True, db_comment='Concentracion medicamento')
     forma_farmaceutica = models.CharField(max_length=50, blank=True, null=True, db_comment='Forma farmaceutica medicamento')
-    via_administracion = models.CharField(max_length=50, blank=True, null=True, db_comment='Via de administracion medicamento')
     registro_invima = models.CharField(unique=True, max_length=100, db_comment='Registro INVIMA del medicamento')
     
     class Meta:
