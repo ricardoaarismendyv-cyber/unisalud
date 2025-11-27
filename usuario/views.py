@@ -14,6 +14,7 @@ import uuid
 from django.shortcuts import render
 from .models import Turnos  # si quieres guardarlo en BD
 import string
+from django.urls import reverse
 
 
 
@@ -47,38 +48,58 @@ def omeusuario(request):
 
 @role_required(allowed_roles=['paciente'])
 def turnosusuario(request):
-    from django.utils.timezone import now
 
-    letra, numero = generar_siguiente_turno()
+    # --- Permitir usuarios NO logueados ---
+    if request.user.is_authenticated and hasattr(request.user, "paciente"):
+        paciente = request.user.paciente
+    else:
+        paciente = None  # Turno anónimo
 
-    # Crear QR con el turno
-    turno_str = f"{letra}{numero:03d}"
-    qr = qrcode.make(turno_str)
-    buffer = BytesIO()
-    qr.save(buffer, format="PNG")
-    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+    # --- Inicializar letra y número ---
+    if "letra" not in request.session:
+        request.session["letra"] = "A"
+    if "numero" not in request.session:
+        request.session["numero"] = 1
 
-    # Guardar el turno en la base de datos
+    letra = request.session["letra"]
+    numero = request.session["numero"]
+
+    turno = f"{letra}{numero:03d}"
+
+    # --- Crear turno ---
     nuevo_turno = Turnos.objects.create(
-        id_paciente_id=1,          # Cambia según tu flujo
-        id_profesional_id=1,       # Cambia según tu flujo
-        id_centro_medico_id=1,     # Cambia según tu flujo
+        id_paciente=paciente,
+        id_profesional_id=1,
+        id_centro_medico_id=1,
         estado="pendiente",
-        fecha_hora_turno=now(),
-        solicitud_turno="ONLINE",
+        fecha_hora_turno=timezone.now(),
+        solicitud_turno=turno,
         categoria_turno="General",
         modulo_asignado="Recepción",
         letra=letra,
         numero=numero
     )
 
+    # --- Actualizar siguiente turno ---
+    if numero < 999:
+        request.session["numero"] += 1
+    else:
+        import string
+        letras = list(string.ascii_uppercase)
+        pos = letras.index(letra)
+        request.session["letra"] = letras[pos + 1] if pos < 25 else "A"
+        request.session["numero"] = 1
+
+    # --- QR SOLO DEL TURNO ---
+    qr = qrcode.make(turno)
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
     return render(request, 'paginas/turnos-usuario.html', {
-        "turno": turno_str,
+        "turno": turno,
         "qr_base64": qr_base64,
-        "registro": nuevo_turno
     })
-
-
 
 
 

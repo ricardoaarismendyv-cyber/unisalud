@@ -484,7 +484,7 @@ class DiagnosticoPaciente(models.Model):
 
 class Turnos(models.Model):
     id_turno = models.AutoField(primary_key=True, db_comment='ID autoincremental')
-    id_paciente = models.ForeignKey('Pacientes', models.DO_NOTHING, db_column='id_paciente', db_comment='Referencia a PACIENTES')
+    id_paciente = models.ForeignKey('Pacientes', models.SET_NULL, db_column='id_paciente', null=True, blank=True, db_comment='Referencia a PACIENTES')
     id_profesional = models.ForeignKey('ProfesionalSalud', models.DO_NOTHING, db_column='id_profesional', db_comment='Referencia a PROFESIONAL_SALUD')
     id_centro_medico = models.ForeignKey('CentrosMedicos', models.DO_NOTHING, db_column='id_centro_medico', db_comment='Referencia a CENTROS_MEDICOS')
     estado = models.CharField(max_length=10, blank=True, null=True, db_comment='Estado: programada, atendido, etc')
@@ -492,6 +492,12 @@ class Turnos(models.Model):
     solicitud_turno = models.CharField(max_length=8, blank=True, null=True, db_comment='Solicitado a partir de los 10m del centro medico')
     categoria_turno = models.CharField(max_length=19, blank=True, null=True, db_comment='El paciente escoge la opcion')
     modulo_asignado = models.CharField(max_length=100, blank=True, null=True, db_comment='Modulo asignado: Facturacion, Laboratorios, Atencion, etc')
+    letra = models.CharField(max_length=1)
+    numero = models.IntegerField()
+    creado = models.DateTimeField(auto_now_add=True)       # NOT NULL obligatorio
+    creado_en = models.DateTimeField(blank=True, null=True)
+
+
 
     class Meta:
         managed = True
