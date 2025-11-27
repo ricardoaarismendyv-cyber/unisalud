@@ -480,6 +480,10 @@ class OrdenMedica(models.Model):
     fecha_cumplimiento = models.DateTimeField(blank=True, null=True, db_comment='Fecha de cumplimiento, maximo 30 dias')
     codigo_qr = models.CharField(max_length=255, blank=True, null=True, db_comment='Codigo QR para descarga segura')
     id_consulta = models.ForeignKey('Consulta', models.DO_NOTHING, db_column='id_consulta', blank=True, null=True, db_comment='Referencia opcional a CONSULTA')
+    
+    # NUEVO: Campos para almacenar PDF en la BD
+    pdf_archivo = models.BinaryField(blank=True, null=True, db_comment='PDF almacenado como bytes en PostgreSQL')
+    pdf_fecha_generacion = models.DateTimeField(blank=True, null=True, db_comment='Fecha de generación del PDF')
 
     class Meta:
         managed = True
@@ -489,6 +493,53 @@ class OrdenMedica(models.Model):
 
     def __str__(self):
         return f'Orden {self.id_orden} - {self.id_paciente}'
+
+    def generate_pdf(self):
+        """Genera PDF en memoria y retorna bytes"""
+        html = render_to_string(
+            'pdf/orden_medica_pdf.html',
+            {
+                'orden': self,
+                'paciente': self.id_paciente,
+                'profesional': self.id_profesional,
+                'medicamento': self.id_medicamento,
+                'servicio': self.id_servicio,
+                'centro': self.id_centro_medico,
+                'es_medicamento': self.id_tipo_orden.nombre_tipo.lower() == 'medicamentos',
+                'es_examen': self.id_tipo_orden.nombre_tipo.lower() in ['examenes', 'procedimientos'],
+            }
+        )
+        pdf_buffer = BytesIO()
+        pisa.CreatePDF(html, dest=pdf_buffer)
+        return pdf_buffer.getvalue()
+
+    def save_pdf_to_db(self):
+        """
+        Genera el PDF y lo guarda en la columna pdf_archivo (PostgreSQL BYTEA).
+        Actualiza la fecha de generación.
+        """
+        from django.utils import timezone
+        pdf_bytes = self.generate_pdf()
+        self.pdf_archivo = pdf_bytes
+        self.pdf_fecha_generacion = timezone.now()
+        self.save(update_fields=['pdf_archivo', 'pdf_fecha_generacion'])
+        return True
+
+    def get_pdf_from_db(self):
+        """
+        Retorna el PDF almacenado en la BD.
+        Si no existe, lo genera, guarda y retorna.
+        """
+        if not self.pdf_archivo:
+            self.save_pdf_to_db()
+        # Convertir memoryview (PostgreSQL) a bytes
+        return bytes(self.pdf_archivo) if self.pdf_archivo else self.generate_pdf()
+
+    def regenerar_pdf(self):
+        """
+        Fuerza la regeneración del PDF (útil si cambiaron datos de la orden).
+        """
+        return self.save_pdf_to_db()
 
 
 class DiagnosticoPaciente(models.Model):
