@@ -1,5 +1,5 @@
 from django import forms
-from usuario.models import Consulta, Pacientes, DiagnosticoPaciente, Enfermedades
+from usuario.models import Consulta, Pacientes, DiagnosticoPaciente, Enfermedades, OrdenMedica
 
 #validando y personalizando los formularios para las consultas médicas y diagnósticos
 class ConsultaForm(forms.ModelForm):
@@ -175,3 +175,98 @@ class DiagnosticoForm(forms.ModelForm):
                 'placeholder': 'Notas del diagnóstico'
             })
         }
+
+class OrdenMedicaForm(forms.ModelForm):
+    """
+    Formulario para crear órdenes médicas.
+    Permite seleccionar medicamentos O servicios según el tipo de orden.
+    """
+    
+    # Campo para buscar paciente por documento
+    buscar_paciente = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Número de documento del paciente'
+        }),
+        label='Buscar paciente'
+    )
+    
+    class Meta:
+        model = OrdenMedica
+        fields = [
+            'id_paciente',
+            'id_consulta',
+            'id_tipo_orden',
+            'id_medicamento',
+            'id_servicio',
+            'dosis',
+            'frecuencia',
+            'duracion_tratamiento',
+            'cantidad',
+            'indicaciones',
+            'fecha_cumplimiento',
+        ]
+        widgets = {
+            'id_paciente': forms.Select(attrs={'class': 'form-select'}),
+            'id_consulta': forms.Select(attrs={'class': 'form-select'}),
+            'id_tipo_orden': forms.Select(attrs={'class': 'form-select', 'id': 'id_tipo_orden'}),
+            'id_medicamento': forms.Select(attrs={'class': 'form-select', 'id': 'id_medicamento'}),
+            'id_servicio': forms.Select(attrs={'class': 'form-select', 'id': 'id_servicio'}),
+            'dosis': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 500mg'}),
+            'frecuencia': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Cada 8 horas'}),
+            'duracion_tratamiento': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 7 días'}),
+            'cantidad': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 21'}),
+            'indicaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'fecha_cumplimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        }
+        labels = {
+            'id_paciente': 'Paciente',
+            'id_consulta': 'Consulta relacionada (opcional)',
+            'id_tipo_orden': 'Tipo de orden',
+            'id_medicamento': 'Medicamento',
+            'id_servicio': 'Servicio/Examen',
+            'dosis': 'Dosis',
+            'frecuencia': 'Frecuencia',
+            'duracion_tratamiento': 'Duración del tratamiento',
+            'cantidad': 'Cantidad',
+            'indicaciones': 'Indicaciones',
+            'fecha_cumplimiento': 'Fecha límite de cumplimiento',
+        }
+    
+    def __init__(self, *args, **kwargs):
+        # Obtener profesional actual de la sesión
+        self.profesional = kwargs.pop('profesional', None)
+        super().__init__(*args, **kwargs)
+        
+        # Hacer campos condicionales según el tipo
+        self.fields['id_medicamento'].required = False
+        self.fields['id_servicio'].required = False
+        self.fields['id_consulta'].required = False
+        
+        # Filtrar consultas del centro médico del profesional
+        if self.profesional:
+            self.fields['id_consulta'].queryset = Consulta.objects.filter(
+                id_profesional=self.profesional,
+                id_centro_medico=self.profesional.id_centro_medico
+            ).order_by('-fecha_programada')[:50]  # Últimas 50
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        tipo_orden = cleaned_data.get('id_tipo_orden')
+        medicamento = cleaned_data.get('id_medicamento')
+        servicio = cleaned_data.get('id_servicio')
+        
+        # Validar que si es medicamento, tenga medicamento seleccionado
+        if tipo_orden and tipo_orden.nombre_tipo.lower() == 'medicamentos':
+            if not medicamento:
+                raise forms.ValidationError('Debe seleccionar un medicamento para este tipo de orden.')
+            cleaned_data['id_servicio'] = None  # Limpiar servicio
+        
+        # Validar que si es examen/procedimiento, tenga servicio
+        elif tipo_orden and tipo_orden.nombre_tipo.lower() in ['examenes', 'procedimientos']:
+            if not servicio:
+                raise forms.ValidationError('Debe seleccionar un servicio/examen para este tipo de orden.')
+            cleaned_data['id_medicamento'] = None  # Limpiar medicamento
+        
+        return cleaned_data
