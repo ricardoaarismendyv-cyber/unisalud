@@ -1,9 +1,9 @@
 from django.shortcuts import redirect
 from django.contrib import messages
 
-def role_required(allowed_roles=[]):
+def role_required(allowed_roles=[]): #decorador personalizado para controlar el acceso a vistas segun los roles de usuario
     def decorator(view_func):
-        def wrapper(request, *args, **kwargs):
+        def wrapper(request, *args, **kwargs): #validación de roles antes de ejecutar la vista
             # Verificamos si el usuario ha iniciado sesión (si la lista de roles existe)
             if 'roles' not in request.session:
                 messages.error(request, 'Debes iniciar sesión para ver esta página.')

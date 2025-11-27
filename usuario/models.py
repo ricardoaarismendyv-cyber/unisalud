@@ -1,5 +1,9 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password #para codificar y verificar las contraseñas de forma segura
+from django.template.loader import render_to_string  # soporte plantilla PDF para HC
+from xhtml2pdf import pisa  # motor conversión HTML → PDF
+from io import BytesIO  # buffer en memoria GUARDAR PDF
+
 
 # aqui cambio los nombres de las clases a tipo CamelCase (nombre pegado con cada primera letra de la palabra en mayuscula)
 #cambio las tablas de db_table a su respectivo en minuscula y un guion bajo
@@ -21,7 +25,8 @@ class Roles(models.Model):
 
 class Usuarios(models.Model):
     id_usuario = models.AutoField(primary_key=True, db_comment='ID autoincremental del usuario')
-    roles = models.ManyToManyField('Roles', db_comment='Roles asignados para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
+    # Quitar db_comment del ManyToManyField (no tiene efecto)
+    roles = models.ManyToManyField('Roles', related_name='usuarios_con_rol')
     nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
     contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
     email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
@@ -33,7 +38,7 @@ class Usuarios(models.Model):
     def __str__(self):
         return self.nombre_usuario
 
-#manejar contraseñas de forma segura
+#manejar contraseñas de forma segura hash
 #set_password: toma la contraseña en texto plano y la codifica antes de almacenarla en la base de datos.
     def set_password(self, raw_password):
         self.contrasena = make_password(raw_password)
@@ -368,7 +373,7 @@ class ProfesionalSalud(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'profesional_salud'
+        db_table = 'profesionalsalud'  # Sin guion bajo
         unique_together = (('id_tipo_identificacion', 'numero_documento'),)
         verbose_name = 'Profesional de Salud'
         verbose_name_plural = 'Profesionales de Salud'
@@ -432,6 +437,28 @@ class Consulta(models.Model):
     def __str__(self):
         return f'Consulta {self.id_consulta} - {self.id_paciente}'
 
+    # NUEVO: generar PDF en memoria
+    def generate_pdf(self):
+        html = render_to_string(
+            'pdf/consulta_pdf.html',
+            {'consulta': self, 'paciente': self.id_paciente, 'profesional': self.id_profesional}
+        )
+        pdf_buffer = BytesIO()
+        pisa.CreatePDF(html, dest=pdf_buffer)
+        return pdf_buffer.getvalue()
+
+    # opcional: guarda el PDF físico dentro de MEDIA_ROOT/historial/
+    def save_pdf_file(self, storage_path='historial'):
+        from django.conf import settings
+        import os
+        pdf_bytes = self.generate_pdf()
+        filename = f'consulta_{self.id_consulta}.pdf'
+        full_dir = os.path.join(settings.MEDIA_ROOT, storage_path)
+        os.makedirs(full_dir, exist_ok=True)
+        with open(os.path.join(full_dir, filename), 'wb') as f:
+            f.write(pdf_bytes)
+        return f'{storage_path}/{filename}'
+
 
 class OrdenMedica(models.Model):
     id_orden = models.AutoField(primary_key=True, db_comment='ID autoincremental')
@@ -451,6 +478,10 @@ class OrdenMedica(models.Model):
     fecha_cumplimiento = models.DateTimeField(blank=True, null=True, db_comment='Fecha de cumplimiento, maximo 30 dias')
     codigo_qr = models.CharField(max_length=255, blank=True, null=True, db_comment='Codigo QR para descarga segura')
     id_consulta = models.ForeignKey('Consulta', models.DO_NOTHING, db_column='id_consulta', blank=True, null=True, db_comment='Referencia opcional a CONSULTA')
+    
+    # NUEVO: Campos para almacenar PDF en la BD
+    pdf_archivo = models.BinaryField(blank=True, null=True, db_comment='PDF almacenado como bytes en PostgreSQL')
+    pdf_fecha_generacion = models.DateTimeField(blank=True, null=True, db_comment='Fecha de generación del PDF')
 
     class Meta:
         managed = True
@@ -460,6 +491,53 @@ class OrdenMedica(models.Model):
 
     def __str__(self):
         return f'Orden {self.id_orden} - {self.id_paciente}'
+
+    def generate_pdf(self):
+        """Genera PDF en memoria y retorna bytes"""
+        html = render_to_string(
+            'pdf/orden_medica_pdf.html',
+            {
+                'orden': self,
+                'paciente': self.id_paciente,
+                'profesional': self.id_profesional,
+                'medicamento': self.id_medicamento,
+                'servicio': self.id_servicio,
+                'centro': self.id_centro_medico,
+                'es_medicamento': self.id_tipo_orden.nombre_tipo.lower() == 'medicamentos',
+                'es_examen': self.id_tipo_orden.nombre_tipo.lower() in ['examenes', 'procedimientos'],
+            }
+        )
+        pdf_buffer = BytesIO()
+        pisa.CreatePDF(html, dest=pdf_buffer)
+        return pdf_buffer.getvalue()
+
+    def save_pdf_to_db(self):
+        """
+        Genera el PDF y lo guarda en la columna pdf_archivo (PostgreSQL BYTEA).
+        Actualiza la fecha de generación.
+        """
+        from django.utils import timezone
+        pdf_bytes = self.generate_pdf()
+        self.pdf_archivo = pdf_bytes
+        self.pdf_fecha_generacion = timezone.now()
+        self.save(update_fields=['pdf_archivo', 'pdf_fecha_generacion'])
+        return True
+
+    def get_pdf_from_db(self):
+        """
+        Retorna el PDF almacenado en la BD.
+        Si no existe, lo genera, guarda y retorna.
+        """
+        if not self.pdf_archivo:
+            self.save_pdf_to_db()
+        # Convertir memoryview (PostgreSQL) a bytes
+        return bytes(self.pdf_archivo) if self.pdf_archivo else self.generate_pdf()
+
+    def regenerar_pdf(self):
+        """
+        Fuerza la regeneración del PDF (útil si cambiaron datos de la orden).
+        """
+        return self.save_pdf_to_db()
 
 
 class DiagnosticoPaciente(models.Model):
