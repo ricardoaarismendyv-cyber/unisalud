@@ -41,12 +41,12 @@
                         <h1>Orden médica más reciente</h1>
                         <p>Aquí puede visualizar su orden médica más reciente, pare ver las demás haga click en el botón "ver historial de ordenes médicas"</p>
                         <div>
-                        <object data="{% static 'docs/omejemplo.pdf' %}" type="application/pdf" width="100%" height="500px" class="mb-3"></object>
+                        <object data="{% static 'orden_medica_pdf' %}" type="application/pdf" width="100%" height="500px" class="mb-3"></object>
                             </div>
                         <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#historialCompleto" aria-expanded="false" aria-controls="historialCompleto">
                             Ver historial de ordenes médicas
                         </button>
-                        <a class="btn btn-main btn-nav" href="{% static "docs/omejemplo.pdf" %}">Descargar PDF orden médica reciente</a>   
+                        <a class="btn btn-main btn-nav" href="{% static "lista_ordenes_medicas.pdf" %}">Descargar PDF orden médica reciente</a>   
                         <!-- Contenido colapsable con el historial -->
                         <div class="collapse mt-3" id="historialCompleto">
                             <div class="card card-body div-main">
