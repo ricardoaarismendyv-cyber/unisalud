@@ -1,0 +1,208 @@
+<!-- filepath: c:\GITHUB Unisalud\unisalud\usuario\templates\pdf\orden_medica_pdf.html -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 12px; margin: 20px; }
+h1 { text-align: center; font-size: 20px; color: #2c3e50; }
+h2 { font-size: 16px; color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px; margin-top: 20px; }
+.header { text-align: center; margin-bottom: 30px; }
+.section { margin-bottom: 20px; }
+.label { font-weight: bold; color: #2c3e50; }
+.box { border: 1px solid #bdc3c7; padding: 10px; margin-top: 5px; background-color: #ecf0f1; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+td, th { padding: 8px; border: 1px solid #bdc3c7; }
+th { background-color: #3498db; color: white; text-align: left; }
+.footer { margin-top: 40px; font-size: 10px; text-align: center; color: #7f8c8d; }
+.badge { background-color: #f39c12; color: white; padding: 3px 8px; border-radius: 3px; font-size: 10px; }
+hr { border: 0; height: 2px; background: #3498db; margin: 20px 0; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>ORDEN MÉDICA #{{ orden.id_orden }}</h1>
+    <p><strong>Tipo:</strong> {{ orden.id_tipo_orden.nombre_tipo }}</p>
+    <p><strong>Estado:</strong> <span class="badge">{{ orden.id_estado_orden.nombre_estado_orden|upper }}</span></p>
+</div>
+
+<hr>
+
+<!-- Datos del Centro Médico -->
+<div class="section">
+    <h2>Centro Médico</h2>
+    <table>
+        <tr>
+            <th width="30%">Nombre:</th>
+            <td>{{ centro.nombre_centro }}</td>
+        </tr>
+        <tr>
+            <th>Dirección:</th>
+            <td>{{ centro.direccion }}</td>
+        </tr>
+        <tr>
+            <th>Teléfono:</th>
+            <td>{{ centro.telefono|default:'No disponible' }}</td>
+        </tr>
+    </table>
+</div>
+
+<!-- Datos del Profesional -->
+<div class="section">
+    <h2>Profesional que Emite</h2>
+    <table>
+        <tr>
+            <th width="30%">Nombre:</th>
+            <td>{{ profesional.nombre1 }} {{ profesional.nombre2|default:'' }} {{ profesional.apellido1 }} {{ profesional.apellido2|default:'' }}</td>
+        </tr>
+        <tr>
+            <th>Documento:</th>
+            <td>{{ profesional.id_tipo_identificacion.identificacion }} {{ profesional.numero_documento }}</td>
+        </tr>
+        <tr>
+            <th>Especialidad:</th>
+            <td>{{ profesional.id_especialidad.nombre_especialidad|default:'Sin especialidad' }}</td>
+        </tr>
+        <tr>
+            <th>Registro Profesional:</th>
+            <td>{{ profesional.registro_profesional|default:'No aplica' }}</td>
+        </tr>
+    </table>
+</div>
+
+<!-- Datos del Paciente -->
+<div class="section">
+    <h2>Datos del Paciente</h2>
+    <table>
+        <tr>
+            <th width="30%">Nombre:</th>
+            <td>{{ paciente.nombre1 }} {{ paciente.nombre2|default:'' }} {{ paciente.apellido1 }} {{ paciente.apellido2|default:'' }}</td>
+        </tr>
+        <tr>
+            <th>Documento:</th>
+            <td>{{ paciente.id_tipo_identificacion.identificacion }} {{ paciente.numero_documento }}</td>
+        </tr>
+        <tr>
+            <th>Fecha de Nacimiento:</th>
+            <td>{{ paciente.fecha_nacimiento }}</td>
+        </tr>
+        <tr>
+            <th>Género:</th>
+            <td>{{ paciente.id_genero.nombre_genero }}</td>
+        </tr>
+    </table>
+</div>
+
+<!-- Detalles de la Orden: MEDICAMENTO -->
+{% if es_medicamento %}
+<div class="section">
+    <h2>Medicamento Prescrito</h2>
+    <table>
+        <tr>
+            <th width="30%">Nombre Comercial:</th>
+            <td>{{ medicamento.nombre_comercial }}</td>
+        </tr>
+        <tr>
+            <th>Nombre Genérico:</th>
+            <td>{{ medicamento.nombre_generico|default:'No especificado' }}</td>
+        </tr>
+        <tr>
+            <th>Principio Activo:</th>
+            <td>{{ medicamento.principio_activo|default:'No especificado' }}</td>
+        </tr>
+        <tr>
+            <th>Concentración:</th>
+            <td>{{ medicamento.concentracion|default:'No especificado' }}</td>
+        </tr>
+        <tr>
+            <th>Forma Farmacéutica:</th>
+            <td>{{ medicamento.forma_farmaceutica|default:'No especificado' }}</td>
+        </tr>
+        <tr>
+            <th>Vía de Administración:</th>
+            <td>{{ medicamento.via_administracion|default:'No especificado' }}</td>
+        </tr>
+    </table>
+    
+    <h2>Posología</h2>
+    <table>
+        <tr>
+            <th width="30%">Dosis:</th>
+            <td>{{ orden.dosis|default:'No especificado' }}</td>
+        </tr>
+        <tr>
+            <th>Frecuencia:</th>
+            <td>{{ orden.frecuencia|default:'No especificado' }}</td>
+        </tr>
+        <tr>
+            <th>Duración del Tratamiento:</th>
+            <td>{{ orden.duracion_tratamiento|default:'No especificado' }}</td>
+        </tr>
+        <tr>
+            <th>Cantidad:</th>
+            <td>{{ orden.cantidad|default:'No especificado' }}</td>
+        </tr>
+    </table>
+</div>
+{% endif %}
+
+<!-- Detalles de la Orden: EXAMEN/SERVICIO -->
+{% if es_examen %}
+<div class="section">
+    <h2>Servicio/Examen Solicitado</h2>
+    <table>
+        <tr>
+            <th width="30%">Nombre del Servicio:</th>
+            <td>{{ servicio.nombre_servicio }}</td>
+        </tr>
+        <tr>
+            <th>Tipo de Servicio:</th>
+            <td>{{ servicio.tipo_servicio }}</td>
+        </tr>
+        <tr>
+            <th>Descripción:</th>
+            <td>{{ servicio.descripcion|default:'No especificado' }}</td>
+        </tr>
+        {% if servicio.id_especialidad %}
+        <tr>
+            <th>Especialidad Requerida:</th>
+            <td>{{ servicio.id_especialidad.nombre_especialidad }}</td>
+        </tr>
+        {% endif %}
+    </table>
+</div>
+{% endif %}
+
+<!-- Indicaciones -->
+<div class="section">
+    <h2>Indicaciones</h2>
+    <div class="box">
+        {{ orden.indicaciones|default:'Sin indicaciones especiales'|linebreaks }}
+    </div>
+</div>
+
+<!-- Fechas -->
+<div class="section">
+    <h2>Fechas</h2>
+    <table>
+        <tr>
+            <th width="30%">Fecha de Emisión:</th>
+            <td>{{ orden.fecha_emision|date:"d/m/Y H:i" }}</td>
+        </tr>
+        <tr>
+            <th>Fecha Límite de Cumplimiento:</th>
+            <td>{{ orden.fecha_cumplimiento|date:"d/m/Y"|default:'No especificada' }}</td>
+        </tr>
+    </table>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <hr>
+    <p>Documento generado electrónicamente • {{ centro.nombre_centro }}</p>
+    <p>Este documento es válido únicamente con el código QR correspondiente</p>
+</div>
+
+</body>
+</html>
