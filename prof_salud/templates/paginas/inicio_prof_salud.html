@@ -34,17 +34,17 @@
                 <div class="container border border-dark rounded p-4 my-5 div-main">    
                     <h1>Historia clínica</h1>
                     <p>Acceda para revisar, actualizar y documentar la información médica, diagnósticos y plan de tratamiento del paciente en la Historia Clínica Electrónica (HCE), cumpliendo con la normativa de confidencialidad.</p>
-                    <a class="btn btn-main" href="{% url 'hc_prof_salud' %}">Historia clínica</a>
+                    <a class="btn btn-main" href="{% url 'registrar-consulta' %}">Historia clínica</a>
                 </div>
                 <div class="container border border-dark rounded p-4 my-5 div-main">
                     <h1>Ordenes Médicas</h1>
                     <p>Acceda para emitir, revisar y gestionar ordenes médicas (medicamentos, laboratorios, procedimientos) y solicitudes de interconsulta, documentando el plan de tratamiento activo del paciente.</p>
-                    <button type="button" class="btn btn-main" onclick="window.location.href='{% url 'om_prof_salud' %}'">Ordenes médicas</button>
+                    <button type="button" class="btn btn-main" onclick="window.location.href='{% url 'crear_orden_medica' %}'">Ordenes médicas</button>
                 </div>
                 <div class="container border border-dark rounded p-4 my-5 div-main">
                     <h1>Ordenes de Medicamentos</h1>
                     <p>Acceda para prescribir, modificar o suspender medicamentos del paciente (incluyendo dosis, vía y frecuencia), verificando las alertas de seguridad y documentando la farmacoterapia actual.</p>
-                    <button type="button" class="btn btn-main" onclick="window.location.href='{% url 'omed_prof_salud' %}'">Ordenes de medicamentos</button>
+                    <button type="button" class="btn btn-main" onclick="window.location.href='{% url 'crear_orden_medica' %}'">Ordenes de medicamentos</button>
                 </div>
             </div>
             <!-- Columna para las imágenes -->
