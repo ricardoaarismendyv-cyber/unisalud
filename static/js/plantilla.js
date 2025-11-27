@@ -12,18 +12,28 @@ document.addEventListener('DOMContentLoaded', function () {
     const toggleOffImg = themeToggleButton ? themeToggleButton.dataset.toggleOff : '';
     const toggleOnImg = themeToggleButton ? themeToggleButton.dataset.toggleOn : '';
 
+    // Aplicar el tema guardado al cargar la página
+    const savedTheme = localStorage.getItem('dark-mode');
+    if (savedTheme === "enabled") {
+        if (body) body.classList.add('dark-mode');
+        if (themeToggleButton && toggleOnImg) themeToggleButton.src = toggleOnImg;
+    } else {
+        if (themeToggleButton && toggleOffImg) themeToggleButton.src = toggleOffImg;
+    }
+
     function toggleTheme() {
         if (!body || !themeToggleButton) return;
 
-        // Comprueba si el body tiene la clase 'dark-mode'
-        if (body.classList.contains('dark-mode')) {
-            // Desactivar modo oscuro
-            body.classList.remove('dark-mode');
-            themeToggleButton.src = toggleOffImg;
+        // Alternar la clase
+        const isDarkNow = body.classList.toggle('dark-mode');
+
+        // Cambiar src del toggle (si existen las rutas)
+        if (isDarkNow) {
+            if (toggleOnImg) themeToggleButton.src = toggleOnImg;
+            localStorage.setItem('dark-mode', 'enabled');
         } else {
-            // Activar modo oscuro
-            body.classList.add('dark-mode');
-            themeToggleButton.src = toggleOnImg;
+            if (toggleOffImg) themeToggleButton.src = toggleOffImg;
+            localStorage.setItem('dark-mode', 'disabled');
         }
     }
 
@@ -47,8 +57,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
-
 
     // --- Lógica para la Barra Lateral de Accesibilidad ---
     const accessibilityIcon = document.getElementById('accessibility-icon');

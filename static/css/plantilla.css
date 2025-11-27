@@ -12,7 +12,7 @@
     --primary-color: #3971eb;
     --primary-light: #3b82f6;
     --primary-dark: #3964d8;
-    --secondary-color: #10b981;
+    --secondary-color: #3971eb,;
     --accent-color: #8b5cf6;
     --text-dark: #1f2937;
     --text-light: #6b7280;
@@ -56,6 +56,20 @@ body.dark-mode {
 main.dark-mode{
         background: #000 !important;
     color: #e5e7eb !important;
+}
+
+/* Iconos de moon, toggle y accesibility negros cuando NO esta activado el modo oscuro */
+#theme-toggle-img,
+#moon-icon,
+#accessibility-icon {
+    filter: brightness(0) invert(0);
+}
+
+/* Iconos blancos cuando esta activado el modo oscuro */
+.dark-mode #theme-toggle-img,
+.dark-mode #moon-icon,
+.dark-mode #accessibility-icon {
+    filter: brightness(0) invert(1); 
 }
 
 /* css de inicio */
@@ -152,7 +166,7 @@ main.dark-mode{
 /*titulos en negrita*/
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
-    color: var(--text-dark);
+    color: var(--text-white);
     margin-bottom: 1rem;
 }
 
@@ -377,7 +391,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .dark-mode .footer-bar {
-    background: linear-gradient(135deg, #1f2937, #19212d) !important;
+    background: linear-gradient(135deg, #0d1117, #1e3a8a) !important;
     position: fixed;
     left: 0;
     bottom: 0;
@@ -398,6 +412,7 @@ h1, h2, h3, h4, h5, h6 {
 
 
 .dark-mode .footer-nav{
+    background: linear-gradient(135deg, #0d1117, #1e3a8a);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -414,7 +429,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .foot-button {
-    background: linear-gradient(135deg, var(--secondary-color), #34d399);
+    background: linear-gradient(135deg, #3964d8);
     margin-bottom: 10px;
     display: inline-flex;
     align-items: center;
@@ -422,7 +437,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .foot-button:hover {
-    background: linear-gradient(135deg, #0d9c6d, var(--secondary-color));
+    background: linear-gradient(135deg, #255ed8);
     box-shadow: var(--shadow-hover);
 }
 
