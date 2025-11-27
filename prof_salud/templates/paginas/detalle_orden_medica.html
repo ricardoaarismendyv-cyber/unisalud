@@ -1,0 +1,285 @@
+<!-- filepath: c:\GITHUB Unisalud\unisalud\prof_salud\templates\prof_salud\detalle_orden_medica.html -->
+{% extends "plantilla_ps.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Orden Médica #{{ orden.id_orden }}</h2>
+        <div>
+            <span class="badge bg-{{ orden.id_estado_orden.nombre_estado_orden|lower == 'pendiente' and 'warning' or orden.id_estado_orden.nombre_estado_orden|lower == 'entregada' and 'success' or 'secondary' }} fs-6">
+                {{ orden.id_estado_orden.nombre_estado_orden|upper }}
+            </span>
+            <a href="{% url 'lista_ordenes_medicas' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+    
+    <!-- Datos del Paciente -->
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-person-circle"></i> Datos del Paciente</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nombre completo:</strong><br>
+                        {{ orden.id_paciente.nombre1 }} 
+                        {{ orden.id_paciente.nombre2|default:'' }} 
+                        {{ orden.id_paciente.apellido1 }} 
+                        {{ orden.id_paciente.apellido2|default:'' }}
+                    </p>
+                    <p><strong>Documento:</strong><br>
+                        {{ orden.id_paciente.id_tipo_identificacion.identificacion }} 
+                        {{ orden.id_paciente.numero_documento }}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Género:</strong> {{ orden.id_paciente.id_genero.nombre_genero }}</p>
+                    <p><strong>Fecha de nacimiento:</strong> {{ orden.id_paciente.fecha_nacimiento }}</p>
+                    <p><strong>Celular:</strong> {{ orden.id_paciente.celular|default:'No registrado' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Datos del Profesional -->
+    <div class="card mb-3">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="bi bi-briefcase-fill"></i> Profesional que emitió la orden</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nombre:</strong><br>
+                        {{ orden.id_profesional.nombre1 }} {{ orden.id_profesional.apellido1 }}
+                    </p>
+                    <p><strong>Especialidad:</strong><br>
+                        {{ orden.id_profesional.id_especialidad.nombre_especialidad|default:'Sin especialidad' }}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Registro profesional:</strong><br>
+                        {{ orden.id_profesional.registro_profesional|default:'No aplica' }}
+                    </p>
+                    <p><strong>Centro médico:</strong><br>
+                        {{ orden.id_centro_medico.nombre_centro }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tipo de Orden -->
+    <div class="card mb-3">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-clipboard2-pulse"></i> Tipo de Orden</h5>
+        </div>
+        <div class="card-body">
+            <h4>{{ orden.id_tipo_orden.nombre_tipo }}</h4>
+            
+            {% if es_medicamento %}
+                <!-- Detalles del Medicamento -->
+                <div class="mt-3">
+                    <h5 class="text-primary">Medicamento Prescrito</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="30%">Nombre comercial:</th>
+                            <td>{{ orden.id_medicamento.nombre_comercial }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nombre genérico:</th>
+                            <td>{{ orden.id_medicamento.nombre_generico|default:'No especificado' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Principio activo:</th>
+                            <td>{{ orden.id_medicamento.principio_activo|default:'No especificado' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Concentración:</th>
+                            <td>{{ orden.id_medicamento.concentracion|default:'No especificado' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Forma farmacéutica:</th>
+                            <td>{{ orden.id_medicamento.forma_farmaceutica|default:'No especificado' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Vía de administración:</th>
+                            <td>{{ orden.id_medicamento.via_administracion|default:'No especificado' }}</td>
+                        </tr>
+                    </table>
+                    
+                    <h5 class="text-primary mt-4">Posología</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="30%">Dosis:</th>
+                            <td>{{ orden.dosis|default:'No especificado' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Frecuencia:</th>
+                            <td>{{ orden.frecuencia|default:'No especificado' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Duración del tratamiento:</th>
+                            <td>{{ orden.duracion_tratamiento|default:'No especificado' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Cantidad:</th>
+                            <td>{{ orden.cantidad|default:'No especificado' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            {% endif %}
+            
+            {% if es_examen %}
+                <!-- Detalles del Servicio/Examen -->
+                <div class="mt-3">
+                    <h5 class="text-primary">Servicio/Examen Solicitado</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="30%">Nombre del servicio:</th>
+                            <td>{{ orden.id_servicio.nombre_servicio }}</td>
+                        </tr>
+                        <tr>
+                            <th>Tipo de servicio:</th>
+                            <td>{{ orden.id_servicio.tipo_servicio }}</td>
+                        </tr>
+                        <tr>
+                            <th>Descripción:</th>
+                            <td>{{ orden.id_servicio.descripcion|default:'No especificado' }}</td>
+                        </tr>
+                        {% if orden.id_servicio.id_especialidad %}
+                        <tr>
+                            <th>Especialidad requerida:</th>
+                            <td>{{ orden.id_servicio.id_especialidad.nombre_especialidad }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Indicaciones -->
+    <div class="card mb-3">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Indicaciones</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-light">
+                {{ orden.indicaciones|default:'Sin indicaciones especiales'|linebreaks }}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Fechas -->
+    <div class="card mb-3">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="bi bi-calendar3"></i> Fechas</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Fecha de emisión:</strong><br>
+                        {{ orden.fecha_emision|date:"d/m/Y H:i" }}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Fecha límite de cumplimiento:</strong><br>
+                        <span class="text-danger fw-bold">
+                            {{ orden.fecha_cumplimiento|date:"d/m/Y"|default:'No especificada' }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Consulta Relacionada y Diagnósticos -->
+    {% if orden.id_consulta %}
+    <div class="card mb-3">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="bi bi-file-medical"></i> Consulta Relacionada</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Consulta #{{ orden.id_consulta.id_consulta }}</strong></p>
+            <p><strong>Fecha:</strong> {{ orden.id_consulta.fecha_programada|date:"d/m/Y H:i" }}</p>
+            <p><strong>Motivo:</strong> {{ orden.id_consulta.motivo_consulta|default:'No especificado' }}</p>
+            
+            {% if diagnosticos %}
+            <h6 class="mt-3">Diagnósticos asociados:</h6>
+            <ul class="list-group">
+                {% for diag in diagnosticos %}
+                <li class="list-group-item">
+                    <strong>{{ diag.id_enfermedad.codigo_cie10 }}</strong> - 
+                    {{ diag.id_enfermedad.nombre_enfermedad }}
+                    <span class="badge bg-info">{{ diag.tipo_diagnostico|default:'No especificado' }}</span>
+                    {% if diag.notas %}
+                        <br><small class="text-muted">{{ diag.notas }}</small>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Acciones -->
+    <div class="text-center mb-4">
+        <a href="#" class="btn btn-primary btn-lg" onclick="window.print(); return false;">
+            <i class="bi bi-printer"></i> Imprimir Orden
+        </a>
+        <a href="{% url 'generar_pdf_orden' orden.id_orden %}" class="btn btn-success btn-lg" target="_blank">
+            <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
+        </a>
+        {% if orden.id_estado_orden.nombre_estado_orden|lower == 'pendiente' %}
+        <button class="btn btn-warning btn-lg" data-bs-toggle="modal" data-bs-target="#modalCambiarEstado">
+            <i class="bi bi-pencil-square"></i> Cambiar Estado
+        </button>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal para cambiar estado -->
+<div class="modal fade" id="modalCambiarEstado" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cambiar Estado de la Orden</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'cambiar_estado_orden' orden.id_orden %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nuevo estado:</label>
+                        <select name="nuevo_estado" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="entregada">Entregada</option>
+                            <option value="vencida">Vencida</option>
+                            <option value="cancelada">Cancelada</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones (opcional):</label>
+                        <textarea name="observaciones" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    .btn, .modal { display: none !important; }
+    .card { break-inside: avoid; }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,158 @@
+<!-- filepath: c:\GITHUB Unisalud\unisalud\prof_salud\templates\prof_salud\crear_orden_medica.html -->
+{% extends "plantilla_ps.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Nueva Orden Médica</h2>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="post" id="formOrdenMedica">
+        {% csrf_token %}
+        
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5>Datos del Paciente</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.id_paciente.label_tag }}
+                        {{ form.id_paciente }}
+                        {% if form.id_paciente.errors %}
+                            <div class="text-danger">{{ form.id_paciente.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.id_consulta.label_tag }}
+                        {{ form.id_consulta }}
+                        <small class="form-text text-muted">Opcional: vincular a una consulta específica</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-3">
+            <div class="card-header bg-info text-white">
+                <h5>Tipo de Orden</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    {{ form.id_tipo_orden.label_tag }}
+                    {{ form.id_tipo_orden }}
+                    {% if form.id_tipo_orden.errors %}
+                        <div class="text-danger">{{ form.id_tipo_orden.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Campo medicamento (se muestra/oculta según tipo) -->
+                <div class="mb-3" id="campo_medicamento" style="display:none;">
+                    {{ form.id_medicamento.label_tag }}
+                    {{ form.id_medicamento }}
+                    {% if form.id_medicamento.errors %}
+                        <div class="text-danger">{{ form.id_medicamento.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Campo servicio (se muestra/oculta según tipo) -->
+                <div class="mb-3" id="campo_servicio" style="display:none;">
+                    {{ form.id_servicio.label_tag }}
+                    {{ form.id_servicio }}
+                    {% if form.id_servicio.errors %}
+                        <div class="text-danger">{{ form.id_servicio.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-3" id="campos_medicamento" style="display:none;">
+            <div class="card-header bg-success text-white">
+                <h5>Detalles del Medicamento</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        {{ form.dosis.label_tag }}
+                        {{ form.dosis }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        {{ form.frecuencia.label_tag }}
+                        {{ form.frecuencia }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        {{ form.duracion_tratamiento.label_tag }}
+                        {{ form.duracion_tratamiento }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        {{ form.cantidad.label_tag }}
+                        {{ form.cantidad }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-3">
+            <div class="card-header bg-warning">
+                <h5>Indicaciones y Observaciones</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    {{ form.indicaciones.label_tag }}
+                    {{ form.indicaciones }}
+                </div>
+                <div class="mb-3">
+                    {{ form.fecha_cumplimiento.label_tag }}
+                    {{ form.fecha_cumplimiento }}
+                    <small class="form-text text-muted">Fecha límite (máximo 30 días)</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle"></i> Generar Orden
+            </button>
+            <a href="{% url 'lista_ordenes_medicas' %}" class="btn btn-secondary">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoOrden = document.getElementById('id_tipo_orden');
+    const campoMedicamento = document.getElementById('campo_medicamento');
+    const campoServicio = document.getElementById('campo_servicio');
+    const camposMedicamento = document.getElementById('campos_medicamento');
+    
+    function actualizarCampos() {
+        const selectedOption = tipoOrden.options[tipoOrden.selectedIndex];
+        const tipoTexto = selectedOption.text.toLowerCase();
+        
+        // Ocultar todos
+        campoMedicamento.style.display = 'none';
+        campoServicio.style.display = 'none';
+        camposMedicamento.style.display = 'none';
+        
+        // Mostrar según tipo
+        if (tipoTexto.includes('medicamento')) {
+            campoMedicamento.style.display = 'block';
+            camposMedicamento.style.display = 'block';
+            document.getElementById('id_medicamento').required = true;
+            document.getElementById('id_servicio').required = false;
+        } else if (tipoTexto.includes('examen') || tipoTexto.includes('procedimiento')) {
+            campoServicio.style.display = 'block';
+            document.getElementById('id_medicamento').required = false;
+            document.getElementById('id_servicio').required = true;
+        }
+    }
+    
+    tipoOrden.addEventListener('change', actualizarCampos);
+    actualizarCampos(); // Ejecutar al cargar
+});
+</script>
+{% endblock %}

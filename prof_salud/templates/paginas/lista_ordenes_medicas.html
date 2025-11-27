@@ -1,0 +1,52 @@
+<!-- filepath: c:\GITHUB Unisalud\unisalud\prof_salud\templates\prof_salud\lista_ordenes_medicas.html -->
+{% extends "plantilla_ps.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Mis Órdenes Médicas</h2>
+    
+    <div class="text-end mb-3">
+        <a href="{% url 'crear_orden_medica' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nueva Orden
+        </a>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Paciente</th>
+                    <th>Tipo</th>
+                    <th>Fecha Emisión</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orden in ordenes %}
+                <tr>
+                    <td>{{ orden.id_orden }}</td>
+                    <td>{{ orden.id_paciente.nombre1 }} {{ orden.id_paciente.apellido1 }}</td>
+                    <td>{{ orden.id_tipo_orden.nombre_tipo }}</td>
+                    <td>{{ orden.fecha_emision|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <span class="badge bg-{{ orden.id_estado_orden.nombre_estado_orden|lower == 'pendiente' and 'warning' or 'success' }}">
+                            {{ orden.id_estado_orden.nombre_estado_orden }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'detalle_orden_medica' orden.id_orden %}" class="btn btn-sm btn-info">
+                            <i class="bi bi-eye"></i> Ver
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No hay órdenes médicas registradas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
