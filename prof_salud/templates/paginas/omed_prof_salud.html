@@ -1,4 +1,4 @@
-{% extends "plantilla_ps.html" %}
+<!-- {% extends "plantilla_ps.html" %}
 {% load static %}
 {% block title %}Órdenes de medicamentos{% endblock title %}
 
@@ -27,12 +27,12 @@
 <section class="main">
     <div class="container-fluid">
         <div class="row justify-content-center p-4">
-            <!-- Columna para el contenido principal -->
+            <!- Columna para el contenido principal 
             <div class="col-lg-10 col-md-10">
                 <div>
                     <a class="btn btn-main btn-nav" href="{% url 'inicio_prof_salud' %}">Volver</a>
                     <a class="btn btn-main btn-nav" href="{% static 'docs/omeejemplo.pdf' %}">Descargar orden de medicamentos reciente</a>
-                    <!-- Botón para activar el modal del QR -->
+                    <!- Botón para activar el modal del QR 
                     <button type="button" class="btn btn-main btn-nav" data-bs-toggle="modal" data-bs-target="#qrModal">
                         Generar QR de la orden de medicamentos reciente
                     </button>
@@ -51,13 +51,13 @@
                         <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#historialMedicamentos" aria-expanded="false" aria-controls="historialMedicamentos">
                             Ver ordenes de medicamentos
                         </button>
-                        <!-- Contenido colapsable con el historial -->
+                        <!- Contenido colapsable con el historial 
                         <div class="collapse mt-3" id="historialMedicamentos">
                             <div class="card card-body div-main">
                                 <h5 class="card-title">Historial Completo</h5>
                                 <p>A continuación se listan sus ordenes de medicamentos anteriores.</p>
                                 <ul class="list-group list-group-flush itemList">
-                                    <!-- Ejemplo de item. Esto debería generarse con un bucle en Django -->
+                                    <!- Ejemplo de item. Esto debería generarse con un bucle en Django 
                                     <li class="list-group-item d-flex justify-content-between align-items-center div-main">
                                         <a href="{% static 'docs/ordenmedicamhistor.pdf' %}">Medicamento para dolor de cabeza y musculoesqueletico - <span>Dra. Maria Torres</span></a>
                                         <div class="text-nowrap">
@@ -74,7 +74,7 @@
         </div>
     </div>
 </section>
-<!-- Modal para el Código QR -->
+<!- Modal para el Código QR -
 <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content div-main">
