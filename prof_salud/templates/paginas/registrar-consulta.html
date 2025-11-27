@@ -1,0 +1,271 @@
+{% extends "plantilla.html" %}
+{% load static %}
+{% block title %}Registrar Consulta{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static "css/custom.css" %}">
+{% endblock estilo %}
+
+{% block auth_button %}
+<li>
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio-prof-salud" %}'">
+        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    </button>
+</li>
+{% endblock auth_button %}
+
+{% block content %}
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <div class="col-lg-10 col-md-10">
+                <div class="mb-3">
+                    <a class="btn btn-main btn-nav" href='{% url "inicio-prof-salud" %}'>Volver</a>
+                </div>
+                
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Registrar Consulta Médica</h1>
+                    <p class="text-muted">Complete el formulario con los datos de la consulta</p>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" id="consultaForm">
+                        {% csrf_token %}
+                        
+                        <!-- Sección: Búsqueda de Paciente -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">1. Datos del Paciente</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    {{ form.numero_documento.label_tag }}
+                                    {{ form.numero_documento }}
+                                    {% if form.numero_documento.errors %}
+                                        <div class="text-danger">{{ form.numero_documento.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección: Fecha y Motivo -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">2. Información de la Consulta</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.fecha_programada.label_tag }}
+                                        {{ form.fecha_programada }}
+                                        {% if form.fecha_programada.errors %}
+                                            <div class="text-danger">{{ form.fecha_programada.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.estado.label_tag }}
+                                        {{ form.estado }}
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.motivo_consulta.label_tag }}
+                                    {{ form.motivo_consulta }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección: Anamnesis y Examen Físico -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">3. Anamnesis y Examen Físico</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    {{ form.anamnesis.label_tag }}
+                                    {{ form.anamnesis }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.examen_fisico.label_tag }}
+                                    {{ form.examen_fisico }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección: Signos Vitales -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">4. Signos Vitales</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        {{ form.frecuencia_cardiaca.label_tag }}
+                                        {{ form.frecuencia_cardiaca }}
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        {{ form.frecuencia_respiratoria.label_tag }}
+                                        {{ form.frecuencia_respiratoria }}
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        {{ form.temperatura.label_tag }}
+                                        {{ form.temperatura }}
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        {{ form.saturacion_oxigeno.label_tag }}
+                                        {{ form.saturacion_oxigeno }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        {{ form.presion_arterial_sistolica.label_tag }}
+                                        {{ form.presion_arterial_sistolica }}
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        {{ form.presion_arterial_diastolica.label_tag }}
+                                        {{ form.presion_arterial_diastolica }}
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        {{ form.peso.label_tag }}
+                                        {{ form.peso }}
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        {{ form.talla.label_tag }}
+                                        {{ form.talla }}
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        {{ form.imc.label_tag }}
+                                        {{ form.imc }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección: Hábitos -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">5. Hábitos</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        {{ form.habitos_fumador.label_tag }}
+                                        {{ form.habitos_fumador }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        {{ form.habitos_alcohol.label_tag }}
+                                        {{ form.habitos_alcohol }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        {{ form.habitos_ejercicio.label_tag }}
+                                        {{ form.habitos_ejercicio }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección: Revisión por Sistemas -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">6. Revisión por Sistemas</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    {{ form.revision_sistemas.label_tag }}
+                                    {{ form.revision_sistemas }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección: Diagnóstico -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">7. Diagnóstico</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    {{ diagnostico_form.id_enfermedad.label_tag }}
+                                    {{ diagnostico_form.id_enfermedad }}
+                                    {% if diagnostico_form.id_enfermedad.errors %}
+                                        <div class="text-danger">{{ diagnostico_form.id_enfermedad.errors }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Seleccione la enfermedad diagnosticada según CIE-10</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ diagnostico_form.tipo_diagnostico.label_tag }}
+                                    {{ diagnostico_form.tipo_diagnostico }}
+                                    {% if diagnostico_form.tipo_diagnostico.errors %}
+                                        <div class="text-danger">{{ diagnostico_form.tipo_diagnostico.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ diagnostico_form.notas.label_tag }}
+                                    {{ diagnostico_form.notas }}
+                                    {% if diagnostico_form.notas.errors %}
+                                        <div class="text-danger">{{ diagnostico_form.notas.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección: Impresión Diagnóstica y Tratamiento -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">8. Impresión Diagnóstica y Plan de Tratamiento</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    {{ form.impresion_diagnostica.label_tag }}
+                                    {{ form.impresion_diagnostica }}
+                                    <small class="form-text text-muted">Resumen de la impresión clínica general</small>
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.plan_tratamiento.label_tag }}
+                                    {{ form.plan_tratamiento }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.notas_adicionales.label_tag }}
+                                    {{ form.notas_adicionales }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href='{% url "inicio-prof-salud" %}' class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-main">Guardar Consulta y Diagnóstico</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Calcular IMC automáticamente
+document.getElementById('id_peso').addEventListener('input', calcularIMC);
+document.getElementById('id_talla').addEventListener('input', calcularIMC);
+
+function calcularIMC() {
+    const peso = parseFloat(document.getElementById('id_peso').value);
+    const talla = parseFloat(document.getElementById('id_talla').value);
+    
+    if (peso > 0 && talla > 0) {
+        const tallaMetros = talla / 100;
+        const imc = (peso / (tallaMetros * tallaMetros)).toFixed(2);
+        document.getElementById('id_imc').value = imc;
+    }
+}
+</script>
+
+{% endblock content %}
