@@ -3,7 +3,9 @@ from login.decorators import role_required
 from .models import Pacientes, Usuarios, Roles, TipoIdentificacion, Genero, ProfesionalSalud, CentrosMedicos, Especialidades
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from usuario.models import Consulta
+from usuario.models import Consulta, OrdenMedica
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 
 @role_required(allowed_roles=['paciente'])
 def inicio_usuario(request):
@@ -33,11 +35,84 @@ def hcusuario(request):
 
 @role_required(allowed_roles=['paciente'])
 def omusuario(request):
-    return render(request, 'paginas/orden-medica-usuario.html')
+    """
+    Vista para que el PACIENTE vea TODAS sus órdenes médicas
+    (medicamentos, exámenes, procedimientos).
+    """
+    try:
+        paciente_id = request.session.get('id_paciente')
+        if not paciente_id:
+            messages.error(request, 'No se encontró tu perfil de paciente.')
+            return redirect('login')
+        
+        paciente = Pacientes.objects.get(id_paciente=paciente_id)
+        
+        # Obtener TODAS las órdenes del paciente
+        ordenes = OrdenMedica.objects.filter(
+            id_paciente=paciente
+        ).select_related(
+            'id_profesional',
+            'id_profesional__id_especialidad',
+            'id_tipo_orden',
+            'id_medicamento',
+            'id_servicio',
+            'id_estado_orden',
+            'id_centro_medico'
+        ).order_by('-fecha_emision')
+        
+        # Orden más reciente
+        orden_reciente = ordenes.first() if ordenes.exists() else None
+        
+        context = {
+            'paciente': paciente,
+            'ordenes': ordenes,
+            'orden_reciente': orden_reciente,
+        }
+        return render(request, 'paginas/orden-medica-usuario.html', context)
+        
+    except Pacientes.DoesNotExist:
+        messages.error(request, 'No se encontró tu perfil de paciente.')
+        return redirect('login')
 
 @role_required(allowed_roles=['paciente'])
 def omeusuario(request):
-    return render(request, 'paginas/orden-medicamentos-usuario.html')
+    """
+    Vista para que el PACIENTE vea sus órdenes de MEDICAMENTOS.
+    Solo muestra órdenes donde id_tipo_orden = 'Medicamentos'.
+    """
+    try:
+        paciente_id = request.session.get('id_paciente')
+        if not paciente_id:
+            messages.error(request, 'No se encontró tu perfil de paciente.')
+            return redirect('login')
+        
+        paciente = Pacientes.objects.get(id_paciente=paciente_id)
+        
+        # Obtener órdenes de MEDICAMENTOS del paciente
+        ordenes_medicamentos = OrdenMedica.objects.filter(
+            id_paciente=paciente,
+            id_tipo_orden__nombre_tipo__iexact='medicamentos'  # Solo medicamentos
+        ).select_related(
+            'id_profesional',
+            'id_profesional__id_especialidad',
+            'id_medicamento',
+            'id_estado_orden',
+            'id_centro_medico'
+        ).order_by('-fecha_emision')
+        
+        # Orden más reciente
+        orden_reciente = ordenes_medicamentos.first() if ordenes_medicamentos.exists() else None
+        
+        context = {
+            'paciente': paciente,
+            'ordenes': ordenes_medicamentos,
+            'orden_reciente': orden_reciente,
+        }
+        return render(request, 'paginas/orden-medicamentos-usuario.html', context)
+        
+    except Pacientes.DoesNotExist:
+        messages.error(request, 'No se encontró tu perfil de paciente.')
+        return redirect('login')
 
 @role_required(allowed_roles=['paciente'])
 def turnosusuario(request):
@@ -192,3 +267,30 @@ def registro(request):
 
 def contactanos(request):
     return render(request, 'paginas/contactanos.html')
+
+@role_required(allowed_roles=['paciente'])
+def descargar_pdf_orden_paciente(request, id_orden):
+    """
+    Permite al PACIENTE descargar el PDF de su orden médica desde PostgreSQL.
+    """
+    try:
+        paciente_id = request.session.get('id_paciente')
+        if not paciente_id:
+            messages.error(request, 'No se encontró tu perfil de paciente.')
+            return redirect('login')
+        
+        paciente = Pacientes.objects.get(id_paciente=paciente_id)
+        
+        # Obtener la orden (verificar que pertenezca al paciente)
+        orden = get_object_or_404(OrdenMedica, id_orden=id_orden, id_paciente=paciente)
+        
+        # Obtener PDF desde PostgreSQL
+        pdf_bytes = orden.get_pdf_from_db()
+        
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="orden_{orden.id_orden}.pdf"'
+        return response
+        
+    except Pacientes.DoesNotExist:
+        messages.error(request, 'No se encontró tu perfil de paciente.')
+        return redirect('login')
