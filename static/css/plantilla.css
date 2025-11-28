@@ -12,7 +12,7 @@
     --primary-color: #3971eb;
     --primary-light: #3b82f6;
     --primary-dark: #3964d8;
-    --secondary-color: #3971eb,;
+    --secondary-color: #3971eb;
     --accent-color: #8b5cf6;
     --text-dark: #1f2937;
     --text-light: #6b7280;
@@ -173,7 +173,7 @@ h1, h2, h3, h4, h5, h6 {
 .custom-highlight-btn {
     background: linear-gradient(135deg, var(--secondary-color), #34d399);
     border: none;
-    color: var(--black);
+    color: var(--white);
     font-weight: 600;
     padding: 12px 32px;
     text-transform: uppercase;
