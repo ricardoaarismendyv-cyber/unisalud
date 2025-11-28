@@ -36,7 +36,7 @@ section.main {
 }
 
 .itemList a {
-    color: var(--text-dark);
+    color: var(--text-white);
     font-weight: 600;
     text-decoration: none;
     transition: color 0.3s ease;
