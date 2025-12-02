@@ -4,13 +4,13 @@
 
 {% block estilo %}
 {{ block.super }}
-    <link rel="stylesheet" href="{% static "css/custom.css" %}">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 {% endblock estilo %}
 
 {% block auth_button %}
 <li>
-    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "consultas_prof_salud" %}'">
-        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url 'consultas_prof_salud' %}'">
+        <img class="img-button" src="{% static 'img/log-out.svg' %}" alt="Icono de logout"> Cerrar Sesión
     </button>
 </li>
 
@@ -25,13 +25,13 @@
             <div class="col-lg-10 col-md-10">
                 <div>
                     <a class="btn btn-main btn-nav" href='{% url "inicio_prof_salud" %}'>Volver</a>
-                <a class="btn btn-main btn-nav" href="{% static "docs/HCdiligenciada.pdf" %}">Descargar historia clínica reciente</a>
+                <a class="btn btn-main btn-nav" href="{% static 'docs/HCdiligenciada.pdf' %}">Descargar historia clínica reciente</a>
                 </div>
             <div class="row justify-content-center">
                 <div class="col-lg-10 col-md-10">
                     <div class="container border border-dark rounded p-4 my-5 div-main">
                         <h1>Diligencie historia clínica del paciente</h1>
-                        <a class="btn btn-main btn-nav" href="{% static 'docs/hcejemplo.pdf' %}">Diligenciar</a>
+                        <a class="btn btn-main btn-nav" href="{% url 'diligenciar_hc' %}">Diligenciar Nueva Historia Clínica</a>
                         <p>Por favor diligencie el siguiente formulario para actualizar la historia clínica del paciente.</p>
                         <p>Recuerde que la información debe ser precisa y completa para garantizar una atención</p>
                         <object data="{% static 'docs/hcejemplo.pdf' %}" type="application/pdf" width="100%" height="500px" class="mb-3"> <p>Su navegador o dispositivo no permite visualizar el pdf correctamente, por favor descarguelo para visualizarlo.</p></object>
