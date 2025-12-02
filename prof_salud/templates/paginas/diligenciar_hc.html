@@ -1,0 +1,189 @@
+{% extends "plantilla_ps.html" %}
+{% load static %}
+{% block title %}Diligenciar Historia Clínica{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock estilo %}
+
+{% block content %}
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <div class="col-lg-10 col-md-10">
+                <a class="btn btn-main btn-nav" href='{% url "hc_prof_salud" %}'>Volver</a>
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Diligenciar Historia Clínica</h1>
+                    <p>Complete todos los campos para registrar la consulta del paciente.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {{ form.as_p }} 
+
+                        <hr>
+                        <h3>Diagnósticos del Paciente</h3>
+                        
+                        {{ diagnostico_formset.management_form }}
+
+                        <div id="diagnosticos-container">
+                            {% for form in diagnostico_formset %}
+                                <div class="diagnostico-form border p-3 mb-3">
+                                    <h5 class="form-title">Diagnóstico #{{ forloop.counter }}</h5>
+                                    {{ form.as_p }}
+                                    {% if form.instance.id or diagnostico_formset.can_delete %}
+                                    <div class="form-check">
+                                        {{ form.DELETE }} 
+                                        <label class="form-check-label" for="{{ form.DELETE.id_for_label }}">Eliminar este diagnóstico</label>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div id="empty-form-template" style="display: none;">
+                            <div class="diagnostico-form border p-3 mb-3">
+                                <h5 class="form-title">Diagnóstico #__prefix__</h5>
+                                {{ diagnostico_formset.empty_form.as_p }}
+                                <div class="form-check">
+                                    {{ diagnostico_formset.empty_form.DELETE }}
+                                    <label class="form-check-label" for="{{ diagnostico_formset.empty_form.DELETE.id_for_label }}">Eliminar este diagnóstico</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" id="add-diagnostico-btn" class="btn btn-secondary mt-2">Añadir Otro Diagnóstico</button>
+
+                        <hr>
+                        <h3>Antecedentes del Paciente</h3>
+
+                        {{ antecedente_formset.management_form }}
+
+                        <div id="antecedente-forms-container">
+                            {% for form in antecedente_formset %}
+                                <div class="antecedente-form border p-3 mb-3">
+                                    <h5 class="form-title">Antecedente #{{ forloop.counter }}</h5>
+                                    {{ form.as_p }}
+                                    {% if form.instance.id or antecedente_formset.can_delete %}
+                                    <div class="form-check">
+                                        {{ form.DELETE }}
+                                        <label class="form-check-label" for="{{ form.DELETE.id_for_label }}">Eliminar este antecedente</label>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div id="empty-antecedente-form-template" style="display: none;">
+                            <div class="antecedente-form border p-3 mb-3">
+                                <h5 class="form-title">Antecedente #__prefix__</h5>
+                                {{ antecedente_formset.empty_form.as_p }}
+                            </div>
+                        </div>
+
+                        <button type="button" id="add-antecedente-btn" class="btn btn-secondary mt-2">Añadir Otro Antecedente</button>
+
+                        <button type="submit" class="btn btn-primary mt-3">Guardar Historia Clínica</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block scripts %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Lógica para añadir formularios de Diagnóstico ---
+    const addFormBtn = document.getElementById('add-diagnostico-btn');
+    const formsContainer = document.getElementById('diagnostico-forms-container');
+    const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
+    const totalFormsInput = document.querySelector('#id_diagnosticos-TOTAL_FORMS');
+
+    addFormBtn.addEventListener('click', function() {
+        let formNum = parseInt(totalFormsInput.value);
+        let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formNum);
+        
+        // Crear un div temporal para insertar el nuevo formulario
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = newFormHtml;
+        
+        // Renombrar el título para que coincida con el nuevo número
+        tempDiv.querySelector('.form-title').textContent = `Diagnóstico #${formNum + 1}`;
+
+        formsContainer.insertAdjacentHTML('beforeend', tempDiv.innerHTML);
+        totalFormsInput.value = formNum + 1;
+    });
+
+    // --- Lógica para añadir formularios de Antecedentes ---
+    const addAntecedenteBtn = document.getElementById('add-antecedente-btn');
+    const antecedenteFormsContainer = document.getElementById('antecedente-forms-container');
+    const emptyAntecedenteTemplate = document.getElementById('empty-antecedente-form-template').innerHTML;
+    const totalAntecedenteInput = document.querySelector('#id_antecedentes-TOTAL_FORMS');
+
+    addAntecedenteBtn.addEventListener('click', function() {
+        let formNum = parseInt(totalAntecedenteInput.value);
+        let newFormHtml = emptyAntecedenteTemplate.replace(/__prefix__/g, formNum);
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = newFormHtml;
+        tempDiv.querySelector('.form-title').textContent = `Antecedente #${formNum + 1}`;
+        antecedenteFormsContainer.insertAdjacentHTML('beforeend', tempDiv.innerHTML);
+        totalAntecedenteInput.value = formNum + 1;
+    });
+
+    // --- Lógica para autocompletar campos de diagnóstico ---
+    // Obtenemos los datos de las enfermedades desde la vista de Django
+    const enfermedadesData = JSON.parse('{{ enfermedades_json|escapejs }}');
+
+    function actualizarCamposDiagnostico(selectElement) {
+        // Extraer el prefijo del formulario (ej: diagnosticos-0)
+        const formPrefixMatch = selectElement.id.match(/id_(.+?)-id_enfermedad/);
+        if (!formPrefixMatch) return;
+
+        const formPrefix = formPrefixMatch[1];
+        const categoriaInput = document.getElementById(`id_${formPrefix}-categoria_grupom`);
+        const grupoInput = document.getElementById(`id_${formPrefix}-grupo_mortalidad`);
+        
+        const selectedId = selectElement.value;
+
+        if (selectedId && enfermedadesData[selectedId]) {
+            const enfermedad = enfermedadesData[selectedId];
+            if (categoriaInput) categoriaInput.value = enfermedad.categoria || '';
+            if (grupoInput) grupoInput.value = enfermedad.grupo || '';
+        } else {
+            // Limpiar si no se selecciona nada o no se encuentran datos
+            if (categoriaInput) categoriaInput.value = '';
+            if (grupoInput) grupoInput.value = '';
+        }
+    }
+
+    // Función para inicializar los listeners en los formularios de diagnóstico
+    function inicializarListenersDiagnostico() {
+        const selectsEnfermedad = document.querySelectorAll('select[id$="-id_enfermedad"]');
+        selectsEnfermedad.forEach(select => {
+            // Evitar añadir el listener múltiples veces
+            if (!select.dataset.listenerAttached) {
+                select.addEventListener('change', function() {
+                    actualizarCamposDiagnostico(this);
+                });
+                select.dataset.listenerAttached = 'true';
+                // Llamada inicial por si el formulario ya tiene un valor al cargar la página
+                actualizarCamposDiagnostico(select);
+            }
+        });
+    }
+
+    // Inicializar para los formularios que ya existen al cargar la página
+    inicializarListenersDiagnostico();
+
+    // Volver a inicializar los listeners cuando se añade un nuevo formulario de diagnóstico
+    document.getElementById('add-diagnostico-btn').addEventListener('click', function() {
+        // Pequeño delay para asegurar que el nuevo formulario se ha añadido al DOM
+        setTimeout(inicializarListenersDiagnostico, 100);
+    });
+});
+</script>
+{% endblock scripts %}
+{% endblock content %}
