@@ -12,6 +12,5 @@ urlpatterns = [
     path('preguntas-frecuentes', views.preguntasfrecuentes, name='preguntas-frecuentes'),
     path('uso-del-sistema', views.usosistema, name='usosistema'),
     path('buzon-sugerencias', views.buzonsugerencias, name='buzonsugerencias'),
-
     path('contactanos', views.contactanos, name='contactanos'),
 ]
