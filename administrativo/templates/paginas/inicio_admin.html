@@ -5,8 +5,8 @@
 
 {% block auth_button %}
 <li>
-    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "logout" %}'">
-        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url 'logout' %}'">
+        <img class="img-button" src="{% static 'img/log-out.svg' %}" alt="Icono de logout"> Cerrar Sesión
     </button>
 </li>
 
@@ -96,7 +96,7 @@
                             </div>
                             <h3>Órdenes de Medicamentos</h3>
                             <p>Acceda para prescribir, modificar o suspender medicamentos de algún paciente (incluyendo dosis, vía y frecuencia), verificando las alertas de seguridad y documentando la farmacoterapia actual.</p>
-                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url "omed_admin" %}'">
+                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'omed_admin' %}'">
                                 Gestionar Medicamentos
                             </button>
                         </div>
@@ -110,7 +110,7 @@
                             </div>
                             <h3>Asignar turno</h3>
                             <p>Asigne turnos con solo un click, de forma rápida y sin demoras. Una interfaz directa y accesible que le permite reservar turnos sin complicaciones, optimizando tu tiempo desde cualquier dispositivo.</p>
-                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url "turnos_admin" %}'">
+                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'turnos_admin' %}'">
                                 Asignar Turno
                             </button>
                         </div>

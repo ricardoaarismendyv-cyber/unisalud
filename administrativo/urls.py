@@ -16,5 +16,6 @@ urlpatterns = [
     path('gestion/', views.gestion_admin, name='gestion_admin'),
     # URLs para los formularios de la página de gestión
     path('gestion/agregar_usuario/', views.agregar_usuario, name='agregar_usuario'),
+    path('gestion/agregar_profesional/', views.agregar_profesional, name='agregar_profesional'),
     path('gestion/eliminar_profesional/', views.eliminar_profesional, name='eliminar_profesional'),
 ]
