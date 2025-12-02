@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout # para manejar la sesión del usuario
 from django.contrib import messages
-from usuario.models import Usuarios, Pacientes, ProfesionalSalud, Roles, TipoIdentificacion, Genero
+from usuario.models import Usuarios, Pacientes, ProfesionalSalud, Roles, TipoIdentificacion, Genero, EstadoCivil, GrupoRh, EstratoSocioeconomico
 
 def login_view(request):
     if request.method == 'POST':
@@ -60,9 +60,15 @@ def registro(request):
     # Cargar datos para los <select> del formulario
     tipos_id = TipoIdentificacion.objects.all()
     generos = Genero.objects.all()
+    estados_civiles = EstadoCivil.objects.all()
+    grupos_rh = GrupoRh.objects.all()
+    estratos = EstratoSocioeconomico.objects.all()
     context = {
         'tipos_identificacion': tipos_id,
-        'generos': generos
+        'generos': generos,
+        'estados_civiles': estados_civiles,
+        'grupos_rh': grupos_rh,
+        'estratos': estratos,
     }
     if request.method == 'POST':
         # Obtener los datos cuando se diligencia el formulario
@@ -104,6 +110,9 @@ def registro(request):
             # Se obtienen de las llaves foráneas.
             tipo_id_obj = TipoIdentificacion.objects.get(id_tipo_identificacion=request.POST.get('tipoDocumento'))
             genero_obj = Genero.objects.get(id_genero=request.POST.get('genero'))
+            estado_civil_obj = EstadoCivil.objects.get(id_estado_civil=request.POST.get('estadoCivil')) if request.POST.get('estadoCivil') else None
+            grupo_rh_obj = GrupoRh.objects.get(id_rh=request.POST.get('grupoRh')) if request.POST.get('grupoRh') else None
+            estrato_obj = EstratoSocioeconomico.objects.get(id_estrato=request.POST.get('estrato')) if request.POST.get('estrato') else None
 
             Pacientes.objects.create(
                 usuario=nuevo_usuario,
@@ -115,6 +124,9 @@ def registro(request):
                 id_tipo_identificacion=tipo_id_obj,
                 fecha_nacimiento=request.POST.get('fechaNacimiento'),
                 id_genero=genero_obj,
+                id_estado_civil=estado_civil_obj,
+                id_rh=grupo_rh_obj,
+                id_estrato=estrato_obj,
                 direccion=request.POST.get('direccion'),
                 telefono=request.POST.get('telefono'),    
                 celular=request.POST.get('celular'),
