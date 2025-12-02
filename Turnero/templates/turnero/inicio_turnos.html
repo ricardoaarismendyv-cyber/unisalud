@@ -1,0 +1,116 @@
+    {% extends "plantilla_admin.html" %}
+    {% load static %}
+    {% block title %} Inicio Turnero {% endblock title %}
+
+    {% block auth_button %}
+    <li>
+        <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio_admin" %}'">
+            <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+        </button>
+    </li>
+    {% endblock auth_button %}
+
+    {% block content %}
+    <section class="main">
+        <div class="container-fluid">
+            <div class="row p-4">
+                <!-- Columna principal -->
+                <div class="col-md-8" style="padding: 60px 20px;">
+
+                    <div class="mb-3">
+                        <label class="form-label">Roles a elegir</label>
+                        <select class="form-select form-select-lg" id="roleSelector">
+                            <option value="{% url 'inicio_admin' %}">Administrativo</option>
+                            <option value="{% url 'inicio-usuario' %}">Usuario</option>
+                            <option value="{% url 'consultas_prof_salud' %}">Profesional de salud</option>
+                            <option value="{% url 'inicio-turnero' %}" selected>Turnero</option>
+                        </select>
+                    </div>
+
+                    <h1>¡Bienvenido! Turnero</h1>
+
+<!-- RECUADRO 1 -->
+<div class="card shadow p-4 mb-4" style="border-radius: 15px; width: 100%;">
+    <h2 class="fw-bold mb-3">Gestionar turnos</h2>
+
+    <p class="text-secondary mb-4">
+        Administre, llame, cierre y visualice turnos pendientes o en proceso 
+        desde un panel rápido y claro.
+    </p>
+
+    <a href="{% url 'gestionar_turnos' %}" 
+        class="btn btn-primary px-4 py-2"
+        style="border-radius: 30px; font-size: 17px;">
+        Gestionar turnos
+    </a>
+</div>
+
+<div class="card shadow p-4 mb-4" style="border-radius: 15px; width: 100%;">
+    <h2 class="fw-bold mb-3">Pantalla de Turnos</h2>
+
+    <p class="text-secondary mb-4">
+        Visualice en tiempo real los turnos siendo llamados y los módulos activos.
+    </p>
+
+    <a href="{% url 'pantalla_turnos' %}" 
+        class="btn btn-primary px-4 py-2"
+        style="border-radius: 30px; font-size: 17px;">
+        Ver Pantalla Turnos
+    </a>
+</div>
+
+                    </div>
+
+                </div>
+
+<div style="
+    position: absolute;
+    right: 20px;
+    top: 180px;
+    width: 350px;
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+">
+    <h4 class="fw-bold text-center mb-3">Usuarios Cerrados</h4>
+
+    <table class="table table-hover text-center">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for user in usuarios_cerrados %}
+                <tr>
+                    <td>{{ user.nombre }}</td>
+                    <td><span class="badge bg-danger">Cerrado</span></td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2" class="text-secondary">No hay usuarios en estado cerrado</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+        </div>
+    </section>
+    {% endblock content %}
+
+    {% block script %}
+    {{ block.super }}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelector = document.getElementById('roleSelector');
+        if (roleSelector) {
+            roleSelector.addEventListener('change', function() {
+                window.location.href = this.value;
+            });
+        }
+    });
+    </script>
+    {% endblock script %}

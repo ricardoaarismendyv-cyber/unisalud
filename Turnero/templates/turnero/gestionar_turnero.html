@@ -1,0 +1,82 @@
+    {% extends "plantilla_admin.html" %}
+    {% load static %}
+
+    {% block title %} Gestionar Turnos {% endblock title %}
+
+    {% block auth_button %}
+    <li>
+        <button type="button" class="navButton0 login-btn"
+            onclick="window.location.href='{% url "inicio_admin" %}'">
+            <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+        </button>
+    </li>
+    {% endblock auth_button %}
+
+    {% block content %}
+
+    <section class="main">
+        <div class="container-fluid">
+            <div class="row p-4">
+                <div class="col-md-10 mx-auto" style="padding: 40px 20px;">
+
+                    <!-- BOTÓN VOLVER -->
+                    <a class="btn btn-main btn-nav mb-4" href="{% url 'inicio-turnero' %}">
+                        ⬅ Volver
+                    </a>
+
+                    <h1>Gestión de turnos</h1>
+                    <p>Desde aquí puedes llamar al siguiente turno o cerrar uno ya atendido.</p>
+
+                    <div class="container border border-dark rounded p-4 my-4 div-main">
+
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Turno</th>
+                                    <th>Paciente</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for turno in turnos %}
+                                <tr>
+                                    <td>{{ turno.letra }}-{{ turno.numero }}</td>
+                                    <td>{{ turno.id_paciente.nombre1 }} {{ turno.id_paciente.apellido1 }}</td>
+                                    <td>{{ turno.estado }}</td>
+                                    <td>
+
+                                        {% if turno.estado != "llamando" %}
+                                        <a href="{% url 'llamar-turno' turno.id_turno %}"
+                                        class="btn btn-success btn-sm">
+                                            Llamar
+                                        </a>
+                                        {% endif %}
+
+                                        {% if turno.estado != "cerrado" %}
+                                        <a href="{% url 'cerrar-turno' turno.id_turno %}"
+                                        class="btn btn-danger btn-sm">
+                                            Cerrar
+                                        </a>
+                                        {% endif %}
+
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No hay turnos pendientes</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% endblock content %}
