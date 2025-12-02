@@ -598,3 +598,20 @@ body.dyslexia-font {
         padding: 15px 20px;
     }
 }
+
+/* Fuente para dislexia */
+.dyslexia {
+    font-family: "OpenDyslexic", Arial, sans-serif !important;
+}
+
+/* Modo alto contraste */
+.high-contrast {
+    background-color: #000 !important;
+    color: #fff !important;
+}
+
+.high-contrast button {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 2px solid #000 !important;
+}

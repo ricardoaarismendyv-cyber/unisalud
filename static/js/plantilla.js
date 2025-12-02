@@ -62,6 +62,41 @@ document.addEventListener('DOMContentLoaded', function () {
     const accessibilityIcon = document.getElementById('accessibility-icon');
     const accessibilitySidebar = document.getElementById('accessibility-sidebar');
     const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+    // Variables globales
+let currentFontSize = 16;  // Tamaño base
+
+// Aumentar tamaño de letra
+document.getElementById("increaseFont").addEventListener("click", () => {
+    currentFontSize += 2;
+    document.body.style.fontSize = currentFontSize + "px";
+});
+
+// Disminuir tamaño de letra
+document.getElementById("decreaseFont").addEventListener("click", () => {
+    if (currentFontSize > 10) {
+        currentFontSize -= 2;
+        document.body.style.fontSize = currentFontSize + "px";
+    }
+});
+
+// Fuente para dislexia
+document.getElementById("dyslexiaFont").addEventListener("click", () => {
+    document.body.classList.toggle("dyslexia");
+});
+
+// Contraste alto
+document.getElementById("highContrast").addEventListener("click", () => {
+    document.body.classList.toggle("high-contrast");
+});
+
+// Restablecer
+document.getElementById("reset").addEventListener("click", () => {
+    currentFontSize = 16;
+    document.body.style.fontSize = "16px";
+
+    document.body.classList.remove("dyslexia");
+    document.body.classList.remove("high-contrast");
+});
 
     if (accessibilityIcon && closeSidebarBtn && accessibilitySidebar) {
         accessibilityIcon.addEventListener('click', () => accessibilitySidebar.style.width = '300px');
