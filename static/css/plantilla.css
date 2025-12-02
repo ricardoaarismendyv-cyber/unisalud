@@ -91,7 +91,7 @@ main.dark-mode{
 }
 
 .div-main {
-    background-color: var(--white);
+    background-color:#7da9f5;
     transition: all 0.3s ease;
     padding: 2rem;
     border-radius: 16px;
