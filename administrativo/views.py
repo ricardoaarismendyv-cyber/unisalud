@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from login.decorators import role_required
 from django.contrib import messages
-from usuario.models import TipoIdentificacion, Genero, Pacientes, Usuarios, Roles, ProfesionalSalud, CentrosMedicos  # Importar modelos necesarios
+from usuario.models import TipoIdentificacion, Genero, Pacientes, Usuarios, Roles, ProfesionalSalud, CentrosMedicos, Especialidades, EstadoCivil, GrupoRh, EstratoSocioeconomico, Eps, TiposAfiliacion, Afiliacion, Medicamentos  # Importar modelos necesarios para hc
 from django.contrib.auth.hashers import make_password # Para encriptar la contraseña
 
 # Create your views here.
@@ -15,12 +15,25 @@ def inicio_admin(request):
     return render(request, 'paginas/inicio_admin.html')
 
 def gestion_admin(request):
-    # 1. Consultar la base de datos para obtener los datos necesarios
+    # 1. Consultar la base de datos para obtener los datos necesarios para hc
     tipos_id = TipoIdentificacion.objects.all()
     generos = Genero.objects.all()
     centros_medicos = CentrosMedicos.objects.all()
-    # 2. Crear un diccionario de contexto para pasar los datos a la plantilla
-    context = {'tipos_identificacion': tipos_id, 'generos': generos, 'centros_medicos': centros_medicos}
+    especialidades = Especialidades.objects.all()
+    estados_civiles = EstadoCivil.objects.all()
+    grupos_rh = GrupoRh.objects.all()
+    estratos = EstratoSocioeconomico.objects.all()
+    pacientes = Pacientes.objects.all()
+    epss = Eps.objects.all()
+    tipos_afiliacion = TiposAfiliacion.objects.all()
+    medicamentos = Medicamentos.objects.all()
+    # 2. Crear un diccionario de contexto para pasar los datos a la plantilla -- crear hc 
+    context = {
+        'tipos_identificacion': tipos_id, 'generos': generos, 'centros_medicos': centros_medicos, 
+        'especialidades': especialidades, 'estados_civiles': estados_civiles, 'grupos_rh': grupos_rh, 
+        'estratos': estratos, 'pacientes': pacientes, 'epss': epss, 'tipos_afiliacion': tipos_afiliacion,
+        'medicamentos': medicamentos
+    }
     # 3. Renderizar la plantilla pasándole el contexto
     return render(request, 'paginas/gestion_admin.html', context)
 
@@ -125,6 +138,68 @@ def eliminar_profesional(request):
     context = {'tipos_identificacion': tipos_id, 'generos': generos}
     return render(request, 'paginas/gestion_admin.html', context)
 
+def agregar_profesional(request):
+    if request.method == 'POST':
+        try:
+            # --- Datos del Usuario ---
+            nombre_usuario = request.POST.get('nombre_usuario_prof')
+            email = request.POST.get('email_prof')
+            password = request.POST.get('password_prof')
+            rol_nombre = request.POST.get('rol_prof') # 'profesional_salud', 'recepcionista', etc.
+
+            # --- Datos del Perfil Profesional ---
+            primer_nombre = request.POST.get('primerNombre_prof')
+            segundo_nombre = request.POST.get('segundoNombre_prof', '')
+            primer_apellido = request.POST.get('primerApellido_prof')
+            segundo_apellido = request.POST.get('segundoApellido_prof', '')
+            tipo_documento_id = request.POST.get('tipoDocumento_prof')
+            numero_documento = request.POST.get('numeroDocumento_prof')
+            genero_id = request.POST.get('genero_prof')
+            celular = request.POST.get('celular_prof')
+            registro_profesional = request.POST.get('registro_profesional', '')
+            especialidad_id = request.POST.get('especialidad_prof')
+            centro_medico_id = request.POST.get('centro_medico_prof')
+
+            # 1. Crear el usuario de Django (Usuarios)
+            nuevo_usuario = Usuarios(
+                nombre_usuario=nombre_usuario,
+                email=email,
+            )
+            nuevo_usuario.set_password(password)
+            nuevo_usuario.save()
+
+            # 2. Asignar el rol correspondiente
+            rol_profesional = Roles.objects.get(nombre_rol=rol_nombre)
+            nuevo_usuario.roles.add(rol_profesional)
+
+            # 3. Obtener objetos foráneos
+            tipo_id_obj = TipoIdentificacion.objects.get(id_tipo_identificacion=tipo_documento_id)
+            genero_obj = Genero.objects.get(id_genero=genero_id)
+            centro_medico_obj = CentrosMedicos.objects.get(id_centro_medico=centro_medico_id)
+            especialidad_obj = Especialidades.objects.get(id_especialidad=especialidad_id) if especialidad_id else None
+
+            # 4. Crear el perfil del ProfesionalSalud
+            ProfesionalSalud.objects.create(
+                usuario=nuevo_usuario,
+                nombre1=primer_nombre,
+                nombre2=segundo_nombre,
+                apellido1=primer_apellido,
+                apellido2=segundo_apellido,
+                id_tipo_identificacion=tipo_id_obj,
+                numero_documento=numero_documento,
+                id_genero=genero_obj,
+                celular=celular,
+                correo=email,
+                registro_profesional=registro_profesional,
+                id_especialidad=especialidad_obj,
+                id_centro_medico=centro_medico_obj,
+            )
+            messages.success(request, f'¡El profesional {primer_nombre} {primer_apellido} ha sido creado con éxito!')
+        except Exception as e:
+            messages.error(request, f'Ocurrió un error al registrar al profesional: {e}')
+        
+        return redirect('gestion_admin')
+    return redirect('gestion_admin')
 
 
 def hc_admin(request):
@@ -147,6 +222,3 @@ def contactanos_admin(request):
 
 def turnos_admin(request):
     return render(request, 'paginas/turnos_admin.html')
-    request.session['active_role'] = 'admin_centro_medico' # <--- AÑADIR ESTA LÍNEA
-    # Aquí puedes añadir lógica para buscar el perfil del admin si es necesario
-    return render(request, 'paginas/inicio_admin.html', {'roles': request.session.get('roles', [])})
