@@ -19,9 +19,11 @@ class Roles(models.Model):
     def __str__(self):
         return self.nombre_rol
 
+#en roles me sale error de: manytomanyfield 'Usuarios.roles', es decir, Django te está diciendo: "He visto que has puesto un comentario aquí, pero no sé dónde ponerlo en la base de datos para este tipo de campo, así que lo voy a ignorar".
+#para ello se elimina el parámetro db_comment en el ManyToManyField de Roles en la clase Usuarios
 class Usuarios(models.Model):
     id_usuario = models.AutoField(primary_key=True, db_comment='ID autoincremental del usuario')
-    roles = models.ManyToManyField('Roles', db_comment='Roles asignados para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
+    roles = models.ManyToManyField('Roles')
     nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
     contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
     email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
@@ -280,17 +282,18 @@ class Servicios(models.Model):
 
 class Enfermedades(models.Model):
     id_enfermedad = models.AutoField(primary_key=True, db_comment='ID autoincremental')
-    codigo_cie10 = models.CharField(unique=True, max_length=10, db_comment='Codigo CIE-10 para clasificar diagnosticos, sintomas')
+    codigo_cie10 = models.CharField(unique=True, max_length=100, db_comment='Codigo CIE-10 para clasificar diagnosticos, sintomas')
     nombre_enfermedad = models.CharField(max_length=300, db_comment='Nombre de la enfermedad')
     descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion clinica de la enfermedad')
-    categoria = models.CharField(max_length=100, blank=True, null=True, db_comment='refiere si es aguda, cronica, infecciosa, etc')
+    categoria_grupom = models.CharField(max_length=100, blank=True, null=True, db_comment='refiere al grupo de mortalidad CIE10')
+    grupo_mortalidad = models.CharField(max_length=150, blank=True, null=True, db_comment='de acuerdo con la CIE-10 ')
 
     class Meta:
         managed = True
         db_table = 'enfermedades'
 
     def __str__(self):
-        return self.nombre_enfermedad
+        return f'{self.codigo_cie10} - {self.nombre_enfermedad}'
 
 
 class EstadoOrden(models.Model):
