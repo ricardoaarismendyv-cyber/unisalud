@@ -186,16 +186,10 @@ class CentrosMedicos(models.Model):
     id_nivel_atencion = models.ForeignKey('NivelesAtencion', models.DO_NOTHING, db_column='id_nivel_atencion', db_comment='Referencia a NIVELES_ATENCION')
     id_ciudad = models.ForeignKey('Ciudad', models.DO_NOTHING, db_column='id_ciudad', db_comment='Referencia a CIUDAD')
     direccion = models.CharField(max_length=255, db_comment='Direccion centro medico')
-    latitud = models.DecimalField(max_digits=10, decimal_places=8, blank=True, null=True, db_comment='Latitud, localizacion geografica')
-    longitud = models.DecimalField(max_digits=10, decimal_places=8, blank=True, null=True, db_comment='Longitud, localizacion geografica')
-    telefono = models.CharField(max_length=15, blank=True, null=True, db_comment='Telefono centro medico')
-    celular = models.CharField(max_length=15, blank=True, null=True, db_comment='Celular centro medico')
+    telefono = models.CharField(max_length=60, blank=True, null=True, db_comment='Telefono centro medico')
+    celular = models.CharField(max_length=60, blank=True, null=True, db_comment='Celular centro medico')
     correo = models.CharField(max_length=100, blank=True, null=True, db_comment='Correo entro medico')
-    sitio_web = models.CharField(max_length=150, blank=True, null=True, db_comment='Sitio web centro medico')
-    codigo_habilitacion = models.CharField(unique=True, max_length=50, blank=True, null=True, db_comment='Codigo de habilitacion REPS')
-    fecha_habilitacion = models.DateField(blank=True, null=True, db_comment='Fecha de habilitacion REPS')
-    estado_centro = models.CharField(max_length=10, blank=True, null=True, db_comment='Esta activa, inactiva')
-
+    
     class Meta:
         managed = True
         db_table = 'centros_medicos'
@@ -237,7 +231,6 @@ class Especialidades(models.Model):
     id_especialidad = models.AutoField(primary_key=True, db_comment='ID autoincremental')
     nombre_especialidad = models.CharField(unique=True, max_length=100, db_comment='refiere a la especialidad medica: neurologia, cardiologia, etc')
     descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion')
-    nivel_formacion = models.CharField(max_length=15, blank=True, null=True, db_comment='Nivel de formacion')
 
     class Meta:
         managed = True
@@ -250,7 +243,7 @@ class Especialidades(models.Model):
 class Medicamentos(models.Model):
     id_medicamento = models.AutoField(primary_key=True, db_comment='ID autoincremental')
     nombre_generico = models.CharField(max_length=200, blank=True, null=True, db_comment='Nombre generico medicamento')
-    principio_activo = models.CharField(max_length=100, blank=True, null=True, db_comment='Principio activo medicamento')
+    principio_activo = models.CharField(max_length=300, blank=True, null=True, db_comment='Principio activo medicamento')
     concentracion = models.CharField(max_length=50, blank=True, null=True, db_comment='Concentracion medicamento')
     forma_farmaceutica = models.CharField(max_length=50, blank=True, null=True, db_comment='Forma farmaceutica medicamento')
     registro_invima = models.CharField(unique=True, max_length=100, db_comment='Registro INVIMA del medicamento')
