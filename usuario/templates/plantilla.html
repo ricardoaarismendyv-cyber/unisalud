@@ -49,16 +49,17 @@
             </li>
             <li class="dark-mode-btn"> 
                 <!-- Pasamos las rutas de las imágenes al JS a través de atributos data-* -->
-                <img id="theme-toggle-img" 
+                <img id="theme-toggle-img" class="hc-icon"
                     src="{% static "img/toggle-left.svg" %}" 
                     data-toggle-off="{% static 'img/toggle-left.svg' %}"
                     data-toggle-on="{% static 'img/toggle-right (2).svg' %}"
                     alt="toggle-off" style="cursor: pointer;">
-                <img id="moon-icon" src="{% static "img/moon (1).svg" %}" alt="moon" style="cursor: pointer;">
+                <img id="moon-icon" class="hc-icon"
+                src="{% static "img/moon (1).svg" %}" alt="moon" style="cursor: pointer;">
             </li>
             
             <!-- Contenedor para el menú de accesibilidad -->
-            <li class="navLogo accessibility-container">
+            <li class="hc-icon">
                 <img id="accessibility-icon" class="access-button" src="{% static "img/accessibility.svg" %}" alt="Opciones de accesibilidad">
             </li>
             {% block auth_button %}
