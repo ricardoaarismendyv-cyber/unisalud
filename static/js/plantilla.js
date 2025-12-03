@@ -89,6 +89,29 @@ document.getElementById("highContrast").addEventListener("click", () => {
     document.body.classList.toggle("high-contrast");
 });
 
+const btnDaltonismo = document.getElementById('btn-modo-daltonismo'); 
+    
+    // Función para aplicar cambios de estilo al cargar
+        function applyAccessibilitySettings() {
+        // 4. Aplicar Modo Daltonismo
+        if (localStorage.getItem('modo-daltonismo') === 'enabled') {
+            body.classList.add('color-blind-mode');
+        }
+}
+        applyAccessibilitySettings();
+        if (btnDaltonismo) {
+        btnDaltonismo.addEventListener('click', () => {
+            const isEnabled = body.classList.toggle('color-blind-mode');
+            localStorage.setItem('modo-daltonismo', isEnabled ? 'enabled' : 'disabled');
+        });
+    }
+        if (btnRestablecer) {
+        btnRestablecer.addEventListener('click', () => {
+            // Restablecer Modo Daltonismo
+            body.classList.remove('color-blind-mode');
+            localStorage.removeItem('modo-daltonismo');
+        });
+    }
 // Restablecer
 document.getElementById("reset").addEventListener("click", () => {
     currentFontSize = 16;
