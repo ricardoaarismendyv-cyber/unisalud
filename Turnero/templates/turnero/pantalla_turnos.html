@@ -1,176 +1,58 @@
-{% extends "plantilla.html" %}
+{% extends "plantilla_admin.html" %}
 {% load static %}
 
-{% block title %}Pantalla de Turnos{% endblock %}
-
-{% block estilo %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static 'css/custom.css' %}">
-
-<style>
-    .card-turno {
-        background: white;
-        border-radius: 20px;
-        padding: 40px;
-        text-align: center;
-        font-size: 2rem;
-        font-weight: bold;
-        min-height: 200px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .tabla-turnos {
-        background: white;
-        border-radius: 20px;
-        padding: 20px;
-    }
-
-    /* --- ESTADOS --- */
-
-    .estado-pendiente {
-        background: #f1b800;
-        color: white;
-        padding: 6px 12px;
-        border-radius: 10px;
-        font-weight: bold;
-    }
-
-    .estado-llamado {
-        background: #007bff;
-        color: white;
-        padding: 6px 12px;
-        border-radius: 10px;
-        font-weight: bold;
-        animation: pulse 1s infinite;
-    }
-
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
-    }
-
-    .estado-cerrado {
-        background: #ffdddd;
-        color: #b30000;
-        padding: 6px 12px;
-        border-radius: 10px;
-        font-weight: bold;
-        border: 1px solid #ffaaaa;
-    }
-</style>
-{% endblock estilo %}
-
-{% block auth_button %}
-<li>
-    <button type="button" class="navButton0 login-btn"
-        onclick="window.location.href='{% url "inicio-turnero" %}'">
-        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono">
-        Volver
-    </button>
-</li>
-{% endblock auth_button %}
 
 {% block content %}
-<section class="main">
-    <div class="container-fluid">
 
-        <h1 class="text-center my-4">Pantalla de Turnos</h1>
+<div class="turnero-page">
 
-        <div class="row justify-content-center">
+    <div class="turnero-wrapper2">
 
-            <!-- =================== TURNO ACTUAL =================== -->
-            <div class="col-lg-5 col-md-12 mb-4">
-                <div class="card-turno">
+        <a class="btn btn-secondary mb-4" href="{% url 'inicio-turnero' %}">
+            ⬅ Volver
+        </a>
 
-                    {% if turno_actual %}
-                        <div>
-                            <h2>Turno Actual</h2>
-                            <p style="font-size: 3rem;">
-                                {{ turno_actual.letra }}{{ turno_actual.numero }}
-                            </p>
-                            {% if turno_actual.modulo_asignado %}
-                                <p style="font-size: 1.5rem;">
-                                    Módulo: {{ turno_actual.modulo_asignado }}
-                                </p>
-                            {% endif %}
-                        </div>
-                    {% else %}
-                        <div>
-                            <h2>Turno Actual</h2>
-                            <p style="font-size: 1.5rem;">Sin turnos llamados</p>
-                        </div>
-                    {% endif %}
+        <h1 class="text-center mb-5">Pantalla de Turnos</h1>
 
+        <div class="turno-box-actual2">
+            <h2 class="mb-4">Turno Actual</h2>
+
+            {% if turno_actual %}
+                <div class="numero-turno-actual2 text-center">
+                    {{ turno_actual.letra }}{{ turno_actual.numero }}
                 </div>
-            </div>
-
-            <!-- =================== TABLA DE TURNOS =================== -->
-            <div class="col-lg-7 col-md-12">
-                <div class="tabla-turnos">
-
-                    <h3 class="mb-3 text-center">Historial de Turnos</h3>
-
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Turno</th>
-                                <th>Paciente</th>
-                                <th>Estado</th>
-                                <th>Módulo</th>
-                                <th>Fecha</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                        {% for turno in turnos %}
-                            <tr>
-
-                                <!-- LETRA + NUMERO -->
-                                <td>{{ turno.letra }}{{ turno.numero }}</td>
-
-                                <!-- PACIENTE -->
-                                <td>
-                                    {% if turno.id_paciente %}
-                                        {{ turno.id_paciente.nombre_completo|default:turno.id_paciente }}
-                                    {% else %}
-                                        Sin paciente
-                                    {% endif %}
-                                </td>
-
-                                <!-- ESTADO -->
-                                <td>
-                                    {% if turno.estado == "pendiente" %}
-                                        <span class="estado-pendiente">Pendiente</span>
-
-                                    {% elif turno.estado == "llamando" %}
-                                        <span class="estado-llamado">Llamando</span>
-
-                                    {% elif turno.estado == "cerrado" %}
-                                        <span class="estado-cerrado">Cerrado</span>
-
-                                    {% else %}
-                                        {{ turno.estado }}
-                                    {% endif %}
-                                </td>
-
-                                <!-- MÓDULO -->
-                                <td>{{ turno.modulo_asignado|default:"—" }}</td>
-
-                                <!-- FECHA -->
-                                <td>{{ turno.fecha_hora_turno|date:"d/m/Y H:i" }}</td>
-
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-
-                    </table>
-
-                </div>
-            </div>
-
+                <p class="fs-3 text-primary fw-bold text-center">Llamando</p>
+            {% else %}
+                <p class="fs-3 text-muted">Sin turnos llamados</p>
+            {% endif %}
         </div>
+
+        <div class="historial-box2">
+            <h2 class="titulo-turnero2">Historial</h2>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-center">Turno</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for t in historial %}
+                    <tr>
+                        <td class="text-center">{{ t.letra }}{{ t.numero }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td class="text-center text-muted">Sin historial</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
     </div>
-</section>
+
+</div>
+
 {% endblock content %}
