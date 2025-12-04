@@ -32,7 +32,8 @@
                 <div class="col-lg-10 col-md-10">
                     <div class="container border border-dark rounded p-4 my-5 div-main">
                         <h1>Diligenciar orden médica</h1>
-                        <a class="btn btn-main btn-nav" href="{% static 'docs/omdiligencia.pdf' %}">Diligenciar</a>
+                        {# Este botón ahora redirige a la vista del formulario #}
+                        <a class="btn btn-main btn-nav" href="{% url 'diligenciar_orden_medica' %}">Diligenciar Nueva Orden Médica</a>
                         <p>Por favor diligencie el siguiente formulario para crear la orden médica del paciente.</p>
                         <p>Recuerde que la información debe ser precisa y completa para garantizar la atención</p>
                         <div>
