@@ -95,14 +95,15 @@
 
         <!-- Barra Lateral de Accesibilidad -->
         <div id="accessibility-sidebar" class="sidebar">
-            <button id="close-sidebar-btn" class="close-sidebar-button">&times;</button>
+        <button id="close-sidebar-btn" class="close-sidebar-button">&times;</button>
             <h2>Opciones de Accesibilidad</h2>
             <button id="increase-font" class="sidebar-button">Aumentar Tamaño de Letra</button>
             <button id="decrease-font" class="sidebar-button">Disminuir Tamaño de Letra</button>
             <button id="dyslexia-font" class="sidebar-button">Fuente para la dislexia</button>
             <button id="high-contrast" class="sidebar-button">Contraste Alto</button>
-            <button id="daltonia-btn" class="accessibility-option">Daltonismo</button>
+            <button id="daltonia-font" class="sidebar-button">Daltonismo</button>
             <button id="reset-accessibility" class="sidebar-button">Restablecer</button>
+        </div>
         </div>
         
     </footer>
@@ -158,6 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const decreaseBtn = document.getElementById('decrease-font');
   const dyslexiaBtn = document.getElementById('dyslexia-font');
   const contrastBtn = document.getElementById('high-contrast');
+  const daltoniaBtn = document.getElementById('daltonia-font');
   const resetBtn = document.getElementById('reset-accessibility');
 
   // Estado (tamaño de fuente)
@@ -248,19 +250,25 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('access_contrast', active ? '1' : '0');
   });
 
+    //Daltonismo
+document.ElementById("daltoniafont").addEventListener("Click", () => {
+    document.body.classList.toggle("daltonia");
+});
   // Restablecer todo
   if (resetBtn) resetBtn.addEventListener('click', () => {
     // tamaño por defecto
     setFontSize(16);
     // eliminar clases
-    document.body.classList.remove('dyslexia-font', 'high-contrast');
+    document.body.classList.remove('dyslexia-font', 'high-contrast', 'daltonia-font');
     // quitar estados visuales en botones
     if (dyslexiaBtn) dyslexiaBtn.classList.remove('active');
     if (contrastBtn) contrastBtn.classList.remove('active');
+    if (daltoniaBtn) daltoniaBtn.classList.remove('active');
     // limpiar localStorage
     localStorage.removeItem('access_fontSize');
     localStorage.removeItem('access_dyslexia');
     localStorage.removeItem('access_contrast');
+    localStorage.removeItem('access_daltonia');
   });
 
   // Aplicar preferencias guardadas (si existen)
@@ -271,6 +279,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (localStorage.getItem('access_contrast') === '1') {
     document.body.classList.add('high-contrast');
     if (contrastBtn) contrastBtn.classList.add('active');
+  }
+  if (localStorage.getItem('access_daltonia') === '1') {
+    document.body.classList.add('daltonia-font');
+    if (daltoniaBtn)
   }
 
 });

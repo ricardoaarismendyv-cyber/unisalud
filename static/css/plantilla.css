@@ -617,6 +617,55 @@ body.dyslexia-font {
 }
 
 /* ICONOS EN CONTRASTE ALTO */
+body.high-daltonia {
+    background-color: #a91616 !important;
+    color: #fff !important;
+}
+
+body.high-daltonia header.mainHeader,
+body.high-daltonia .mainNav,
+body.high-daltonia footer,
+body.high-daltonia .footer-bar,
+body.high-daltonia main,
+body.high-daltonia .sidebar {
+    background-image: none !important;
+    background-color: black!important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+body.high-daltonia .navButton1,
+body.high-daltonia .navButton0,
+body.high_daltonia .foot-button,
+body.high-daltonia .sidebar-button {
+    background-image: none !important;
+    background-color: rgb(234, 40, 40) !important;
+    color: #ffff00 !important;
+    border: 1px solid #fff !important;
+}
+
+body.high-daltonia a,
+body.high-daltonia button,
+body.high-daltonia button:visited,
+body.high-daltonia a:visited {
+    color: #ffff00 !important;
+}
+
+body.high-daltonia .div-main {
+    background-image: none;
+    background-color: #000 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+body.high-daltonia {
+    color: #ffff00 !important;
+}
+
+body.daltonia {
+    background-color: #34d399;
+
+}
 .high-contrast .hc-icon {
     filter: invert(1) brightness(2) !important;
 }

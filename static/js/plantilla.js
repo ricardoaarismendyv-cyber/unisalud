@@ -89,29 +89,12 @@ document.getElementById("highContrast").addEventListener("click", () => {
     document.body.classList.toggle("high-contrast");
 });
 
-const btnDaltonismo = document.getElementById('btn-modo-daltonismo'); 
-    
-    // Función para aplicar cambios de estilo al cargar
-        function applyAccessibilitySettings() {
-        // 4. Aplicar Modo Daltonismo
-        if (localStorage.getItem('modo-daltonismo') === 'enabled') {
-            body.classList.add('color-blind-mode');
-        }
-}
-        applyAccessibilitySettings();
-        if (btnDaltonismo) {
-        btnDaltonismo.addEventListener('click', () => {
-            const isEnabled = body.classList.toggle('color-blind-mode');
-            localStorage.setItem('modo-daltonismo', isEnabled ? 'enabled' : 'disabled');
-        });
-    }
-        if (btnRestablecer) {
-        btnRestablecer.addEventListener('click', () => {
-            // Restablecer Modo Daltonismo
-            body.classList.remove('color-blind-mode');
-            localStorage.removeItem('modo-daltonismo');
-        });
-    }
+
+//Daltonismo
+document.getElementById("daltoniafont").addEventListener("Click", () => {
+    document.body.classList.toggle("daltonia");
+});
+
 // Restablecer
 document.getElementById("reset").addEventListener("click", () => {
     currentFontSize = 16;
@@ -119,23 +102,11 @@ document.getElementById("reset").addEventListener("click", () => {
 
     document.body.classList.remove("dyslexia");
     document.body.classList.remove("high-contrast");
+    document.body.classList.remove("daltonia");
 });
 
     if (accessibilityIcon && closeSidebarBtn && accessibilitySidebar) {
         accessibilityIcon.addEventListener('click', () => accessibilitySidebar.style.width = '300px');
         closeSidebarBtn.addEventListener('click', () => accessibilitySidebar.style.width = '0');
     }
-const daltoniaBtn = document.getElementById('daltonia-btn');
-
-daltoniaBtn.addEventListener('click', () => {
-    document.body.classList.toggle('daltonia-mode');
-
-    // Cambiar texto del botón
-    if (document.body.classList.contains('daltonia-mode')) {
-        daltoniaBtn.textContent = "Desactivar modo daltonismo";
-    } else {
-        daltoniaBtn.textContent = "Modo daltonismo";
-    }
-});
-
 });
