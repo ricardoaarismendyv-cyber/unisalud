@@ -184,8 +184,6 @@ class CentrosMedicos(models.Model):
     id_nivel_atencion = models.ForeignKey('NivelesAtencion', models.DO_NOTHING, db_column='id_nivel_atencion', db_comment='Referencia a NIVELES_ATENCION')
     id_ciudad = models.ForeignKey('Ciudad', models.DO_NOTHING, db_column='id_ciudad', db_comment='Referencia a CIUDAD')
     direccion = models.CharField(max_length=255, db_comment='Direccion centro medico')
-    latitud = models.DecimalField(max_digits=10, decimal_places=8, blank=True, null=True, db_comment='Latitud, localizacion geografica')
-    longitud = models.DecimalField(max_digits=10, decimal_places=8, blank=True, null=True, db_comment='Longitud, localizacion geografica')
     telefono = models.CharField(max_length=15, blank=True, null=True, db_comment='Telefono centro medico')
     celular = models.CharField(max_length=15, blank=True, null=True, db_comment='Celular centro medico')
     correo = models.CharField(max_length=100, blank=True, null=True, db_comment='Correo entro medico')
@@ -233,7 +231,7 @@ class TiposAfiliacion(models.Model):
 
 class Especialidades(models.Model):
     id_especialidad = models.AutoField(primary_key=True, db_comment='ID autoincremental')
-    nombre_especialidad = models.CharField(unique=True, max_length=100, db_comment='refiere a la especialidad medica: neurologia, cardiologia, etc')
+    nombre_especialidad = models.CharField(unique=0, max_length=100, db_comment='refiere a la especialidad medica: neurologia, cardiologia, etc')
     descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion')
     nivel_formacion = models.CharField(max_length=15, blank=True, null=True, db_comment='Nivel de formacion')
 
@@ -335,7 +333,7 @@ class Pacientes(models.Model):
     celular = models.CharField(max_length=15, blank=True, null=True, db_comment='Celular paciente')
     telefono = models.CharField(max_length=15, blank=True, null=True, db_comment='Telefono fijo paciente, opcional')
     correo_electronico = models.CharField(max_length=100, blank=True, null=True, db_comment='Correo paciente, opcional')
-    fecha_registro = models.DateTimeField(blank=True, null=True, db_comment='Fecha de registro paciente')
+    fecha_registro = models.DateTimeField(auto_now_add=True, blank=True, null=True, db_comment='Fecha de registro paciente')
 
     class Meta:
         managed = True

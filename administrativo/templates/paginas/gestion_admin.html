@@ -57,8 +57,8 @@
                                             <input type="text" class="form-control" id="primerNombre" name="primerNombre" required>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label for="segundoNombre" class="form-label">Segundo Nombre</label>
-                                            <input type="text" class="form-control" id="segundoNombre" name="segundoNombre">
+                                            <label for="segundoNombre" class="form-label">Segundo Nombre <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="segundoNombre" name="segundoNombre" required>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -68,8 +68,8 @@
                                             <input type="text" class="form-control" id="primerApellido" name="primerApellido" required>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label for="segundoApellido" class="form-label">Segundo Apellido</label>
-                                            <input type="text" class="form-control" id="segundoApellido" name="segundoApellido">
+                                            <label for="segundoApellido" class="form-label">Segundo Apellido <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="segundoApellido" name="segundoApellido" required>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -99,6 +99,35 @@
                                                 <option value="" selected disabled>Seleccionar...</option>
                                                 {% for g in generos %}
                                                 <option value="{{ g.id_genero }}">{{ g.nombre_genero }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="estrato" class="form-label">Estrato Socioeconómico<span style="color:red">*</span></label>
+                                            <select id="estrato" name="estrato" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                {% for estrato in estratos %}
+                                                <option value="{{ estrato.id_estrato }}">{{ estrato.id_estrato }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="estadoCivil" class="form-label">Estado civil<span style="color:red">*</span></label>
+                                            <select id="estadoCivil" name="estadoCivil" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                {% for estado in estados_civiles %}
+                                                <option value="{{ estado.id_estado_civil }}">{{ estado.nombre_estado }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="rh" class="form-label">Grupo Sanguíneo (RH)<span style="color:red">*</span></label>
+                                            <select id="rh" name="rh" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                {% for rh in grupos_rh %} 
+                                                <option value="{{rh.id_rh }}">{{ rh.tipo_rh }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -215,23 +244,113 @@
                         </div>
                         <div class="collapse mt-3" id="agregarProf">
                             <div class="card card-body div-main p-4">
-                                <form id="formAgregarProfesional" method="POST" action="">
+                                <form id="formAgregarProfesional" method="POST" action="{% url 'agregar_profesional' %}">
                                     {% csrf_token %}
-                                    <h5>Agregar nuevo profesional de la salud</h5>
+                                    <h5>Agregar Nuevo Profesional de la Salud</h5>
+                                    <p>Busque el documento para verificar si el profesional ya existe. Si no, complete el formulario para crearlo.</p>
+                                    
+                                    <!-- Campos de Datos Personales -->
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <input class="form-control my-2" type="text" name="documento" placeholder="Documento de identidad" required>
+                                            <label for="primerNombre_prof" class="form-label">Primer Nombre <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="primerNombre_prof" name="primerNombre_prof" required>
                                         </div>
-
-
                                         <div class="col-md-6 mb-3">
-                                            <input class="form-control my-2" type="text" name="especialidad" placeholder="Especialidad" required>
+                                            <label for="segundoNombre_prof" class="form-label">Segundo Nombre</label>
+                                            <input type="text" class="form-control" id="segundoNombre_prof" name="segundoNombre_prof">
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label for="centroMedico" class="form-label">Centro Médico <span style="color:red">*</span></label>
-                                            <select name="centroMedico" id="centroMedico" class="form-select" required>
+                                            <label for="primerApellido_prof" class="form-label">Primer Apellido <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="primerApellido_prof" name="primerApellido_prof" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="segundoApellido_prof" class="form-label">Segundo Apellido</label>
+                                            <input type="text" class="form-control" id="segundoApellido_prof" name="segundoApellido_prof">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="tipoDocumento_prof" class="form-label">Tipo de Documento <span style="color:red">*</span></label>
+                                            <select id="tipoDocumento_prof" name="tipoDocumento_prof" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                {% for tipo in tipos_identificacion %}
+                                                <option value="{{ tipo.id_tipo_identificacion }}">{{ tipo.nombre_identificacion }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="numeroDocumento_prof" class="form-label">Número de Documento <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="numeroDocumento_prof" name="numeroDocumento_prof" placeholder="Buscar o ingresar documento" required>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="genero_prof" class="form-label">Género <span style="color:red">*</span></label>
+                                            <select id="genero_prof" name="genero_prof" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                {% for g in generos %}
+                                                <option value="{{ g.id_genero }}">{{ g.nombre_genero }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="celular_prof" class="form-label">Número de Celular <span style="color:red">*</span></label>
+                                            <input type="tel" class="form-control" id="celular_prof" name="celular_prof" required>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campos de Credenciales de Usuario -->
+                                    <hr>
+                                    <h5>Credenciales del Sistema</h5>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="nombre_usuario_prof" class="form-label">Nombre de Usuario <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="nombre_usuario_prof" name="nombre_usuario_prof" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="email_prof" class="form-label">Correo Electrónico <span style="color:red">*</span></label>
+                                            <input type="email" class="form-control" id="email_prof" name="email_prof" required>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="password_prof" class="form-label">Contraseña <span style="color:red">*</span></label>
+                                            <input type="password" class="form-control" id="password_prof" name="password_prof" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="rol_prof" class="form-label">Rol del Profesional <span style="color:red">*</span></label>
+                                            <select id="rol_prof" name="rol_prof" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                <option value="profesional_salud">Profesional de Salud</option>
+                                                <option value="recepcionista">Recepcionista</option>
+                                                <option value="laboratorista">Laboratorista</option>
+                                                <option value="admin_centro_medico">Admin. Centro Médico</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campos Específicos del Profesional -->
+                                    <hr>
+                                    <h5>Información Profesional</h5>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="registro_profesional" class="form-label">Registro Profesional (RETHUS)</label>
+                                            <input type="text" class="form-control" id="registro_profesional" name="registro_profesional">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="especialidad_prof" class="form-label">Especialidad</label>
+                                            <select id="especialidad_prof" name="especialidad_prof" class="form-select">
+                                                <option value="" selected>Ninguna</option>
+                                                {% for esp in especialidades %}
+                                                <option value="{{ esp.id_especialidad }}">{{ esp.nombre_especialidad }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="centro_medico_prof" class="form-label">Centro Médico <span style="color:red">*</span></label>
+                                            <select name="centro_medico_prof" id="centro_medico_prof" class="form-select" required>
                                                 <option value="" selected disabled>Seleccionar centro médico...</option>
                                                 {% for centro in centros_medicos %}
                                                 <option value="{{ centro.id_centro_medico }}">{{ centro.nombre_centro }}</option>
@@ -241,9 +360,6 @@
                                     </div>
                                     <button type="submit" class="btn btn-success mt-2">Registrar profesional</button>
                                 </form>
-                                <div id="mensaje-exito-profesional" class="alert alert-success mt-3 d-none" role="alert">
-                                    ✅ El/La profesional fue registrado con éxito.
-                                </div>
                             </div>
                         </div>
                         <div class="mt-4">
