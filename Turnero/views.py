@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from usuario.models import Turnos  
+from django.contrib import messages
+
 
 @login_required
 def inicio_turnero(request):
@@ -9,8 +11,17 @@ def inicio_turnero(request):
 
 @login_required
 def gestionar_turnero(request):
-    turnos = Turnos.objects.filter(estado__in=["pendiente", "llamando"]).order_by("id_turno")
+    turnos = Turnos.objects.filter(
+        estado__in=["pendiente", "llamando", "cerrado"]
+    ).order_by("id_turno")
+
+    # Normalizar estado para evitar problemas en el template
+    for t in turnos:
+        if t.estado:
+            t.estado = t.estado.lower().strip()
+
     return render(request, "turnero/gestionar_turnero.html", {"turnos": turnos})
+
 
 
 @login_required
@@ -32,11 +43,12 @@ def cerrar_turno(request, id_turno):
 def pantalla_turnos(request):
 
     turno_actual = (
-        Turnos.objects
-        .filter(estado__iregex=r"^llam")   # <-- CAPTURA TODO lo llamado
-        .order_by("-id_turno")
-        .first()
-    )
+    Turnos.objects
+    .filter(estado__iregex=r"^llam")
+    .order_by("-id_turno")
+)
+
+
 
     turno_siguiente = (
         Turnos.objects
@@ -56,3 +68,14 @@ def pantalla_turnos(request):
         "turno_siguiente": turno_siguiente,
         "historial": historial,
     })
+
+@login_required
+def volver_llamar(request, id_turno):
+    turno = get_object_or_404(Turnos, id_turno=id_turno)
+
+    turno.estado = "llamando"
+    turno.save()
+
+    messages.success(request, f"El turno {turno.letra}{turno.numero} fue vuelto a llamar.")
+    return redirect("gestionar_turnos")
+

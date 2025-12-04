@@ -38,21 +38,27 @@
     ⬅ Volver
 </a>
 
-<h1 class="text-center mb-4">Pantalla de Turnos</h1>
-
 <div class="turnero-wrapper2">
 
 <div class="turno-box-actual2">
     <h2 class="mb-4 text-center">Turno Actual</h2>
 
-    {% if turno_actual %}
-        <div class="numero-turno-actual2 text-center">
-            {{ turno_actual.letra }}{{ turno_actual.numero }}
-        </div>
-        <p class="fs-3 text-primary fw-bold text-center">Llamando</p>
-    {% else %}
-        <p class="fs-3 text-muted text-center">Sin turnos llamados</p>
-    {% endif %}
+{% if turno_actual %}
+    <div class="d-flex flex-wrap justify-content-center gap-4">
+        {% for t in turno_actual %}
+            <div class="numero-turno-actual2 text-center p-4"
+                    style="min-width:180px; background:white; border-radius:20px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+                <h1 class="display-3 fw-bold text-primary">
+                    {{ t.letra }}{{ t.numero }}
+                </h1>
+                <p class="fs-4 fw-semibold text-success">Llamando</p>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="fs-3 text-muted text-center">Sin turnos llamados</p>
+{% endif %}
+
 
     <hr class="my-4">
 
@@ -70,7 +76,7 @@
 
 
     <div class="historial-box2">
-        <h2 class="titulo-turnero2 text-center">Historial</h2>
+        <h2 class="titulo-turnero2 text-center">Historial de Turnos Cerrados</h2>
 
         <table class="table table-striped text-center">
             <thead>
