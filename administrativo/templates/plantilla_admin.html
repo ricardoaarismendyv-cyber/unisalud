@@ -32,9 +32,9 @@
             <li>
                 <img class="navImg" src="{% static 'img/unisaludLogoHorizontal.jpg' %}" alt="logounisalud"></li>
             <li>
-                <button type="button" class="navButton1" onclick="window.location.href='{% url "preguntas-frecuentes_admin" %}'">Preguntas frecuentes</button></li>
+                <button type="button" class="navButton1" onclick="window.location.href='{% url 'preguntas-frecuentes_admin' %}'">Preguntas frecuentes</button></li>
             <li>
-                <button type="button" class="navButton1" onclick="window.location.href='{% url "usosistema_admin" %}'">¿Cómo usar el sistema?</button></li>
+                <button type="button" class="navButton1" onclick="window.location.href='{% url 'usosistema_admin' %}'">¿Cómo usar el sistema?</button></li>
             </ul>
             <ul class="navMenu">
             <!-- Menú de selección de idioma -->
@@ -80,10 +80,10 @@
             <nav class="footer-nav" >
                 <ul  class="footer-menu">
                     <li>
-                        <a href="{% url "contactanos_admin" %}"><input class="foot-button" type="button" value="¡Contáctanos!"></a>
+                        <a href="{% url 'contactanos_admin' %}"><input class="foot-button" type="button" value="¡Contáctanos!"></a>
                     </li>
                     <li>
-                        <a href="{% url "buzonsugerencias_admin" %}"><input class="foot-button" type="button" value="Buzón de sugerencias"></a>
+                        <a href="{% url 'buzonsugerencias_admin' %}"><input class="foot-button" type="button" value="Buzón de sugerencias"></a>
                     </li>
                 </ul>
                 <p>© Copyright 2025 Unisalud</p>

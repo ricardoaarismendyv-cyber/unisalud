@@ -1,16 +1,16 @@
-{% extends "plantilla_admin.html" %}
+{% extends "plantilla.html" %}
 {% load static %}
 {% block title %}Gestion de usuarios{% endblock title %}
 
 {% block estilo %}
 {{ block.super }}
-    <link rel="stylesheet" href="{% static "css/custom.css" %}">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 {% endblock estilo %}
 
 {% block auth_button %}
 <li>
-    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio_admin" %}'">
-        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url 'inicio_admin' %}'">
+        <img class="img-button" src="{% static 'img/log-out.svg' %}" alt="Icono de logout"> Cerrar Sesión
     </button>
 </li>
 
@@ -31,162 +31,336 @@
                 <div class="col-lg-12 col-md-12">
                     <div class="container border border-dark rounded p-4 my-5 div-main">
                         <h1>Gestion de usuarios</h1>
+                        
+                        <!-- Muestra mensajes de error o éxito (movido aquí para visibilidad) -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} text-center mt-3" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
                         <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#agregarUsuario" aria-expanded="false" aria-controls="agregarUsuario">Agregar usuario</button>
                         <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#eliminarProf" aria-expanded="false" aria-controls="eliminarProf">Eliminar profesional de salud</button>
                         <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#modificarUsuario" aria-expanded="false" aria-controls="modificarUsuario">Modificar información de usuario</button>
                         <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#agregarProf" aria-expanded="false" aria-controls="agregarProf">Añadir nuevo profesional de salud</button>
                         <div class="collapse mt-3" id="agregarUsuario">
-                            <div class="card card-body div-main p-3">
-                                <h5>Agregar nuevo usuario</h5>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <input class="form-control my-2" type="text" placeholder="Primer nombre">
+                            <div class="card card-body div-main p-4">
+                                <form id="formAgregarUsuario" method="POST" action="{% url 'agregar_usuario' %}">
+                                    {% csrf_token %}
+                                    <h5>Agregar nuevo usuario</h5>                                    
+                                    <div class="row">
+                                        <!-- Nombres -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="primerNombre" class="form-label">Primer Nombre <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="primerNombre" name="primerNombre" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="segundoNombre" class="form-label">Segundo Nombre <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="segundoNombre" name="segundoNombre" required>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                    <input class="form-control my-2" type="text" placeholder="Segundo nombre">
+                                    <div class="row">
+                                        <!-- Apellidos -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="primerApellido" class="form-label">Primer Apellido <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="primerApellido" name="primerApellido" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="segundoApellido" class="form-label">Segundo Apellido <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="segundoApellido" name="segundoApellido" required>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                    <input class="form-control my-2" type="text" placeholder="Primer apellido">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="numeroDocumento" class="form-label">Número de documento <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="numeroDocumento" name="numeroDocumento" required placeholder="Sin puntos ni comas">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="tipoDocumento" class="form-label">Tipo de documento <span style="color:red">*</span></label>
+                                            <select id="tipoDocumento" name="tipoDocumento" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                {% for tipo in tipos_identificacion %}
+                                                <option value="{{ tipo.id_tipo_identificacion }}">{{ tipo.nombre_identificacion }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                    <input class="form-control my-2" type="text" placeholder="Segundo apellido">
+                                    <div class="row">
+                                        <!-- Fecha de Nacimiento y Género -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento <span style="color:red">*</span></label>
+                                            <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="genero" class="form-label">Género <span style="color:red">*</span></label>
+                                            <select id="genero" name="genero" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                {% for g in generos %}
+                                                <option value="{{ g.id_genero }}">{{ g.nombre_genero }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                    <input class="form-control my-2" type="text" placeholder="Tipo de documento">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="estrato" class="form-label">Estrato Socioeconómico<span style="color:red">*</span></label>
+                                            <select id="estrato" name="estrato" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                {% for estrato in estratos %}
+                                                <option value="{{ estrato.id_estrato }}">{{ estrato.id_estrato }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="estadoCivil" class="form-label">Estado civil<span style="color:red">*</span></label>
+                                            <select id="estadoCivil" name="estadoCivil" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                {% for estado in estados_civiles %}
+                                                <option value="{{ estado.id_estado_civil }}">{{ estado.nombre_estado }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="rh" class="form-label">Grupo Sanguíneo (RH)<span style="color:red">*</span></label>
+                                            <select id="rh" name="rh" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                {% for rh in grupos_rh %} 
+                                                <option value="{{rh.id_rh }}">{{ rh.tipo_rh }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                    <input class="form-control my-2" type="text" placeholder="Número de documento">
+                                    <!-- Dirección -->
+                                    <div class="mb-3">
+                                        <label for="direccion" class="form-label">Dirección</label>
+                                        <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Ej: Calle 5 # 10-15">
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                    <input class="form-control my-2" type="text" placeholder="Teléfono">
+                                    <div class="row">
+                                        <!-- Teléfonos -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="telefono" class="form-label">Número Telefónico</label>
+                                            <input type="tel" class="form-control" id="telefono" name="telefono">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="celular" class="form-label">Número de Celular <span style="color:red">*</span></label>
+                                            <input type="tel" class="form-control" id="celular" name="celular" required>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                    <input class="form-control my-2" type="email" placeholder="Correo electrónico">
+                                    <!-- Usuario, Correo y Contraseñas -->
+                                    <div class="mb-3">
+                                        <label for="nombre_usuario" class="form-label">Nombre de Usuario <span style="color:red">*</span></label>
+                                        <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario" required>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                    <input class="form-control my-2" type="password" placeholder="Contraseña">
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Dirección de Correo Electrónico <span style="color:red">*</span></label>
+                                        <input type="email" class="form-control" id="email" name="email" required>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                    <input class="form-control my-2" type="password" placeholder="Confirmar contraseña">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="password" class="form-label">Contraseña <span style="color:red">*</span></label>
+                                            <input type="password" class="form-control" id="password" name="password" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="confirmPassword" class="form-label">Confirmar Contraseña <span style="color:red">*</span></label>
+                                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                        </div>
                                     </div>
-                                </div>
-                                <button class="btn btn-success mt-2" onclick="mostrarExito()">Guardar usuario</button>
-                                <div id="mensaje-exito" class="alert alert-success mt-3 d-none" role="alert">
-                                    ✅ Usuario registrado con éxito.
-                                </div>
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-success mt-2">Guardar usuario</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                         <div class="collapse mt-3" id="eliminarProf">
-                            <div class="card card-body div-main p-3">
-                                <h5>Eliminar profesional de la salud</h5>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <input class="form-control my-2" type="text" placeholder="Documento del profesional">
+                            <div class="card card-body div-main p-4">
+                                <form id="formEliminarProf" method="POST" action="{% url 'eliminar_profesional' %}">
+                                    {% csrf_token %}
+                                    <h5>Eliminar profesional de la salud</h5>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <input class="form-control my-2" type="text" name="documento_profesional" placeholder="Documento del profesional" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <textarea class="form-control my-2" name="justificacion" placeholder="Justificación de la eliminación" rows="3" required></textarea>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <textarea class="form-control my-2" placeholder="Justificación de la eliminación"></textarea>
-                                    </div>
-                                </div>
-                                <button class="btn btn-danger mt-2" onclick="mostrarExito()">Eliminar profesional</button>
-                                <div id="mensaje-exito" class="alert alert-success mt-3 d-none" role="alert">
+                                    <button type="submit" class="btn btn-danger mt-2">Eliminar profesional</button>
+                                </form>
+                                <div id="mensaje-exito-eliminar" class="alert alert-success mt-3 d-none" role="alert">
                                     ✅ El profesional fue eliminado con éxito.
                                 </div>
                             </div>
                         </div>
                         <div class="collapse mt-3" id="modificarUsuario">
-                            <div class="card card-body div-main p-3">
-        <h5>Modificar información de usuario</h5>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="text" placeholder="Primer nombre">
-            </div>
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="text" placeholder="Segundo nombre">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="text" placeholder="Primer apellido">
-            </div>
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="text" placeholder="Segundo apellido">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="text" placeholder="Tipo de documento">
-            </div>
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="text" placeholder="Número de documento">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="text" placeholder="Teléfono">
-            </div>
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="email" placeholder="Correo electrónico">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12 mb-3">
-                <input class="form-control my-2" type="password" placeholder="Nueva contraseña (opcional)">
-            </div>
-        </div>
-        <button class="btn btn-warning mt-2" onclick="mostrarExito()" >Guardar cambios</button>
-        <div id="mensaje-exito" class="alert alert-success mt-3 d-none" role="alert">
-    ✅ Los cambios se guardaron con éxito.
-</div>
-    </div>
+                            <div class="card card-body div-main p-4">
+                                <form id="formModificarUsuario" method="POST" action="">
+                                    {% csrf_token %}
+                                    <h5>Modificar información de usuario</h5>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <input class="form-control my-2" type="text" name="primer_nombre" placeholder="Primer nombre">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <input class="form-control my-2" type="text" name="segundo_nombre" placeholder="Segundo nombre">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <input class="form-control my-2" type="text" name="primer_apellido" placeholder="Primer apellido">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <input class="form-control my-2" type="text" name="segundo_apellido" placeholder="Segundo apellido">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <input class="form-control my-2" type="text" name="tipo_documento" placeholder="Tipo de documento">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <input class="form-control my-2" type="text" name="numero_documento" placeholder="Número de documento" required>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <input class="form-control my-2" type="text" name="telefono" placeholder="Teléfono">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <input class="form-control my-2" type="email" name="email" placeholder="Correo electrónico">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12 mb-3">
+                                            <input class="form-control my-2" type="password" name="nueva_contrasena" placeholder="Nueva contraseña (opcional)">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-warning mt-2">Guardar cambios</button>
+                                </form>
+                                <div id="mensaje-exito-modificar" class="alert alert-success mt-3 d-none" role="alert">
+                                    ✅ Los cambios se guardaron con éxito.
+                                </div>
+                            </div>
                         </div>
                         <div class="collapse mt-3" id="agregarProf">
-                            <div class="card card-body div-main p-3">
-        <h5>Agregar nuevo profesional de la salud</h5>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="text" placeholder="Nombres">
-            </div>
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="text" placeholder="Apellidos">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="text" placeholder="Documento de identidad">
-            </div>
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="text" placeholder="Especialidad">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="text" placeholder="Teléfono">
-            </div>
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="email" placeholder="Correo electrónico">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="password" placeholder="Contraseña">
-            </div>
-            <div class="col-md-6 mb-3">
-                <input class="form-control my-2" type="password" placeholder="Confirmar contraseña">
-            </div>
-        </div>
-        <button class="btn btn-success mt-2" onclick="mostrarExito()">Registrar profesional</button>
-        <div id="mensaje-exito" class="alert alert-success mt-3 d-none" role="alert">
-    ✅ El/La profesinal fue registrado con éxito.
-</div>
-    </div>
+                            <div class="card card-body div-main p-4">
+                                <form id="formAgregarProfesional" method="POST" action="{% url 'agregar_profesional' %}">
+                                    {% csrf_token %}
+                                    <h5>Agregar Nuevo Profesional de la Salud</h5>
+                                    <p>Busque el documento para verificar si el profesional ya existe. Si no, complete el formulario para crearlo.</p>
+                                    
+                                    <!-- Campos de Datos Personales -->
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="primerNombre_prof" class="form-label">Primer Nombre <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="primerNombre_prof" name="primerNombre_prof" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="segundoNombre_prof" class="form-label">Segundo Nombre</label>
+                                            <input type="text" class="form-control" id="segundoNombre_prof" name="segundoNombre_prof">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="primerApellido_prof" class="form-label">Primer Apellido <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="primerApellido_prof" name="primerApellido_prof" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="segundoApellido_prof" class="form-label">Segundo Apellido</label>
+                                            <input type="text" class="form-control" id="segundoApellido_prof" name="segundoApellido_prof">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="tipoDocumento_prof" class="form-label">Tipo de Documento <span style="color:red">*</span></label>
+                                            <select id="tipoDocumento_prof" name="tipoDocumento_prof" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                {% for tipo in tipos_identificacion %}
+                                                <option value="{{ tipo.id_tipo_identificacion }}">{{ tipo.nombre_identificacion }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="numeroDocumento_prof" class="form-label">Número de Documento <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="numeroDocumento_prof" name="numeroDocumento_prof" placeholder="Buscar o ingresar documento" required>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="genero_prof" class="form-label">Género <span style="color:red">*</span></label>
+                                            <select id="genero_prof" name="genero_prof" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                {% for g in generos %}
+                                                <option value="{{ g.id_genero }}">{{ g.nombre_genero }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="celular_prof" class="form-label">Número de Celular <span style="color:red">*</span></label>
+                                            <input type="tel" class="form-control" id="celular_prof" name="celular_prof" required>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campos de Credenciales de Usuario -->
+                                    <hr>
+                                    <h5>Credenciales del Sistema</h5>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="nombre_usuario_prof" class="form-label">Nombre de Usuario <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="nombre_usuario_prof" name="nombre_usuario_prof" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="email_prof" class="form-label">Correo Electrónico <span style="color:red">*</span></label>
+                                            <input type="email" class="form-control" id="email_prof" name="email_prof" required>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="password_prof" class="form-label">Contraseña <span style="color:red">*</span></label>
+                                            <input type="password" class="form-control" id="password_prof" name="password_prof" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="rol_prof" class="form-label">Rol del Profesional <span style="color:red">*</span></label>
+                                            <select id="rol_prof" name="rol_prof" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                <option value="profesional_salud">Profesional de Salud</option>
+                                                <option value="recepcionista">Recepcionista</option>
+                                                <option value="laboratorista">Laboratorista</option>
+                                                <option value="admin_centro_medico">Admin. Centro Médico</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campos Específicos del Profesional -->
+                                    <hr>
+                                    <h5>Información Profesional</h5>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="registro_profesional" class="form-label">Registro Profesional (RETHUS)</label>
+                                            <input type="text" class="form-control" id="registro_profesional" name="registro_profesional">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="especialidad_prof" class="form-label">Especialidad</label>
+                                            <select id="especialidad_prof" name="especialidad_prof" class="form-select">
+                                                <option value="" selected>Ninguna</option>
+                                                {% for esp in especialidades %}
+                                                <option value="{{ esp.id_especialidad }}">{{ esp.nombre_especialidad }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="centro_medico_prof" class="form-label">Centro Médico <span style="color:red">*</span></label>
+                                            <select name="centro_medico_prof" id="centro_medico_prof" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar centro médico...</option>
+                                                {% for centro in centros_medicos %}
+                                                <option value="{{ centro.id_centro_medico }}">{{ centro.nombre_centro }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-success mt-2">Registrar profesional</button>
+                                </form>
+                            </div>
                         </div>
                         <div class="mt-4">
                             <h4>Registro de actividad</h4>
@@ -231,13 +405,8 @@
 
 {% endblock content %}
 {% block script %}
+{{ block.super }} {# Asegura que cualquier script de la plantilla base se mantenga #}
 <script>
-    function mostrarExito() {
-        const alerta = document.getElementById("mensaje-exito");
-        alerta.classList.remove("d-none");  // mostrar
-        setTimeout(() => {
-            alerta.classList.add("d-none"); // ocultar después de 3s
-        }, 5000);
-    }
+    // La función mostrarExito ya no es necesaria con el sistema de mensajes de Django
 </script>
 {% endblock script %}

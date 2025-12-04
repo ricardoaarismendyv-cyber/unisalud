@@ -13,6 +13,7 @@ def inicio_prof_salud(request):
                 if not profesional_id:
                         messages.error(request, 'No se encontró un perfil de profesional de salud en su sesión.')
                         return redirect('login')
+                request.session['active_role'] = 'profesional_salud' # <--- AÑADIR ESTA LÍNEA
                 profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
                 return render(request, 'paginas/inicio_prof_salud.html', {'profesional': profesional, 'roles': request.session.get('roles', [])})
         except ProfesionalSalud.DoesNotExist:

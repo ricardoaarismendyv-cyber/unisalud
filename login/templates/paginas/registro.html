@@ -81,6 +81,36 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="row">
+                            <!-- Estado Civil, Grupo RH y Estrato -->
+                            <div class="col-md-4 mb-3">
+                                <label for="estadoCivil" class="form-label">Estado Civil</label>
+                                <select id="estadoCivil" name="estadoCivil" class="form-select">
+                                    <option value="" selected disabled>Seleccionar...</option>
+                                    {% for ec in estados_civiles %}
+                                    <option value="{{ ec.id_estado_civil }}">{{ ec.nombre_estado }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="grupoRh" class="form-label">Grupo Sanguíneo y RH</label>
+                                <select id="grupoRh" name="grupoRh" class="form-select">
+                                    <option value="" selected disabled>Seleccionar...</option>
+                                    {% for rh in grupos_rh %}
+                                    <option value="{{ rh.id_rh }}">{{ rh.tipo_rh }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="estrato" class="form-label">Estrato Socioeconómico</label>
+                                <select id="estrato" name="estrato" class="form-select">
+                                    <option value="" selected disabled>Seleccionar...</option>
+                                    {% for e in estratos %}
+                                    <option value="{{ e.id_estrato }}">{{ e.id_estrato }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                         <!-- Dirección -->
                         <div class="mb-3">
                             <label for="direccion" class="form-label">Dirección</label>
