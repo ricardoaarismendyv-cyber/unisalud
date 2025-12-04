@@ -253,7 +253,7 @@ class Medicamentos(models.Model):
         db_table = 'medicamentos'
 
     def __str__(self):
-        return self.nombre_comercial
+        return self.nombre_generico
 
 
 class Servicios(models.Model):
@@ -331,7 +331,7 @@ class Pacientes(models.Model):
     celular = models.CharField(max_length=15, blank=True, null=True, db_comment='Celular paciente')
     telefono = models.CharField(max_length=15, blank=True, null=True, db_comment='Telefono fijo paciente, opcional')
     correo_electronico = models.CharField(max_length=100, blank=True, null=True, db_comment='Correo paciente, opcional')
-    fecha_registro = models.DateTimeField(blank=True, null=True, db_comment='Fecha de registro paciente')
+    fecha_registro = models.DateTimeField(auto_now_add=True, blank=True, null=True, db_comment='Fecha de registro paciente')
 
     class Meta:
         managed = True
@@ -498,11 +498,30 @@ class Turnos(models.Model):
 class AntecedentesPaciente(models.Model):
     id_antecedente = models.AutoField(primary_key=True, db_comment='ID autoincremental')
     id_paciente = models.ForeignKey('Pacientes', models.DO_NOTHING, db_column='id_paciente', db_comment='Referencia a PACIENTES')
-    tipo_antecedente = models.CharField(max_length=13, db_comment='si es: familiar, personal, etc')
+    TIPO_ANTECEDENTE_CHOICES = [
+        ('Familiar', 'Familiar'),
+        ('Personal', 'Personal'),
+        ('Laboral', 'Laboral'),
+    ]
+    tipo_antecedente = models.CharField(
+        max_length=13,
+        choices=TIPO_ANTECEDENTE_CHOICES,
+        db_comment='si es: familiar, personal, etc'
+    )
     descripcion = models.TextField(db_comment='Descripcion')
     fecha_registro = models.DateField(blank=True, null=True, db_comment='Fecha de registro')
-    severidad = models.CharField(max_length=8, blank=True, null=True, db_comment='es: leve, moderada, etc')
-    estado_antecedente = models.CharField(max_length=14, blank=True, null=True, db_comment='Esta: activo, resuelto, etc')
+    SEVERIDAD_CHOICES = [
+        ('Leve', 'Leve'),
+        ('Moderada', 'Moderada'),
+        ('Alta', 'Alta'),
+    ]
+    severidad = models.CharField(max_length=8, choices=SEVERIDAD_CHOICES, blank=True, null=True, db_comment='es: leve, moderada, etc')
+    ESTADO_ANTECEDENTE_CHOICES = [
+        ('Activo', 'Activo'),
+        ('Resuelto', 'Resuelto'),
+        ('Pendiente', 'Pendiente'),
+    ]
+    estado_antecedente = models.CharField(max_length=14, choices=ESTADO_ANTECEDENTE_CHOICES, blank=True, null=True, db_comment='Esta: activo, resuelto, etc')
 
     class Meta:
         managed = True
