@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, DiagnosticoPaciente, AntecedentesPaciente, Enfermedades
+from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, DiagnosticoPaciente, AntecedentesPaciente, Enfermedades, OrdenMedica, Servicios, Consulta
 from login.decorators import role_required
-from .forms import ConsultaForm, DiagnosticoFormSet, AntecedenteFormSet
+from .forms import ConsultaForm, DiagnosticoFormSet, AntecedenteFormSet, OrdenMedicaForm
 from django.utils import timezone
 import json
 from django.http import HttpResponse
@@ -177,3 +177,44 @@ def generar_hc_pdf(request, consulta_id):
     except Consulta.DoesNotExist:
         messages.error(request, 'La consulta solicitada no existe.')
         return redirect('hc_prof_salud')
+
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+def diligenciar_orden_medica(request):
+    """
+    Vista para que el profesional de la salud diligencie una nueva orden médica.
+    """
+    try:
+        profesional_id = request.session.get('id_profesional')
+        profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
+    except ProfesionalSalud.DoesNotExist:
+        messages.error(request, 'Error: Su perfil de profesional de salud no está configurado. Por favor, inicie sesión de nuevo.')
+        return redirect('login')
+
+    if request.method == 'POST':
+        form = OrdenMedicaForm(request.POST)
+        if form.is_valid():
+            try:
+                orden = form.save(commit=False)  # No guardamos en la BD todavía
+                orden.id_profesional = profesional
+                orden.id_centro_medico = profesional.id_centro_medico
+                orden.fecha_emision = timezone.now()
+                
+                orden.save() # Guardamos la instancia completa en la base de datos
+                
+                messages.success(request, '¡Orden médica creada con éxito!')
+                return redirect('om_prof_salud')  # Redirigimos a la página principal de órdenes
+            except Exception as e:
+                messages.error(request, f'Ocurrió un error inesperado al guardar la orden: {e}')
+        else:
+            messages.error(request, 'Por favor, corrija los errores en el formulario.')
+    else:
+        form = OrdenMedicaForm()
+
+    # Obtenemos todos los servicios para pasarlos a la plantilla
+    servicios = Servicios.objects.all()
+
+    return render(request, 'paginas/diligenciar_orden_medica.html', {
+        'form': form,
+        'servicios': servicios,
+    })
