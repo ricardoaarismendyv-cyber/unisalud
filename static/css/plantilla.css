@@ -477,3 +477,18 @@ body.dyslexia-font {
         padding: 15px 20px;
     }
 }
+.card-historial {
+    border-radius: 20px;
+    background: #fff;
+}
+
+.titulo-card {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.card-historial table th,
+.card-historial table td {
+    font-size: 1.2rem;
+    padding: 6px 0;
+}

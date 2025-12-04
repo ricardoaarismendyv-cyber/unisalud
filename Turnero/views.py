@@ -30,13 +30,29 @@ def cerrar_turno(request, id_turno):
 
 @login_required
 def pantalla_turnos(request):
-    # Turno actual (el que se está llamando)
-    turno_actual = Turnos.objects.filter(estado="llamando").order_by("-id_turno").first()
 
-    # Historial (los últimos turnos cerrados)
-    historial = Turnos.objects.filter(estado="cerrado").order_by("-id_turno")[:10]
+    turno_actual = (
+        Turnos.objects
+        .filter(estado__iregex=r"^llam")   # <-- CAPTURA TODO lo llamado
+        .order_by("-id_turno")
+        .first()
+    )
+
+    turno_siguiente = (
+        Turnos.objects
+        .filter(estado__icontains="pend")
+        .order_by("id_turno")
+        .first()
+    )
+
+    historial = (
+        Turnos.objects
+        .filter(estado__icontains="cerr")
+        .order_by("-id_turno")[:20]
+    )
 
     return render(request, "turnero/pantalla_turnos.html", {
         "turno_actual": turno_actual,
+        "turno_siguiente": turno_siguiente,
         "historial": historial,
     })

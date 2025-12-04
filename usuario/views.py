@@ -50,23 +50,33 @@ def omeusuario(request):
 def turnosusuario(request):
 
     # Si ya hay un turno guardado en la sesión
-    if request.session.get("turno_id"):
-        try:
-            turno_existente = Turnos.objects.get(id_turno=request.session["turno_id"])
-            
-            # Generar el QR del mismo turno
-            qr = qrcode.make(turno_existente.solicitud_turno)
-            buffer = BytesIO()
-            qr.save(buffer, format="PNG")
-            qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+    turno_id_session = request.session.get("turno_id")
 
-            return render(request, 'paginas/turnos-usuario.html', {
-                "turno": turno_existente.solicitud_turno,
-                "qr_base64": qr_base64,
-            })
+    if turno_id_session:
+        try:
+            turno_existente = Turnos.objects.get(id_turno=turno_id_session)
+
+            # 🔴 Si el turno ya NO está pendiente → borrar sesión para generar uno nuevo
+            if turno_existente.estado != "pendiente":
+                del request.session["turno_id"]
+
+            else:
+                # 🟢 Si sigue pendiente → mostrar el mismo QR
+                qr = qrcode.make(turno_existente.solicitud_turno)
+                buffer = BytesIO()
+                qr.save(buffer, format="PNG")
+                qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+                return render(request, 'paginas/turnos-usuario.html', {
+                    "turno": turno_existente.solicitud_turno,
+                    "qr_base64": qr_base64,
+                })
+
         except Turnos.DoesNotExist:
-            # Si el turno no existe, continúa para crear uno nuevo
-            pass
+            # Si el turno desapareció de la BD, limpiar la sesión
+            if "turno_id" in request.session:
+                del request.session["turno_id"]
+
 
     # --- Usuario con o sin login ---
     paciente = request.user.paciente if request.user.is_authenticated and hasattr(request.user, "paciente") else None
