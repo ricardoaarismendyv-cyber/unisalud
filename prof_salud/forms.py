@@ -1,6 +1,6 @@
 #para diligenciar la HC
 from django import forms
-from usuario.models import Consulta, Pacientes, Enfermedades, AntecedentesPaciente
+from usuario.models import Consulta, Pacientes, Enfermedades, AntecedentesPaciente, OrdenMedica, Medicamentos, Servicios, TipoOrden, EstadoOrden
 from django.forms import formset_factory
 
 class ConsultaForm(forms.ModelForm):
@@ -109,4 +109,76 @@ class AntecedenteForm(forms.ModelForm):
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = field.widget.attrs.get('class', '') + ' mb-2'
 
+        # Personalizar el texto para la opción vacía
+        self.fields['tipo_antecedente'].empty_label = "Seleccione un tipo"
+        self.fields['severidad'].empty_label = "Seleccione una severidad"
+        self.fields['estado_antecedente'].empty_label = "Seleccione un estado"
+
 AntecedenteFormSet = formset_factory(AntecedenteForm, extra=1, can_delete=True)
+
+
+class OrdenMedicaForm(forms.ModelForm):
+    """Formulario para crear una Orden Médica."""
+    class Meta:
+        model = OrdenMedica
+        fields = [
+            'id_orden',
+            'id_profesional',
+            'id_paciente',
+            'id_tipo_orden',
+            'id_medicamento',
+            'id_servicio',
+            'dosis',
+            'frecuencia',
+            'cantidad',
+            'duracion_tratamiento',
+            'indicaciones',
+            'id_centro_medico',
+            'id_estado_orden',
+            'fecha_emision',
+            'fecha_cumplimiento',
+            'codigo_qr',
+            'id_consulta',
+        ]
+        widgets = {
+            'id_paciente': forms.Select(attrs={'class': 'form-control'}),
+            'id_tipo_orden': forms.Select(attrs={'class': 'form-control'}),
+            'id_medicamento': forms.Select(attrs={'class': 'form-control'}),
+            'id_servicio': forms.Select(attrs={'class': 'form-control'}),
+            'dosis': forms.TextInput(attrs={'class': 'form-control'}),
+            'frecuencia': forms.TextInput(attrs={'class': 'form-control'}),
+            'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
+            'duracion_tratamiento': forms.TextInput(attrs={'class': 'form-control'}),
+            'nombre_servicio': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'tipo_servicio': forms.Select(attrs={'class': 'form-control'}),
+            'estado': forms.Select(attrs={'class': 'form-control'}),
+            'fecha_registro': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'indicaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'id_estado_orden': forms.Select(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'id_paciente': 'Paciente',
+            'id_profesional': 'Profesional de Salud',
+            'id_centro_medico': 'Centro Médico',
+            'id_consulta': 'Consulta Asociada',
+            'id_tipo_orden': 'Tipo de Orden',
+            'id_medicamento': 'Medicamento',
+            'id_servicio': 'Servicio Solicitado',
+            'duracion_tratamiento': 'Duración del Tratamiento',
+            'id_estado_orden': 'Estado de la Orden',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(OrdenMedicaForm, self).__init__(*args, **kwargs)
+        # Hacemos que el medicamento y el servicio no sean obligatorios en el formulario
+        self.fields['id_medicamento'].required = False
+        self.fields['id_servicio'].required = False
+
+        # Añadimos un texto de ayuda y una opción vacía
+        self.fields['id_paciente'].empty_label = "Seleccione un paciente"
+        self.fields['id_tipo_orden'].empty_label = "Seleccione el tipo"
+        self.fields['id_medicamento'].empty_label = "N/A - No aplica medicamento"
+        self.fields['id_servicio'].empty_label = "N/A - No aplica servicio"
+        self.fields['id_estado_orden'].empty_label = "Seleccione un estado"
+    
