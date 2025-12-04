@@ -551,8 +551,8 @@ body.high-contrast .navButton0,
 body.high-contrast .foot-button,
 body.high-contrast .sidebar-button {
     background-image: none !important;
-    background-color: #222 !important;
-    color: #ff0000 !important;
+    background-color: rgb(234, 40, 40) !important;
+    color: #ffff00 !important;
     border: 1px solid #fff !important;
 }
 
@@ -611,7 +611,7 @@ body.dyslexia-font {
 }
 
 .high-contrast button {
-    background-color: #fff !important;
+    background-color: rgb(234, 40, 40) !important;
     color: #000 !important;
     border: 2px solid #000 !important;
 }
@@ -620,7 +620,4 @@ body.dyslexia-font {
 .high-contrast .hc-icon {
     filter: invert(1) brightness(2) !important;
 }
-/* Color normal (por ejemplo gris oscuro) */
-.hc-icon {
-  color: #e1e8f3; /* ejemplo */
-}
+

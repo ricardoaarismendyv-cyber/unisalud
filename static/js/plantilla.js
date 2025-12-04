@@ -125,5 +125,17 @@ document.getElementById("reset").addEventListener("click", () => {
         accessibilityIcon.addEventListener('click', () => accessibilitySidebar.style.width = '300px');
         closeSidebarBtn.addEventListener('click', () => accessibilitySidebar.style.width = '0');
     }
+const daltoniaBtn = document.getElementById('daltonia-btn');
+
+daltoniaBtn.addEventListener('click', () => {
+    document.body.classList.toggle('daltonia-mode');
+
+    // Cambiar texto del botón
+    if (document.body.classList.contains('daltonia-mode')) {
+        daltoniaBtn.textContent = "Desactivar modo daltonismo";
+    } else {
+        daltoniaBtn.textContent = "Modo daltonismo";
+    }
+});
 
 });
