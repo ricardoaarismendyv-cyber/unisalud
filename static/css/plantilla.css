@@ -587,12 +587,12 @@ body.dyslexia-font {
         flex-direction: column;
         gap: 10px;
     }
-    
+
     .footer-menu {
         flex-direction: column;
         gap: 10px;
     }
-    
+
     .mainNav {
         height: auto;
         padding: 15px 20px;
@@ -669,4 +669,3 @@ body.daltonia {
 .high-contrast .hc-icon {
     filter: invert(1) brightness(2) !important;
 }
-
