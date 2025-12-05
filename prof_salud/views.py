@@ -31,7 +31,31 @@ def inicio_prof_salud(request):
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def hc_prof_salud(request):
-    return render(request, 'paginas/hc_prof_salud.html') #Vista de Historia Clínica para el profesional de salud
+    """
+    Vista de Historia Clínica para el profesional de salud.
+    Muestra la última consulta registrada por el profesional.
+    """
+    ultima_consulta = None
+    historial_paciente = None
+    try:
+        profesional_id = request.session.get('id_profesional')
+        if profesional_id:
+            profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
+            # Buscamos la última consulta atendida por este profesional
+            ultima_consulta = Consulta.objects.filter(id_profesional=profesional, estado='Atendido').order_by('-fecha_atencion').first()
+
+            # Si encontramos una última consulta, buscamos el historial de ese paciente
+            if ultima_consulta:
+                paciente = ultima_consulta.id_paciente
+                # Obtenemos las últimas 5 consultas de ese paciente, ordenadas por fecha
+                historial_paciente = Consulta.objects.filter(id_paciente=paciente, estado='Atendido').order_by('-fecha_atencion')[:5]
+
+    except ProfesionalSalud.DoesNotExist:
+        messages.error(request, 'No se pudo encontrar el perfil del profesional.')
+    except Exception as e:
+        messages.error(request, f'Ocurrió un error inesperado: {e}')
+
+    return render(request, 'paginas/hc_prof_salud.html', {'ultima_consulta': ultima_consulta, 'historial_paciente': historial_paciente})
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def om_prof_salud(request):
@@ -118,7 +142,7 @@ def diligenciar_hc(request):
                         antecedente.save()
 
                 messages.success(request, f'Historia clínica para el paciente {nueva_consulta.id_paciente} guardada con éxito.')
-                return redirect('generar_hc_pdf', consulta_id=nueva_consulta.id_consulta)
+                return redirect('ver_hc_pdf', consulta_id=nueva_consulta.id_consulta)
             except Exception as e:
                 messages.error(request, f'Ocurrió un error al guardar la historia clínica: {e}')
     else:
@@ -152,8 +176,22 @@ def render_to_pdf(template_src, context_dict={}):
     result = BytesIO()
     pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
     if not pdf.err:
-        return HttpResponse(result.getvalue(), content_type='application/pdf')
+        # Devolvemos solo los bytes del PDF, no la respuesta HTTP completa
+        return result.getvalue()
     return None
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+def ver_hc_pdf(request, consulta_id):
+    """
+    Muestra una página con el PDF de la HC incrustado y opciones para descargar o volver.
+    """
+    try:
+        # Verificamos que la consulta exista para evitar errores
+        consulta = Consulta.objects.get(id_consulta=consulta_id)
+        return render(request, 'paginas/ver_hc_pdf.html', {'consulta': consulta})
+    except Consulta.DoesNotExist:
+        messages.error(request, 'La consulta solicitada no existe.')
+        return redirect('hc_prof_salud')
 
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
@@ -172,7 +210,16 @@ def generar_hc_pdf(request, consulta_id):
             'antecedentes': antecedentes,
         }
         pdf = render_to_pdf('pdf/hc_pdf_template.html', context)
-        return HttpResponse(pdf, content_type='application/pdf')
+
+        if pdf:
+            # Creamos la respuesta HTTP con los bytes del PDF
+            response = HttpResponse(pdf, content_type='application/pdf')
+            # Esta cabecera le indica al navegador que muestre el archivo en línea
+            response['Content-Disposition'] = f'inline; filename="hc_{consulta.id_consulta}.pdf"'
+            return response
+        
+        messages.error(request, 'No se pudo generar el PDF.')
+        return redirect('hc_prof_salud')
 
     except Consulta.DoesNotExist:
         messages.error(request, 'La consulta solicitada no existe.')
