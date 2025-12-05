@@ -24,9 +24,7 @@
         <!-- Fuentes de Google: OpenDyslexic para accesibilidad -->
         <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
         <link rel="stylesheet" href="{% static 'css/plantilla.css' %}">
-
     </head>
-
     <body id="page-body">
         <header class="mainHeader">
             <!-- place navbar here -->
@@ -57,7 +55,7 @@
                 <img id="moon-icon" class="hc-icon"
                 src="{% static "img/moon (1).svg" %}" alt="moon" style="cursor: pointer;">
             </li>
-
+            
             <!-- Contenedor para el menú de accesibilidad -->
             <li class="hc-icon">
                 <img id="accessibility-icon" class="access-button" src="{% static "img/accessibility.svg" %}" alt="Opciones de accesibilidad">
@@ -73,10 +71,9 @@
     </header>
         <main>
             {% block content %}{% endblock content %}
-
         </main>
         <footer>
-
+            
             <!-- place footer here -->
             {% block footer %}{% endblock footer %}
         <div class="footer-bar">
@@ -92,10 +89,9 @@
                 <p>© Copyright 2025 Unisalud</p>
             </nav>
         </div>
-
         <!-- Barra Lateral de Accesibilidad -->
         <div id="accessibility-sidebar" class="sidebar">
-            <button id="close-sidebar-btn" class="close-sidebar-button">&times;</button>
+        <button id="close-sidebar-btn" class="close-sidebar-button">&times;</button>
             <h2>Opciones de Accesibilidad</h2>
             <button id="increase-font" class="sidebar-button">Aumentar Tamaño de Letra</button>
             <button id="decrease-font" class="sidebar-button">Disminuir Tamaño de Letra</button>
@@ -113,32 +109,27 @@
             integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
             crossorigin="anonymous"
         ></script>
-
         <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
             integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
             crossorigin="anonymous"
         ></script>
-
         <!-- Carga del script de la plantilla -->
         <script src="{% static 'js/plantilla.js' %}"></script>
-
+        
         <!-- Script base de la plantilla (siempre se carga) -->
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const languageButton = document.getElementById('language-button');
                 const languageMenu = document.getElementById('language-menu');
-
                 if (languageButton && languageMenu) {
                     languageButton.addEventListener('click', function(event) {
                         event.stopPropagation(); 
                         languageMenu.style.display = languageMenu.style.display === 'block' ? 'none' : 'block';
                     });
-
                     document.addEventListener('click', function() {
                         languageMenu.style.display = 'none';
                     });
-
                     languageMenu.querySelectorAll('a').forEach(link => {
                         link.addEventListener('click', function(event) {
                             event.preventDefault();
@@ -154,23 +145,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const openBtn = document.getElementById('accessibility-icon');
   const sidebar = document.getElementById('accessibility-sidebar');
   const closeBtn = document.getElementById('close-sidebar-btn');
-
   const increaseBtn = document.getElementById('increase-font');
   const decreaseBtn = document.getElementById('decrease-font');
   const dyslexiaBtn = document.getElementById('dyslexia-font');
   const contrastBtn = document.getElementById('high-contrast');
+  const daltoniaBtn = document.getElementById('daltonia-font');
+co nst daltoniaBtn = document.getElementById('daltonia-font');
   const resetBtn = document.getElementById('reset-accessibility');
 
   // Estado (tamaño de fuente)
   let currentFontSize = parseInt(localStorage.getItem('access_fontSize')) || 16;
   document.body.style.fontSize = currentFontSize + 'px';
-
   // Asegurarnos de que la sidebar empiece cerrada (coincide con tu CSS .sidebar {width:0})
-    if (sidebar) {
+  if (sidebar) {
     sidebar.style.width = sidebar.style.width || '0';
     sidebar.setAttribute('aria-hidden', sidebar.style.width === '0' ? 'true' : 'false');
   }
-
   // Funciones para abrir y cerrar
   function openSidebar() {
     if (!sidebar) return;
@@ -186,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
     sidebar.setAttribute('aria-hidden', 'true');
     if (openBtn) openBtn.focus();
   }
-
   // Event listeners abrir/cerrar
   if (openBtn) openBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -197,7 +186,6 @@ document.addEventListener('DOMContentLoaded', () => {
     e.stopPropagation();
     closeSidebar();
   });
-
   // Cerrar con tecla Esc cuando el panel esté abierto
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
@@ -206,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   });
-
   // Cerrar al hacer click fuera del sidebar
   document.addEventListener('click', (e) => {
     if (!sidebar) return;
@@ -214,48 +201,44 @@ document.addEventListener('DOMContentLoaded', () => {
     const isOpen = sidebar.style.width && sidebar.style.width !== '0px';
     if (isOpen && !clickedInside) closeSidebar();
   });
-
   // Previene que c(evita cierre)
   if (sidebar) sidebar.addEventListener('click', (e) => e.stopPropagation());
-
   // Funciones de accesibilidad
   function setFontSize(size) {
     currentFontSize = size;
     document.body.style.fontSize = currentFontSize + 'px';
     localStorage.setItem('access_fontSize', currentFontSize);
   }
-
   // Aumentar
   if (increaseBtn) increaseBtn.addEventListener('click', () => {
     setFontSize(Math.min(currentFontSize + 2, 28));
   });
-
   // Disminuir
   if (decreaseBtn) decreaseBtn.addEventListener('click', () => {
     setFontSize(Math.max(currentFontSize - 2, 10));
   });
-
   // Fuente para dislexia 
   if (dyslexiaBtn) dyslexiaBtn.addEventListener('click', () => {
     const active = document.body.classList.toggle('dyslexia-font');
     dyslexiaBtn.classList.toggle('active', active);
     localStorage.setItem('access_dyslexia', active ? '1' : '0');
   });
-
   // Contraste alto
   if (contrastBtn) contrastBtn.addEventListener('click', () => {
     const active = document.body.classList.toggle('high-contrast');
     contrastBtn.classList.toggle('active', active);
     localStorage.setItem('access_contrast', active ? '1' : '0');
   });
-
+    //Daltonismo
+document.ElementById("daltoniafont").addEventListener("Click", () => {
+    document.body.classList.toggle("daltonia");
+});
   // Restablecer todo
   if (resetBtn) resetBtn.addEventListener('click', () => {
     // tamaño por defecto
     setFontSize(16);
     // eliminar clases
-    document.body.classList.remove('dyslexia-font', 'high-contrast');
-    document.body.classList.remove('dyslexia-font', 'high-contrast');
+    document.body.classList.remove('dyslexia-font', 'high-contrast', 'daltonia-font');
     // quitar estados visuales en botones
     if (dyslexiaBtn) dyslexiaBtn.classList.remove('active');
     if (contrastBtn) contrastBtn.classList.remove('active');
@@ -264,8 +247,8 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.removeItem('access_fontSize');
     localStorage.removeItem('access_dyslexia');
     localStorage.removeItem('access_contrast');
+    localStorage.removeItem('access_daltonia');
   });
-
   // Aplicar preferencias guardadas (si existen)
   if (localStorage.getItem('access_dyslexia') === '1') {
     document.body.classList.add('dyslexia-font');
@@ -275,17 +258,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('high-contrast');
     if (contrastBtn) contrastBtn.classList.add('active');
   }
+  if (localStorage.getItem('access_daltonia') === '1') {
+    document.body.classList.add('daltonia-font');
+    if (daltoniaBtn)
+  }
 });
 document.addEventListener("DOMContentLoaded", function () {
     const panel = document.querySelector(".accesibilidad-panel, #accesibilidadPanel, .accesibilidad, #accessibility"); 
     const openBtn = document.querySelector(".open-accessibility, #openAccessibility, #btnAccesibilidad, .btn-accesibilidad");
     const closeBtn = document.querySelector(".close-accessibility, #closeAccessibility, .cerrar-accesibilidad");
-
     if (!panel) {
         console.error("❌ No encuentro el panel de accesibilidad en el HTML.");
         return;
     }
-
     if (openBtn) {
         openBtn.addEventListener("click", () => {
             panel.style.display = "block";
@@ -293,7 +278,6 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
         console.error("❌ No encuentro el botón que debe abrir accesibilidad.");
     }
-
     if (closeBtn) {
         closeBtn.addEventListener("click", () => {
             panel.style.display = "none";
