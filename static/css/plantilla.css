@@ -278,6 +278,8 @@ h1, h2, h3, h4, h5, h6 {
     width: 100%;
     z-index: 1030;
     background: var(--white);
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .mainNav {
@@ -616,56 +618,29 @@ body.dyslexia-font {
     border: 2px solid #000 !important;
 }
 
-/* ICONOS EN CONTRASTE ALTO */
-body.high-daltonia {
-    background-color: #a91616 !important;
-    color: #fff !important;
-}
+/* =================================================================
+  ESTILOS PARA EL MODO DALTONISMO (CORRECCIÓN DE LAYOUT Y ESTABILIDAD) 
+  ================================================================= */
 
-body.high-daltonia header.mainHeader,
-body.high-daltonia .mainNav,
-body.high-daltonia footer,
-body.high-daltonia .footer-bar,
-body.high-daltonia main,
-body.high-daltonia .sidebar {
-    background-image: none !important;
-    background-color: black!important;
-    color: #fff !important;
-    border-color: #fff !important;
+body.color-blind-mode {
+    /* MÁS SEGURO: Usar el filtro SVG definido en el HTML (si lo tienes) o el Data URI si es el único que funciona */
+    /* *** OPCIÓN MÁS ESTABLE *** */
+    /* filter: url(#color-blind-filter) !important; */ 
+    
+    /* *** TU OPCIÓN ACTUAL (Si la anterior falla, usar esta) *** */
+    filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='deuteranopia'><feColorMatrix type='matrix' values='0.33 0.67 0 0 0  0.33 0.67 0 0 0  0 0 1 0 0  0 0 0 1 0'/></filter></svg>#deuteranopia") !important;
+    
+    /* SEGURIDAD DE LAYOUT: Estas líneas previenen los problemas de posición */
+    transform: none !important; 
+    perspective: none !important;
+    position: static !important; /* Fuerza al body a comportarse normalmente */
+    
+    /* Otras reglas de seguridad */
+    opacity: 1 !important;
+    background-color: initial !important; 
 }
-
-body.high-daltonia .navButton1,
-body.high-daltonia .navButton0,
-body.high_daltonia .foot-button,
-body.high-daltonia .sidebar-button {
-    background-image: none !important;
-    background-color: rgb(234, 40, 40) !important;
-    color: #ffff00 !important;
-    border: 1px solid #fff !important;
-}
-
-body.high-daltonia a,
-body.high-daltonia button,
-body.high-daltonia button:visited,
-body.high-daltonia a:visited {
-    color: #ffff00 !important;
-}
-
-body.high-daltonia .div-main {
-    background-image: none;
-    background-color: #000 !important;
-    color: #fff !important;
-    border-color: #fff !important;
-}
-
-body.high-daltonia {
-    color: #ffff00 !important;
-}
-
-body.daltonia {
-    background-color: #34d399;
-
-}
-.high-contrast .hc-icon {
-    filter: invert(1) brightness(2) !important;
+/* Excluye la barra de navegación y el pie de página fijos */
+body.color-blind-mode .mainHeader,
+body.color-blind-mode .footer-bar {
+    filter: none !important; 
 }

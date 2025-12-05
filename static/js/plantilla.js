@@ -123,12 +123,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Daltonismo
     if (daltonBtn) {
-        daltonBtn.addEventListener('click', () => {
-            const active = body.classList.toggle('color-blind-mode');
-            daltonBtn.classList.toggle('active', active);
-            localStorage.setItem('access_daltonismo', active ? '1' : '0');
-        });
-    }
+    daltonBtn.addEventListener('click', () => {
+        const active = document.body.classList.toggle('color-blind-mode');
+        daltonBtn.classList.toggle('active', active);
+        localStorage.setItem('access_daltonismo', active ? '1' : '0');
+    });
+}
+
 
     // Restablecer
     if (resetBtn) {
