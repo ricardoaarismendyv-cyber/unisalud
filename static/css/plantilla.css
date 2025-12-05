@@ -623,23 +623,18 @@ body.dyslexia-font {
   ================================================================= */
 
 body.color-blind-mode {
-    /* MÁS SEGURO: Usar el filtro SVG definido en el HTML (si lo tienes) o el Data URI si es el único que funciona */
-    /* *** OPCIÓN MÁS ESTABLE *** */
-    /* filter: url(#color-blind-filter) !important; */ 
-    
-    /* *** TU OPCIÓN ACTUAL (Si la anterior falla, usar esta) *** */
     filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='deuteranopia'><feColorMatrix type='matrix' values='0.33 0.67 0 0 0  0.33 0.67 0 0 0  0 0 1 0 0  0 0 0 1 0'/></filter></svg>#deuteranopia") !important;
     
     /* SEGURIDAD DE LAYOUT: Estas líneas previenen los problemas de posición */
     transform: none !important; 
     perspective: none !important;
-    position: static !important; /* Fuerza al body a comportarse normalmente */
-    
+    position: static !important; 
+
     /* Otras reglas de seguridad */
     opacity: 1 !important;
     background-color: initial !important; 
 }
-/* Excluye la barra de navegación y el pie de página fijos */
+
 body.color-blind-mode .mainHeader,
 body.color-blind-mode .footer-bar {
     filter: none !important; 
