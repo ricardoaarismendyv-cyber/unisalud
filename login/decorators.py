@@ -4,8 +4,8 @@ from django.contrib import messages
 def role_required(allowed_roles=[]):
     def decorator(view_func):
         def wrapper(request, *args, **kwargs):
-            # Usamos el método estándar de Django para verificar si el usuario está autenticado.
-            if not request.user.is_authenticated:
+            # Verificamos si el 'id_usuario' está en la sesión, en lugar de usar request.user.is_authenticated.
+            if 'id_usuario' not in request.session:
                 messages.error(request, 'Debes iniciar sesión para ver esta página.')
                 return redirect('login')
             
