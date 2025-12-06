@@ -125,9 +125,11 @@ def diligenciar_hc(request):
                 # Guardar los diagnósticos del formset
                 for form in diagnostico_formset:
                     if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                        # El ID de la enfermedad ahora viene del campo oculto 'id_enfermedad'
+                        enfermedad_obj = form.cleaned_data.get('id_enfermedad')
                         DiagnosticoPaciente.objects.create(
                             id_consulta=nueva_consulta,
-                            id_enfermedad=form.cleaned_data['id_enfermedad'],
+                            id_enfermedad=enfermedad_obj,
                             tipo_diagnostico=form.cleaned_data['tipo_diagnostico'],
                             notas=form.cleaned_data.get('notas', ''),
                             fecha_registro=timezone.now()
