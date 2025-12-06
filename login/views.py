@@ -37,7 +37,7 @@ def login_view(request):
                 if any(rol in roles_profesionales for rol in roles_usuario):
                     # Prioridad 1: Rol profesional. Si tiene perfil, redirige.
                     if 'id_profesional' in request.session:
-                        return redirect('inicio_prof_salud')
+                        return redirect('consultas_prof_salud')
                 elif 'paciente' in roles_usuario:
                     # Prioridad 2: Rol paciente. Si no es profesional pero es paciente, redirige.
                     if 'id_paciente' in request.session:
@@ -53,7 +53,9 @@ def login_view(request):
 
 # para cerrar sesion y redirige al login
 def logout_view(request):
-    logout(request)
+    # logout(request) funciona con el sistema de auth de Django.
+    # Para limpiar la sesión manual, usamos flush().
+    request.session.flush()
     return redirect('login')
 
 
