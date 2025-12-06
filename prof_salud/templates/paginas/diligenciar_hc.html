@@ -33,7 +33,13 @@
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h4 class="form-title mb-0">Diagnóstico #{{ forloop.counter }}</h4>
                                     </div>
-                                    {% for field in form %}{% if field.name != 'DELETE' %}<p>{{ field.label_tag }} {{ field }}</p>{% endif %}{% endfor %}
+                                    {{ form.id_enfermedad }} {# Campo oculto #}
+                                    <p>{{ form.codigo_cie10_select.label_tag }} {{ form.codigo_cie10_select }}</p>
+                                    <p>{{ form.nombre_enfermedad_select.label_tag }} {{ form.nombre_enfermedad_select }}</p>
+                                    <p>{{ form.tipo_diagnostico.label_tag }} {{ form.tipo_diagnostico }}</p>
+                                    <p>{{ form.categoria_grupom.label_tag }} {{ form.categoria_grupom }}</p>
+                                    <p>{{ form.grupo_mortalidad.label_tag }} {{ form.grupo_mortalidad }}</p>
+                                    <p>{{ form.notas.label_tag }} {{ form.notas }}</p>
                                     <div style="display: none;">{{ form.DELETE }}</div>
                                 </div>
                             {% endfor %}
@@ -42,9 +48,13 @@
                         <div id="empty-form-template" style="display: none;">
                             <div class="diagnostico-form border p-3 mb-3">
                                 <h5 class="form-title">Diagnóstico #__prefix__</h5>
-                                {% for field in diagnostico_formset.empty_form %}
-                                    {% if field.name != 'DELETE' %}<p>{{ field.label_tag }} {{ field }}</p>{% endif %}
-                                {% endfor %}
+                                {{ diagnostico_formset.empty_form.id_enfermedad }}
+                                <p>{{ diagnostico_formset.empty_form.codigo_cie10_select.label_tag }} {{ diagnostico_formset.empty_form.codigo_cie10_select }}</p>
+                                <p>{{ diagnostico_formset.empty_form.nombre_enfermedad_select.label_tag }} {{ diagnostico_formset.empty_form.nombre_enfermedad_select }}</p>
+                                <p>{{ diagnostico_formset.empty_form.tipo_diagnostico.label_tag }} {{ diagnostico_formset.empty_form.tipo_diagnostico }}</p>
+                                <p>{{ diagnostico_formset.empty_form.categoria_grupom.label_tag }} {{ diagnostico_formset.empty_form.categoria_grupom }}</p>
+                                <p>{{ diagnostico_formset.empty_form.grupo_mortalidad.label_tag }} {{ diagnostico_formset.empty_form.grupo_mortalidad }}</p>
+                                <p>{{ diagnostico_formset.empty_form.notas.label_tag }} {{ diagnostico_formset.empty_form.notas }}</p>
                                 <div style="display: none;">{{ diagnostico_formset.empty_form.DELETE }}</div>
                             </div>
                         </div>
@@ -214,16 +224,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const enfermedadesData = JSON.parse('{{ enfermedades_json|escapejs }}');
 
     function actualizarCamposDiagnostico(selectElement) {
-        // Extraer el prefijo del formulario (ej: diagnosticos-0)
-        const formPrefixMatch = selectElement.id.match(/id_(.+?)-id_enfermedad/);
+        const formPrefixMatch = selectElement.id.match(/id_(diagnosticos-\d+)-/);
         if (!formPrefixMatch) return;
 
         const formPrefix = formPrefixMatch[1];
-        const categoriaInput = document.getElementById(`id_${formPrefix}-categoria_grupom`);
-        const grupoInput = document.getElementById(`id_${formPrefix}-grupo_mortalidad`);
-        
         const selectedId = selectElement.value;
 
+        // Referencias a todos los campos del formulario
+        const hiddenIdInput = document.getElementById(`id_${formPrefix}-id_enfermedad`);
+        const codigoSelect = document.getElementById(`id_${formPrefix}-codigo_cie10_select`);
+        const nombreSelect = document.getElementById(`id_${formPrefix}-nombre_enfermedad_select`);
+        const categoriaInput = document.getElementById(`id_${formPrefix}-categoria_grupom`);
+        const grupoInput = document.getElementById(`id_${formPrefix}-grupo_mortalidad`);
+
+        // Sincronizar los dos selects
+        if (codigoSelect && nombreSelect) {
+            codigoSelect.value = selectedId;
+            nombreSelect.value = selectedId;
+        }
+
+        // Actualizar el campo oculto con el ID
+        if (hiddenIdInput) {
+            hiddenIdInput.value = selectedId;
+        }
+
+        // Rellenar los campos de solo lectura
         if (selectedId && enfermedadesData[selectedId]) {
             const enfermedad = enfermedadesData[selectedId];
             if (categoriaInput) categoriaInput.value = enfermedad.categoria || '';
@@ -237,8 +262,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Función para inicializar los listeners en los formularios de diagnóstico
     function inicializarListenersDiagnostico() {
-        const selectsEnfermedad = document.querySelectorAll('select[id$="-id_enfermedad"]');
-        selectsEnfermedad.forEach(select => {
+        const allSelects = document.querySelectorAll('select[id$="-codigo_cie10_select"], select[id$="-nombre_enfermedad_select"]');
+        allSelects.forEach(select => {
             // Evitar añadir el listener múltiples veces
             if (!select.dataset.listenerAttached) {
                 select.addEventListener('change', function() {
