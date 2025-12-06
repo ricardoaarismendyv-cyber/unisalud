@@ -56,14 +56,39 @@ class ConsultaForm(forms.ModelForm):
             self.fields[field].widget.attrs['class'] = self.fields[field].widget.attrs.get('class', '') + ' form-control mb-2'
 
 
+class EnfermedadChoiceField(forms.ModelChoiceField):
+    """
+    Campo personalizado para mostrar el código CIE-10 y el nombre de la enfermedad en las opciones.
+    """
+    def label_from_instance(self, obj):
+        return f"{obj.codigo_cie10} - {obj.nombre_enfermedad}"
+
+class CodigoCIE10ChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.codigo_cie10
+
+class NombreEnfermedadChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.nombre_enfermedad
+
 class DiagnosticoPacienteForm(forms.Form):
     """Formulario para un único diagnóstico."""
-    id_enfermedad = forms.ModelChoiceField(
+    # Campo oculto que guardará el ID de la enfermedad seleccionada.
+    id_enfermedad = forms.ModelChoiceField(queryset=Enfermedades.objects.none(), widget=forms.HiddenInput(), required=True)
+
+    codigo_cie10_select = CodigoCIE10ChoiceField(
         queryset=Enfermedades.objects.all(),
-        label="Enfermedad (CIE-10)",
+        label="Código CIE-10",
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        empty_label="Seleccione un código",
+        required=False
+    )
+    nombre_enfermedad_select = NombreEnfermedadChoiceField(
+        queryset=Enfermedades.objects.all(),
+        label="Nombre Enfermedad",
         widget=forms.Select(attrs={'class': 'form-control'}),
         empty_label="Seleccione una enfermedad",
-        help_text="Si no aparecen enfermedades, deben ser cargadas en el sistema."
+        required=False
     )
     tipo_diagnostico = forms.ChoiceField(
         choices=[('', 'Seleccione un tipo'), ('Principal', 'Principal'), ('Presuntivo', 'Presuntivo'), ('Secundario', 'Secundario')],
