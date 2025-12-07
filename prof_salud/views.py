@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades
+from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, Turnos
 from login.decorators import role_required
+from django.contrib.auth.decorators import login_required
 
 ALLOWED_PROF_ROLES = ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']
 
@@ -60,3 +61,27 @@ def registro_prof_salud(request):
         'generos': Genero.objects.all(),
     }
     return render(request, 'paginas/registro_prof_salud.html', context)
+
+@login_required
+def consultas_pacientes(request):
+
+    # Obtener el profesional de salud logueado
+    profesional = ProfesionalSalud.objects.get(usuario=request.user)
+
+    # Turnos asignados a ese profesional
+    turnos = (
+        Turnos.objects
+        .filter(id_profesional=profesional)
+        .exclude(estado__iexact="cerrado")
+        .order_by("id_turno")
+    )
+
+    # ORGANIZAR DATOS PARA EL TEMPLATE COMO EL TEMPLATE LOS ESPERA
+    profesionales = [{
+        "consultorio": profesional.id_centro_medico.id_centro_medico,   # O tu campo de consultorio real
+        "turnos": turnos
+    }]
+
+    return render(request, "profesional/consultas_pacientes.html", {
+        "profesionales": profesionales
+    })

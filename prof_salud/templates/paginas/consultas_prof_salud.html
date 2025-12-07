@@ -28,29 +28,23 @@
                     <div class="col-lg-10 col-md-10">
                         <div class="container border border-dark rounded p-4 my-5 div-main">
                             <h1>Consultas Pacientes</h1>
-                            <div class="turnos-container">
-                                <div class="turno-card">
-                                    <div class="paciente">
-                                        <a class="btn btn-main btn-nav" href='{% url "inicio_prof_salud" %}'>Ana Rodriguez</a>
+                        <div class="turnos-container">
+                            {% for profesional in profesionales %}
+                                {% for turno in profesional.turnos %}
+                                    <div class="turno-card">
+                                        <div class="paciente">
+                                            {{ turno.id_paciente.nombre_completo }}
+                                        </div>
+                                        <div class="consultorio">
+                                            Consultorio #{{ profesional.consultorio }}
+                                        </div>
                                     </div>
-                                    <div class="consultorio">Consultorio #3</div>
-                                </div>
-                                <div class="turno-card">
-                                    <div class="paciente">Carlos Méndez</div>
-                                    <div class="consultorio">Consultorio #1</div>
-                                </div>
-                                <div class="turno-card">
-                                    <div class="paciente">Luisa Fernández</div>
-                                    <div class="consultorio">Consultorio #5</div>
-                                </div>
-                                <div class="turno-card">
-                                    <div class="paciente">Jorge Salazar</div>
-                                    <div class="consultorio">Consultorio #2</div>
-                                </div>
-                                <div class="turno-card">
-                                    <div class="paciente">María Gómez</div>
-                                    <div class="consultorio">Consultorio #4</div>
-                                </div>
+                                {% empty %}
+                                    <!-- Si no hay turnos en ningún profesional -->
+                                    <p class="text-center mt-4">No hay turnos asignados actualmente.</p>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
                             </div>
                         </div>
                     </div>
