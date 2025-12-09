@@ -183,11 +183,11 @@ class CentrosMedicos(models.Model):
     id_centro_medico = models.AutoField(primary_key=True, db_comment='ID autoincremental')
     nombre_centro = models.CharField(max_length=150, db_comment='Nombre del centro medico')
     id_red_salud = models.ForeignKey('RedesSalud', models.DO_NOTHING, db_column='id_red_salud', blank=True, null=True, db_comment='Referencia a redessalud')
-    id_nivel_atencion = models.ForeignKey('NivelesAtencion', models.DO_NOTHING, db_column='id_nivel_atencion', db_comment='Referencia a NIVELES_ATENCION')
-    id_ciudad = models.ForeignKey('Ciudad', models.DO_NOTHING, db_column='id_ciudad', db_comment='Referencia a CIUDAD')
+    id_nivel_atencion = models.ForeignKey('NivelesAtencion', models.DO_NOTHING, db_column='id_nivel_atencion', null=True, db_comment='Referencia a NIVELES_ATENCION')
+    id_ciudad = models.ForeignKey('Ciudad', models.DO_NOTHING, db_column='id_ciudad', null=True, db_comment='Referencia a CIUDAD')
     direccion = models.CharField(max_length=255, db_comment='Direccion centro medico')
-    telefono = models.CharField(max_length=60, blank=True, null=True, db_comment='Telefono centro medico')
     celular = models.CharField(max_length=60, blank=True, null=True, db_comment='Celular centro medico')
+    telefono = models.CharField(max_length=60, blank=True, null=True, db_comment='Telefono centro medico')
     correo = models.CharField(max_length=100, blank=True, null=True, db_comment='Correo entro medico')
     
     class Meta:
@@ -229,6 +229,7 @@ class TiposAfiliacion(models.Model):
 
 class Especialidades(models.Model):
     id_especialidad = models.AutoField(primary_key=True, db_comment='ID autoincremental')
+    codigo_especialidad = models.IntegerField(default=0, db_comment='Codigo unico para la especialidad medica')
     nombre_especialidad = models.CharField(unique=True, max_length=100, db_comment='refiere a la especialidad medica: neurologia, cardiologia, etc')
     descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion')
 
@@ -242,11 +243,12 @@ class Especialidades(models.Model):
 
 class Medicamentos(models.Model):
     id_medicamento = models.AutoField(primary_key=True, db_comment='ID autoincremental')
+    codigo_medicamento = models.IntegerField(default=0, db_comment='Codigo unico del medicamento')
     nombre_generico = models.CharField(max_length=200, blank=True, null=True, db_comment='Nombre generico medicamento')
-    principio_activo = models.CharField(max_length=300, blank=True, null=True, db_comment='Principio activo medicamento')
-    concentracion = models.CharField(max_length=50, blank=True, null=True, db_comment='Concentracion medicamento')
-    forma_farmaceutica = models.CharField(max_length=50, blank=True, null=True, db_comment='Forma farmaceutica medicamento')
-    registro_invima = models.CharField(unique=True, max_length=100, db_comment='Registro INVIMA del medicamento')
+    principio_activo = models.CharField(max_length=500, blank=True, null=True, db_comment='Principio activo medicamento')
+    concentracion = models.CharField(max_length=350, blank=True, null=True, db_comment='Concentracion medicamento')
+    forma_farmaceutica = models.CharField(max_length=350, blank=True, null=True, db_comment='Forma farmaceutica medicamento')
+    registro_invima = models.CharField(unique=True, max_length=500, db_comment='Registro INVIMA del medicamento')
     
     class Meta:
         managed = True
@@ -258,12 +260,10 @@ class Medicamentos(models.Model):
 
 class Servicios(models.Model):
     id_servicio = models.AutoField(primary_key=True, db_comment='ID autoincremental del servicio')
-    nombre_servicio = models.CharField(max_length=200, db_comment='Nombre del servicio medico')
-    descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion detallada del servicio medico')
-    tipo_servicio = models.CharField(max_length=21, db_comment='Categoria: imagenologia, laboratorio, etc')
+    codigo_servicio = models.IntegerField(default=0, db_comment='Codigo unico del servicio medico')
+    nombre_servicio = models.CharField(max_length=500, db_comment='Nombre del servicio medico')
+    tipo_servicio = models.CharField(max_length=550, db_comment='Categoria: imagenologia, laboratorio, etc')
     id_especialidad = models.ForeignKey('Especialidades', models.DO_NOTHING, db_column='id_especialidad', blank=True, null=True, db_comment='Especialidad requerida (opcional)')
-    estado = models.CharField(max_length=10, blank=True, null=True, db_comment='Esta activo, inactivo, etc')
-    fecha_registro = models.DateTimeField(blank=True, null=True, db_comment='Fecha de creacion')
 
     class Meta:
         managed = True
@@ -275,11 +275,11 @@ class Servicios(models.Model):
 
 class Enfermedades(models.Model):
     id_enfermedad = models.AutoField(primary_key=True, db_comment='ID autoincremental')
-    codigo_cie10 = models.CharField(unique=True, max_length=100, db_comment='Codigo CIE-10 para clasificar diagnosticos, sintomas')
+    codigo_cie10 = models.CharField(max_length=300, unique=True, db_comment='Codigo CIE-10 para clasificar diagnosticos, sintomas')
     nombre_enfermedad = models.CharField(max_length=300, db_comment='Nombre de la enfermedad')
     descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion clinica de la enfermedad')
-    categoria_grupom = models.CharField(max_length=100, blank=True, null=True, db_comment='refiere al grupo de mortalidad CIE10')
-    grupo_mortalidad = models.CharField(max_length=150, blank=True, null=True, db_comment='de acuerdo con la CIE-10 ')
+    categoria_grupom = models.CharField(max_length=300, blank=True, null=True, db_comment='refiere al grupo de mortalidad CIE10')
+    grupo_mortalidad = models.CharField(max_length=250, blank=True, null=True, db_comment='de acuerdo con la CIE-10 ')
 
     class Meta:
         managed = True
