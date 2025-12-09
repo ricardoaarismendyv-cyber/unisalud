@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from login.decorators import role_required
 from django.contrib import messages
+from django.http import JsonResponse
 from usuario.models import TipoIdentificacion, Genero, Pacientes, Usuarios, Roles, ProfesionalSalud, CentrosMedicos, Especialidades, EstadoCivil, GrupoRh, EstratoSocioeconomico, Eps, TiposAfiliacion, Afiliacion, Medicamentos  # Importar modelos necesarios
 from django.contrib.auth.hashers import make_password # Para encriptar la contraseña
 from datetime import datetime
@@ -15,6 +16,7 @@ def login_admin(request):
 def inicio_admin(request):
     return render(request, 'paginas/inicio_admin.html')
 
+@role_required(allowed_roles=ALLOWED_ADMIN_ROLES)
 def gestion_admin(request):
     # 1. Consultar la base de datos para obtener los datos necesarios
     tipos_id = TipoIdentificacion.objects.all()
@@ -72,6 +74,7 @@ def agregar_usuario(request):
                 nuevo_usuario_django = Usuarios(
                     nombre_usuario=nombre_usuario,
                     email=email,
+                    numero_documento=numero_documento, # <-- AÑADIDO: Guardar documento en Usuarios
                 )
                 nuevo_usuario_django.set_password(password) # Usar el método para encriptar
                 nuevo_usuario_django.save()
@@ -145,9 +148,56 @@ def eliminar_profesional(request):
     context = {'tipos_identificacion': tipos_id, 'generos': generos}
     return render(request, 'paginas/gestion_admin.html', context)
 
+
+@role_required(allowed_roles=ALLOWED_ADMIN_ROLES)
+def buscar_usuario_por_documento(request):
+    documento = request.GET.get('numero_documento')
+    if not documento:
+        return JsonResponse({'status': 'error', 'message': 'Debe proporcionar un número de documento.'}, status=400)
+
+    # 1. Verificar si ya existe como ProfesionalSalud
+    if ProfesionalSalud.objects.filter(numero_documento=documento).exists():
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Este usuario ya tiene un rol como profesional de la salud.'
+        }, status=409) # 409 Conflict
+
+    # 2. Buscar si existe como Usuario y si tiene perfil de Paciente
+    try:
+        # Buscamos primero en la tabla Usuarios
+        usuario = Usuarios.objects.get(numero_documento=documento)
+        
+        # Verificamos si tiene un perfil de paciente para autocompletar
+        try:
+            paciente = Pacientes.objects.select_related('id_tipo_identificacion', 'id_genero').get(usuario=usuario)
+            datos_paciente = {
+                'id_usuario': usuario.id_usuario,
+                'nombre1': paciente.nombre1,
+                'nombre2': paciente.nombre2 or '',
+                'apellido1': paciente.apellido1,
+                'apellido2': paciente.apellido2 or '',
+                'id_tipo_identificacion': paciente.id_tipo_identificacion.id_tipo_identificacion,
+                'numero_documento': paciente.numero_documento,
+                'id_genero': paciente.id_genero.id_genero,
+                'celular': paciente.celular or '',
+                'email': usuario.email,
+            }
+            return JsonResponse({'status': 'paciente_encontrado', 'data': datos_paciente})
+        except Pacientes.DoesNotExist:
+            # Si el usuario existe pero no es paciente (caso raro), lo tratamos como no encontrado para crear perfil
+            return JsonResponse({'status': 'no_encontrado', 'message': 'Usuario sin perfil de paciente. Puede crear uno nuevo.'})
+
+    except Usuarios.DoesNotExist:
+        # 3. Si no existe como paciente ni profesional, es un usuario nuevo
+        return JsonResponse({'status': 'no_encontrado', 'message': 'No se encontró usuario. Puede crear uno nuevo.'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
 def agregar_profesional(request):
     if request.method == 'POST':
         try:
+            id_usuario_existente = request.POST.get('id_usuario_existente')
             # --- Datos del Usuario ---
             nombre_usuario = request.POST.get('nombre_usuario_prof')
             email = request.POST.get('email_prof')
@@ -167,28 +217,38 @@ def agregar_profesional(request):
             especialidad_id = request.POST.get('especialidad_prof')
             centro_medico_id = request.POST.get('centro_medico_prof')
 
-            # --- Validaciones ---
-            if Usuarios.objects.filter(nombre_usuario=nombre_usuario).exists():
-                messages.error(request, f'El nombre de usuario "{nombre_usuario}" ya está en uso.')
-                return redirect('gestion_admin')
-            
-            if Usuarios.objects.filter(email=email).exists():
-                messages.error(request, f'El correo electrónico "{email}" ya está registrado.')
-                return redirect('gestion_admin')
-
             if ProfesionalSalud.objects.filter(numero_documento=numero_documento, id_tipo_identificacion=tipo_documento_id).exists():
                 messages.error(request, f'Ya existe un profesional registrado con el documento {numero_documento}.')
                 return redirect('gestion_admin')
 
-            # 1. Crear el usuario de Django (Usuarios)
-            nuevo_usuario = Usuarios(
-                nombre_usuario=nombre_usuario,
-                email=email,
-            )
-            nuevo_usuario.set_password(password)
-            nuevo_usuario.save()
+            if id_usuario_existente:
+                # --- LÓGICA PARA ACTUALIZAR PACIENTE A PROFESIONAL ---
+                usuario_a_actualizar = Usuarios.objects.get(id_usuario=id_usuario_existente)
+                # No se cambian usuario, email ni contraseña. Solo se añade el rol.
+                
+            else:
+                # --- LÓGICA PARA CREAR NUEVO USUARIO Y PROFESIONAL ---
+                # Validaciones para nuevo usuario
+                if Usuarios.objects.filter(nombre_usuario=nombre_usuario).exists():
+                    messages.error(request, f'El nombre de usuario "{nombre_usuario}" ya está en uso.')
+                    return redirect('gestion_admin')
+                
+                if Usuarios.objects.filter(email=email).exists():
+                    messages.error(request, f'El correo electrónico "{email}" ya está registrado.')
+                    return redirect('gestion_admin')
 
-            # 2. Asignar el rol correspondiente
+                # 1. Crear el usuario de Django (Usuarios)
+                nuevo_usuario = Usuarios(
+                    nombre_usuario=nombre_usuario,
+                    email=email,
+                    numero_documento=numero_documento, # <-- AÑADIDO: Guardar documento en Usuarios
+                )
+                nuevo_usuario.set_password(password)
+                nuevo_usuario.save()
+                usuario_a_actualizar = nuevo_usuario
+
+            # Asignar el rol correspondiente (común para ambos casos)
+            nuevo_usuario = usuario_a_actualizar
             rol_profesional = Roles.objects.get(nombre_rol=rol_nombre)
             nuevo_usuario.roles.add(rol_profesional)
 

@@ -42,9 +42,11 @@
                         {% endif %}
 
                         <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#agregarUsuario" aria-expanded="false" aria-controls="agregarUsuario">Agregar usuario</button>
-                        <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#eliminarProf" aria-expanded="false" aria-controls="eliminarProf">Eliminar profesional de salud</button>
                         <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#modificarUsuario" aria-expanded="false" aria-controls="modificarUsuario">Modificar información de usuario</button>
                         <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#agregarProf" aria-expanded="false" aria-controls="agregarProf">Añadir nuevo profesional de salud</button>
+                        <button class="btn btn-main" data-bs-toggle="collapse" data-bs-target="#eliminarProf" aria-expanded="false" aria-controls="eliminarProf">Eliminar profesional de salud</button>
+
+
                         <div class="collapse mt-3" id="agregarUsuario">
                             <div class="card card-body div-main p-4">
                                 <form id="formAgregarUsuario" method="POST" action="{% url 'agregar_usuario' %}">
@@ -173,6 +175,124 @@
                                 </form>
                             </div>
                         </div>
+                        <div class="collapse mt-3" id="agregarProf">
+                            <div class="card card-body div-main p-4">
+                                <h5>Agregar Nuevo Profesional de la Salud</h5>
+                                <p>Busque el documento para verificar si el usuario ya existe. Si no, complete el formulario para crearlo.</p>
+                                
+                                <!-- Sección de Búsqueda -->
+                                <div id="seccionBusquedaProfesional" class="mb-3">
+                                    <div class="input-group">
+                                        <input type="search" id="documento_a_buscar" class="form-control" placeholder="Número de documento del usuario a buscar/crear">
+                                        <button class="btn btn-primary" type="button" id="btn-buscar-profesional">Buscar</button>
+                                    </div>
+                                    <div id="mensaje-busqueda" class="mt-2"></div>
+                                </div>
+
+                                <form id="formAgregarProfesional" method="POST" action="{% url 'agregar_profesional' %}" class="d-none">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="id_usuario_existente" id="id_usuario_existente">
+                                    <!-- Campos de Datos Personales -->
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="primerNombre_prof" class="form-label">Primer Nombre <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="primerNombre_prof" name="primerNombre_prof" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="segundoNombre_prof" class="form-label">Segundo Nombre</label>
+                                            <input type="text" class="form-control" id="segundoNombre_prof" name="segundoNombre_prof">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="primerApellido_prof" class="form-label">Primer Apellido <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="primerApellido_prof" name="primerApellido_prof" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="segundoApellido_prof" class="form-label">Segundo Apellido</label>
+                                            <input type="text" class="form-control" id="segundoApellido_prof" name="segundoApellido_prof">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="tipoDocumento_prof" class="form-label">Tipo de Documento <span style="color:red">*</span></label>
+                                            <select id="tipoDocumento_prof" name="tipoDocumento_prof" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                {% for tipo in tipos_identificacion %}
+                                                <option value="{{ tipo.id_tipo_identificacion }}">{{ tipo.nombre_identificacion }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="numeroDocumento_prof" class="form-label">Número de Documento <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="numeroDocumento_prof" name="numeroDocumento_prof" required>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="genero_prof" class="form-label">Género <span style="color:red">*</span></label>
+                                            <select id="genero_prof" name="genero_prof" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar...</option>
+                                                {% for g in generos %}
+                                                <option value="{{ g.id_genero }}">{{ g.nombre_genero }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="celular_prof" class="form-label">Número de Celular <span style="color:red">*</span></label>
+                                            <input type="tel" class="form-control" id="celular_prof" name="celular_prof" required>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campos de Credenciales de Usuario (se ocultan si el usuario existe) -->
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3" id="campo_nombre_usuario_prof">
+                                            <label for="nombre_usuario_prof" class="form-label">Nombre de Usuario <span style="color:red">*</span></label>
+                                            <input type="text" class="form-control" id="nombre_usuario_prof" name="nombre_usuario_prof" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3" id="campo_email_prof">
+                                            <label for="email_prof" class="form-label">Correo Electrónico <span style="color:red">*</span></label>
+                                            <input type="email" class="form-control" id="email_prof" name="email_prof" required>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3" id="campo_password_prof">
+                                            <label for="password_prof" class="form-label">Contraseña <span style="color:red">*</span></label>
+                                            <input type="password" class="form-control" id="password_prof" name="password_prof" required>
+                                        </div>
+                                        
+                                    </div>
+
+                                    <!-- Campos Específicos del Profesional -->
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="registro_profesional" class=" form-label">Registro Profesional (RETHUS)</label>
+                                            <input type="text" class="form-control" id="registro_profesional" name="registro_profesional">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="especialidad_prof" class="form-label">Especialidad</label>
+                                            <select id="especialidad_prof" name="especialidad_prof" class="form-select">
+                                                <option value="" selected>Ninguna</option>
+                                                {% for esp in especialidades %}
+                                                <option value="{{ esp.id_especialidad }}">{{ esp.nombre_especialidad }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="centro_medico_prof" class="form-label">Centro Médico <span style="color:red">*</span></label>
+                                            <select name="centro_medico_prof" id="centro_medico_prof" class="form-select" required>
+                                                <option value="" selected disabled>Seleccionar centro médico...</option>
+                                                {% for centro in centros_medicos %}
+                                                <option value="{{ centro.id_centro_medico }}">{{ centro.nombre_centro }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-success mt-2">Registrar profesional</button>
+                                </form>
+                            </div>
+                        </div>
                         <div class="collapse mt-3" id="eliminarProf">
                             <div class="card card-body div-main p-4">
                                 <form id="formEliminarProf" method="POST" action="{% url 'eliminar_profesional' %}">
@@ -242,126 +362,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="collapse mt-3" id="agregarProf">
-                            <div class="card card-body div-main p-4">
-                                <form id="formAgregarProfesional" method="POST" action="{% url 'agregar_profesional' %}">
-                                    {% csrf_token %}
-                                    <h5>Agregar Nuevo Profesional de la Salud</h5>
-                                    <p>Busque el documento para verificar si el profesional ya existe. Si no, complete el formulario para crearlo.</p>
-                                    
-                                    <!-- Campos de Datos Personales -->
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="primerNombre_prof" class="form-label">Primer Nombre <span style="color:red">*</span></label>
-                                            <input type="text" class="form-control" id="primerNombre_prof" name="primerNombre_prof" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="segundoNombre_prof" class="form-label">Segundo Nombre</label>
-                                            <input type="text" class="form-control" id="segundoNombre_prof" name="segundoNombre_prof">
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="primerApellido_prof" class="form-label">Primer Apellido <span style="color:red">*</span></label>
-                                            <input type="text" class="form-control" id="primerApellido_prof" name="primerApellido_prof" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="segundoApellido_prof" class="form-label">Segundo Apellido</label>
-                                            <input type="text" class="form-control" id="segundoApellido_prof" name="segundoApellido_prof">
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="tipoDocumento_prof" class="form-label">Tipo de Documento <span style="color:red">*</span></label>
-                                            <select id="tipoDocumento_prof" name="tipoDocumento_prof" class="form-select" required>
-                                                <option value="" selected disabled>Seleccionar...</option>
-                                                {% for tipo in tipos_identificacion %}
-                                                <option value="{{ tipo.id_tipo_identificacion }}">{{ tipo.nombre_identificacion }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="numeroDocumento_prof" class="form-label">Número de Documento <span style="color:red">*</span></label>
-                                            <input type="text" class="form-control" id="numeroDocumento_prof" name="numeroDocumento_prof" placeholder="Buscar o ingresar documento" required>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="genero_prof" class="form-label">Género <span style="color:red">*</span></label>
-                                            <select id="genero_prof" name="genero_prof" class="form-select" required>
-                                                <option value="" selected disabled>Seleccionar...</option>
-                                                {% for g in generos %}
-                                                <option value="{{ g.id_genero }}">{{ g.nombre_genero }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="celular_prof" class="form-label">Número de Celular <span style="color:red">*</span></label>
-                                            <input type="tel" class="form-control" id="celular_prof" name="celular_prof" required>
-                                        </div>
-                                    </div>
-
-                                    <!-- Campos de Credenciales de Usuario -->
-                                    <hr>
-                                    <h5>Credenciales del Sistema</h5>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="nombre_usuario_prof" class="form-label">Nombre de Usuario <span style="color:red">*</span></label>
-                                            <input type="text" class="form-control" id="nombre_usuario_prof" name="nombre_usuario_prof" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="email_prof" class="form-label">Correo Electrónico <span style="color:red">*</span></label>
-                                            <input type="email" class="form-control" id="email_prof" name="email_prof" required>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="password_prof" class="form-label">Contraseña <span style="color:red">*</span></label>
-                                            <input type="password" class="form-control" id="password_prof" name="password_prof" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="rol_prof" class="form-label">Rol del Profesional <span style="color:red">*</span></label>
-                                            <select id="rol_prof" name="rol_prof" class="form-select" required>
-                                                <option value="" selected disabled>Seleccionar...</option>
-                                                <option value="profesional_salud">Profesional de Salud</option>
-                                                <option value="recepcionista">Recepcionista</option>
-                                                <option value="laboratorista">Laboratorista</option>
-                                                <option value="admin_centro_medico">Admin. Centro Médico</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <!-- Campos Específicos del Profesional -->
-                                    <hr>
-                                    <h5>Información Profesional</h5>
-                                    <div class="row">
-                                        <div class="col-md-4 mb-3">
-                                            <label for="registro_profesional" class="form-label">Registro Profesional (RETHUS)</label>
-                                            <input type="text" class="form-control" id="registro_profesional" name="registro_profesional">
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label for="especialidad_prof" class="form-label">Especialidad</label>
-                                            <select id="especialidad_prof" name="especialidad_prof" class="form-select">
-                                                <option value="" selected>Ninguna</option>
-                                                {% for esp in especialidades %}
-                                                <option value="{{ esp.id_especialidad }}">{{ esp.nombre_especialidad }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label for="centro_medico_prof" class="form-label">Centro Médico <span style="color:red">*</span></label>
-                                            <select name="centro_medico_prof" id="centro_medico_prof" class="form-select" required>
-                                                <option value="" selected disabled>Seleccionar centro médico...</option>
-                                                {% for centro in centros_medicos %}
-                                                <option value="{{ centro.id_centro_medico }}">{{ centro.nombre_centro }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <button type="submit" class="btn btn-success mt-2">Registrar profesional</button>
-                                </form>
-                            </div>
-                        </div>
+                        
                         <div class="mt-4">
                             <h4>Registro de actividad</h4>
                             <ul class="list-group">
@@ -407,6 +408,96 @@
 {% block script %}
 {{ block.super }} {# Asegura que cualquier script de la plantilla base se mantenga #}
 <script>
-    // La función mostrarExito ya no es necesaria con el sistema de mensajes de Django
+document.addEventListener('DOMContentLoaded', function() {
+    const btnBuscar = document.getElementById('btn-buscar-profesional');
+    const formProfesional = document.getElementById('formAgregarProfesional');
+    const mensajeBusqueda = document.getElementById('mensaje-busqueda');
+    const personalDataFields = [
+        'primerNombre_prof', 'segundoNombre_prof', 'primerApellido_prof', 'segundoApellido_prof',
+        'tipoDocumento_prof', 'numeroDocumento_prof', 'genero_prof', 'celular_prof'
+    ];
+
+
+    btnBuscar.addEventListener('click', function() {
+        const numeroDocumento = document.getElementById('documento_a_buscar').value;
+        if (!numeroDocumento) {
+            mensajeBusqueda.className = 'alert alert-warning';
+            mensajeBusqueda.textContent = 'Por favor, ingrese un número de documento.';
+            return;
+        }
+
+        // Limpiar estado anterior
+        mensajeBusqueda.textContent = '';
+        mensajeBusqueda.className = '';
+        formProfesional.reset();
+        formProfesional.classList.add('d-none');
+        // Asegurarse de que los campos no sean de solo lectura al iniciar una nueva búsqueda
+        personalDataFields.forEach(id => {
+            document.getElementById(id).readOnly = false;
+        });
+
+        fetch(`/administrativo/gestion/buscar_usuario/?numero_documento=${numeroDocumento}`)
+            .then(response => {
+                if (response.status === 409) { // Conflicto: ya es profesional
+                    return response.json().then(data => {
+                        throw new Error(data.message);
+                    });
+                }
+                if (!response.ok) {
+                    throw new Error('Error en la red o en el servidor.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                formProfesional.classList.remove('d-none'); // Mostrar el formulario
+
+                // Campos de credenciales
+                const camposCredenciales = ['campo_nombre_usuario_prof', 'campo_email_prof', 'campo_password_prof'];
+
+                if (data.status === 'paciente_encontrado') {
+                    mensajeBusqueda.className = 'alert alert-info';
+                    mensajeBusqueda.textContent = 'Paciente encontrado. Complete la información profesional para añadir el nuevo rol.';
+                    
+                    // Rellenar formulario
+                    const paciente = data.data;
+                    document.getElementById('id_usuario_existente').value = paciente.id_usuario;
+                    document.getElementById('primerNombre_prof').value = paciente.nombre1;
+                    document.getElementById('segundoNombre_prof').value = paciente.nombre2;
+                    document.getElementById('primerApellido_prof').value = paciente.apellido1;
+                    document.getElementById('segundoApellido_prof').value = paciente.apellido2;
+                    document.getElementById('tipoDocumento_prof').value = paciente.id_tipo_identificacion;
+                    document.getElementById('numeroDocumento_prof').value = paciente.numero_documento;
+                    document.getElementById('genero_prof').value = paciente.id_genero;
+                    document.getElementById('celular_prof').value = paciente.celular;
+
+                    // Hacer los campos de solo lectura
+                    personalDataFields.forEach(id => {
+                        document.getElementById(id).readOnly = true;
+                    });
+                    
+                    // Ocultar y deshabilitar campos de credenciales
+                    camposCredenciales.forEach(id => document.getElementById(id).classList.add('d-none'));
+                    document.getElementById('nombre_usuario_prof').required = false;
+                    document.getElementById('email_prof').required = false;
+                    document.getElementById('password_prof').required = false;
+
+                } else if (data.status === 'no_encontrado') {
+                    mensajeBusqueda.className = 'alert alert-success';
+                    mensajeBusqueda.textContent = 'Usuario no encontrado. Puede crearlo completando el siguiente formulario.';
+                    document.getElementById('numeroDocumento_prof').value = numeroDocumento; // Pre-rellenar documento
+                    
+                    // Mostrar y requerir campos de credenciales
+                    camposCredenciales.forEach(id => document.getElementById(id).classList.remove('d-none'));
+                    document.getElementById('nombre_usuario_prof').required = true;
+                    document.getElementById('email_prof').required = true;
+                    document.getElementById('password_prof').required = true;
+                }
+            })
+            .catch(error => {
+                mensajeBusqueda.className = 'alert alert-danger';
+                mensajeBusqueda.textContent = error.message;
+            });
+    });
+});
 </script>
 {% endblock script %}
