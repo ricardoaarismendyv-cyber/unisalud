@@ -1,18 +1,17 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, DiagnosticoPaciente, AntecedentesPaciente, Enfermedades, OrdenMedica, Servicios, Consulta
+from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, DiagnosticoPaciente, AntecedentesPaciente, Enfermedades, Consulta, OrdenMedica, Servicios, EstadoOrden, TipoOrden
 from login.decorators import role_required
-from .forms import ConsultaForm, DiagnosticoFormSet, AntecedenteFormSet, OrdenMedicaForm
+from .forms import ConsultaForm, DiagnosticoFormSet, AntecedenteFormSet, OrdenMedicaForm, serviciosFormSet, OrdenMedicamentoForm
 from django.utils import timezone
 import json
 from django.http import HttpResponse
 from django.template.loader import get_template #obtener o descargar una plantilla de diseño web
 from xhtml2pdf import pisa #conversión real que realiza el trabajo de transformar el contenido HTML y CSS en el formato PDF.
 from io import BytesIO #generar un archivo (como un PDF o una imagen) y enviarlo inmediatamente a un usuario a través de una API web, sin tocar el sistema de archivos del servidor.
-
+from django.core.serializers.json import DjangoJSONEncoder
 
 ALLOWED_PROF_ROLES = ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']
-
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def inicio_prof_salud(request):
@@ -118,7 +117,7 @@ def diligenciar_hc(request):
                 nueva_consulta.fecha_programada = timezone.now() # O la fecha de la cita real
                 nueva_consulta.fecha_atencion = timezone.now()
                 nueva_consulta.estado = 'Atendido'
-                paciente_obj = consulta_form.cleaned_data['paciente']
+                paciente_obj = nueva_consulta.id_paciente # El paciente ya está asignado al guardar el form
                 nueva_consulta.id_paciente = paciente_obj
                 nueva_consulta.save()
 
@@ -130,7 +129,8 @@ def diligenciar_hc(request):
                         DiagnosticoPaciente.objects.create(
                             id_consulta=nueva_consulta,
                             id_enfermedad=enfermedad_obj,
-                            tipo_diagnostico=form.cleaned_data['tipo_diagnostico'],
+                            # Usamos .get() para evitar un KeyError si el campo está vacío
+                            tipo_diagnostico=form.cleaned_data.get('tipo_diagnostico'),
                             notas=form.cleaned_data.get('notas', ''),
                             fecha_registro=timezone.now()
                         )
@@ -168,7 +168,6 @@ def diligenciar_hc(request):
         'enfermedades_json': enfermedades_json
     })
 
-
 def render_to_pdf(template_src, context_dict={}):
     """
     Función auxiliar para renderizar una plantilla HTML a un objeto PDF.
@@ -194,7 +193,6 @@ def ver_hc_pdf(request, consulta_id):
     except Consulta.DoesNotExist:
         messages.error(request, 'La consulta solicitada no existe.')
         return redirect('hc_prof_salud')
-
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def generar_hc_pdf(request, consulta_id):
@@ -227,43 +225,164 @@ def generar_hc_pdf(request, consulta_id):
         messages.error(request, 'La consulta solicitada no existe.')
         return redirect('hc_prof_salud')
 
-
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
-def diligenciar_orden_medica(request):
-    """
-    Vista para que el profesional de la salud diligencie una nueva orden médica.
-    """
-    try:
-        profesional_id = request.session.get('id_profesional')
-        profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
-    except ProfesionalSalud.DoesNotExist:
-        messages.error(request, 'Error: Su perfil de profesional de salud no está configurado. Por favor, inicie sesión de nuevo.')
+def diligenciar_omedica(request):
+    profesional_id = request.session.get('id_profesional')
+    if not profesional_id:
+        messages.error(request, 'No se pudo identificar al profesional. Por favor, inicie sesión de nuevo.')
         return redirect('login')
 
+    profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
+
     if request.method == 'POST':
-        form = OrdenMedicaForm(request.POST)
+        orden_medica_form = OrdenMedicaForm(request.POST)
+        servicios_formset = serviciosFormSet(request.POST, prefix='servicios')
+
+        if orden_medica_form.is_valid() and servicios_formset.is_valid():
+            try:
+                nueva_orden_medica = orden_medica_form.save(commit=False)
+                # Obtenemos los datos comunes del formulario principal, pero no lo guardamos aún.
+                orden_base = orden_medica_form.cleaned_data
+                estado_pendiente = EstadoOrden.objects.get(nombre_estado_orden='Pendiente')
+                
+                # Asignar los datos que no vienen del formulario
+                nueva_orden_medica.id_profesional = profesional
+                nueva_orden_medica.id_centro_medico = profesional.id_centro_medico
+                nueva_orden_medica.fecha_emision = timezone.now()
+                estado_pendiente = EstadoOrden.objects.get(nombre_estado_orden='Pendiente')
+                nueva_orden_medica.id_estado_orden = estado_pendiente
+                nueva_orden_medica.save()
+                orden_creada_id = None # Variable para guardar el ID de la última orden creada
+
+                # Guardar los servicios del formset
+                for form in servicios_formset:
+                    if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                        servicios_obj = form.cleaned_data.get('id_servicio')
+                        # Creamos una nueva instancia de OrdenMedica para cada servicio
+                        OrdenMedica.objects.create(
+                            id_paciente=nueva_orden_medica.id_paciente,)
+                        # Si no hay servicio, no creamos la orden
+                        if not servicios_obj:
+                            continue
+                    
+
+                        nueva_orden = OrdenMedica.objects.create(
+                            id_paciente=orden_base.get('id_paciente'),
+                            id_profesional=profesional,
+                            id_centro_medico=profesional.id_centro_medico,
+                            id_tipo_orden=nueva_orden_medica.id_tipo_orden,
+                            id_servicio=servicios_obj,
+                            indicaciones=form.cleaned_data.get('indicaciones', ''),
+                            id_estado_orden=estado_pendiente,
+                            fecha_emision=timezone.now(), 
+                        )
+                        orden_creada_id = nueva_orden.id_orden # Actualizamos el ID con la última orden
+
+                messages.success(request, f'Orden Médica para el paciente {nueva_orden_medica.id_paciente} guardada con éxito.')                
+                # Redirigir a la nueva vista para ver el PDF de la orden médica
+                return redirect('ver_omedica_pdf', orden_id=nueva_orden_medica.id_orden)
+                if orden_creada_id:
+                    messages.success(request, f'Orden(es) Médica(s) para el paciente {orden_base.get("id_paciente")} guardada(s) con éxito.')
+                    # Redirigir a la vista PDF de la última orden creada
+                    return redirect('ver_omedica_pdf', orden_id=orden_creada_id)
+                else:
+                    messages.warning(request, 'No se añadió ningún servicio, por lo que no se guardó ninguna orden.')
+                    return redirect('diligenciar_omedica')
+
+            except Exception as e:
+                messages.error(request, f'Ocurrió un error al guardar la orden médica: {e}')
+    else:
+        orden_medica_form = OrdenMedicaForm()
+        servicios_formset = serviciosFormSet(prefix='servicios')
+
+    # Preparar datos de enfermedades para JavaScript
+    servicios_data = {
+        e.id_servicio: {
+            'codigo_servicio': e.codigo_servicio,
+            'nombre_servicio': e.nombre_servicio,
+            'tipo_servicio': e.tipo_servicio
+        } for e in Servicios.objects.all()
+    }
+    servicios_json = json.dumps(servicios_data)
+
+    return render(request, 'paginas/diligenciar_omedica.html', {
+        'form': orden_medica_form, 
+        'servicios_formset': servicios_formset,
+        'servicios_json': servicios_json
+    })
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+def ver_omedica_pdf(request, orden_id):
+    """
+    Muestra una página con el PDF de la Orden Médica incrustado y opciones para descargar o volver.
+    """
+    try:
+        # Verificamos que la orden exista para evitar errores
+        orden = OrdenMedica.objects.get(id_orden=orden_id)
+        return render(request, 'paginas/ver_omedica_pdf.html', {'orden': orden})
+    except OrdenMedica.DoesNotExist:
+        messages.error(request, 'La orden médica solicitada no existe.')
+        return redirect('om_prof_salud')
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+def generar_omedica_pdf(request, orden_id):
+    """
+    Genera un PDF para una orden médica específica.
+    """
+    try:
+        orden = OrdenMedica.objects.get(id_orden=orden_id)
+        # Asumiendo que los servicios están en otras órdenes con el mismo tipo y paciente,
+        # sería mejor buscar las órdenes relacionadas si se crearon por separado.
+        # Por ahora, nos centraremos en la orden principal.
+
+        context = {
+            'orden': orden,
+        }
+        pdf = render_to_pdf('pdf/omedica_pdf_template.html', context)
+
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = f'inline; filename="orden_medica_{orden.id_orden}.pdf"'
+            return response
+        
+        messages.error(request, 'No se pudo generar el PDF de la orden médica.')
+        return redirect('om_prof_salud')
+
+    except OrdenMedica.DoesNotExist:
+        messages.error(request, 'La orden médica solicitada no existe.')
+        return redirect('om_prof_salud')
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+def diligenciar_omedicamentos(request):
+    profesional_id = request.session.get('id_profesional')
+    if not profesional_id:
+        messages.error(request, 'No se pudo identificar al profesional. Por favor, inicie sesión de nuevo.')
+        return redirect('login')
+
+    profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
+
+    if request.method == 'POST':
+        form = OrdenMedicamentoForm(request.POST)
         if form.is_valid():
             try:
-                orden = form.save(commit=False)  # No guardamos en la BD todavía
-                orden.id_profesional = profesional
-                orden.id_centro_medico = profesional.id_centro_medico
-                orden.fecha_emision = timezone.now()
+                nueva_orden = form.save(commit=False)
                 
-                orden.save() # Guardamos la instancia completa en la base de datos
-                
-                messages.success(request, '¡Orden médica creada con éxito!')
-                return redirect('om_prof_salud')  # Redirigimos a la página principal de órdenes
+                # Asignar los datos que no vienen del formulario
+                nueva_orden.id_profesional = profesional
+                nueva_orden.id_centro_medico = profesional.id_centro_medico
+                nueva_orden.fecha_emision = timezone.now()
+                # Asignar un estado inicial y tipo de orden
+                # nueva_orden.id_estado_orden_id = EstadoOrden.objects.get(nombre_estado_orden='Pendiente').id_estado_orden
+                # nueva_orden.id_tipo_orden_id = TipoOrden.objects.get(nombre_tipo='Medicamentos').id_tipo_orden
+                nueva_orden.save()
+
+                messages.success(request, f'Orden de Medicamentos para el paciente {nueva_orden.id_paciente} guardada con éxito.')
+                return redirect('omed_prof_salud') # Redirigir a la lista de órdenes de medicamentos
             except Exception as e:
-                messages.error(request, f'Ocurrió un error inesperado al guardar la orden: {e}')
-        else:
-            messages.error(request, 'Por favor, corrija los errores en el formulario.')
+                messages.error(request, f'Ocurrió un error al guardar la orden: {e}')
     else:
-        form = OrdenMedicaForm()
+        form = OrdenMedicamentoForm()
 
-    # Obtenemos todos los servicios para pasarlos a la plantilla
-    servicios = Servicios.objects.all()
-
-    return render(request, 'paginas/diligenciar_orden_medica.html', {
-        'form': form,
-        'servicios': servicios,
+    return render(request, 'paginas/diligenciar_omedicamentos.html', {
+        'form': form
     })
