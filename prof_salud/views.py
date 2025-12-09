@@ -78,7 +78,7 @@ def consultas_pacientes(request):
 
     # ORGANIZAR DATOS PARA EL TEMPLATE COMO EL TEMPLATE LOS ESPERA
     profesionales = [{
-        "consultorio": profesional.id_centro_medico.id_centro_medico,   # O tu campo de consultorio real
+        "consultorio": profesional.id_centro_medico,   # O tu campo de consultorio real
         "turnos": turnos
     }]
 
