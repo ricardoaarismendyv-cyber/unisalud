@@ -1,0 +1,290 @@
+{% extends "plantilla_ps.html" %}
+{% load static %}
+{% block title %}Diligenciar Historia Clínica{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock estilo %}
+
+{% block content %}
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <div class="col-lg-10 col-md-10">
+                <a class="btn btn-main btn-nav" href='{% url "hc_prof_salud" %}'>Volver</a>
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Diligenciar Historia Clínica</h1>
+                    <p>Complete todos los campos para registrar la consulta del paciente.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {{ form.as_p }} 
+
+                        <hr>
+                        <h3>Diagnósticos del Paciente</h3>
+                        
+                        {{ diagnostico_formset.management_form }}
+
+                        <div id="diagnosticos-container">
+                            {% for form in diagnostico_formset %}
+                                <div class="diagnostico-form border p-3 mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h4 class="form-title mb-0">Diagnóstico #{{ forloop.counter }}</h4>
+                                    </div>
+                                    {{ form.id_enfermedad }} {# Campo oculto #}
+                                    <p>{{ form.codigo_cie10_select.label_tag }} {{ form.codigo_cie10_select }}</p>
+                                    <p>{{ form.nombre_enfermedad_select.label_tag }} {{ form.nombre_enfermedad_select }}</p>
+                                    <p>{{ form.tipo_diagnostico.label_tag }} {{ form.tipo_diagnostico }}</p>
+                                    <p>{{ form.categoria_grupom.label_tag }} {{ form.categoria_grupom }}</p>
+                                    <p>{{ form.grupo_mortalidad.label_tag }} {{ form.grupo_mortalidad }}</p>
+                                    <p>{{ form.notas.label_tag }} {{ form.notas }}</p>
+                                    <div style="display: none;">{{ form.DELETE }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div id="empty-form-template" style="display: none;">
+                            <div class="diagnostico-form border p-3 mb-3">
+                                <h5 class="form-title">Diagnóstico #__prefix__</h5>
+                                {{ diagnostico_formset.empty_form.id_enfermedad }}
+                                <p>{{ diagnostico_formset.empty_form.codigo_cie10_select.label_tag }} {{ diagnostico_formset.empty_form.codigo_cie10_select }}</p>
+                                <p>{{ diagnostico_formset.empty_form.nombre_enfermedad_select.label_tag }} {{ diagnostico_formset.empty_form.nombre_enfermedad_select }}</p>
+                                <p>{{ diagnostico_formset.empty_form.tipo_diagnostico.label_tag }} {{ diagnostico_formset.empty_form.tipo_diagnostico }}</p>
+                                <p>{{ diagnostico_formset.empty_form.categoria_grupom.label_tag }} {{ diagnostico_formset.empty_form.categoria_grupom }}</p>
+                                <p>{{ diagnostico_formset.empty_form.grupo_mortalidad.label_tag }} {{ diagnostico_formset.empty_form.grupo_mortalidad }}</p>
+                                <p>{{ diagnostico_formset.empty_form.notas.label_tag }} {{ diagnostico_formset.empty_form.notas }}</p>
+                                <div style="display: none;">{{ diagnostico_formset.empty_form.DELETE }}</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-2">
+                            <button type="button" id="add-diagnostico-btn" class="btn btn-secondary">Añadir Otro Diagnóstico</button>
+                            <button type="button" id="remove-diagnostico-btn" class="btn btn-outline-danger">Eliminar Último</button>
+                        </div>
+                        <hr>
+                        <h3>Antecedentes del Paciente</h3>
+
+                        {{ antecedente_formset.management_form }}
+
+                        <div id="antecedente-forms-container">
+                            {% for form in antecedente_formset %}
+                                <div class="antecedente-form border p-3 mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h4 class="form-title mb-0">Antecedente #{{ forloop.counter }}</h4>
+                                    </div>
+                                    {% for field in form %}
+                                        {% if field.name != 'DELETE' %}<p>{{ field.label_tag }} {{ field }}</p>{% endif %}
+                                    {% endfor %}
+                                    <div style="display: none;">{{ form.DELETE }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div id="empty-antecedente-form-template" style="display: none;">
+                            <div class="antecedente-form border p-3 mb-3">
+                                <h5 class="form-title">Antecedente #__prefix__</h5>
+                                {% for field in antecedente_formset.empty_form %}
+                                    {% if field.name != 'DELETE' %}<p>{{ field.label_tag }} {{ field }}</p>{% endif %}
+                                {% endfor %}
+                                <div style="display: none;">{{ antecedente_formset.empty_form.DELETE }}</div>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <button type="button" id="add-antecedente-btn" class="btn btn-secondary">Añadir Otro Antecedente</button>
+                            <button type="button" id="remove-antecedente-btn" class="btn btn-outline-danger">Eliminar Último</button>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mt-3">Guardar Historia Clínica</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block scripts %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Lógica para añadir formularios de Diagnóstico ---
+    const addDiagnosticoBtn = document.getElementById('add-diagnostico-btn');
+    const diagnosticosContainer = document.getElementById('diagnosticos-container');
+    const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
+    const totalFormsInput = document.querySelector('#id_diagnosticos-TOTAL_FORMS');
+
+    addDiagnosticoBtn.addEventListener('click', function() {
+        let formNum = parseInt(totalFormsInput.value);
+        let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formNum);
+        
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = newFormHtml;
+        
+        tempDiv.querySelector('.form-title').textContent = `Diagnóstico #${formNum + 1}`;
+        
+        // Añadir botón de eliminar al nuevo formulario
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'btn btn-danger btn-sm float-end delete-diagnostico-btn';
+        deleteBtn.textContent = 'Eliminar';
+        tempDiv.querySelector('.diagnostico-form').insertBefore(deleteBtn, tempDiv.querySelector('.diagnostico-form').firstChild.nextSibling);
+
+        diagnosticosContainer.append(tempDiv.firstElementChild);
+        totalFormsInput.value = formNum + 1;
+        
+        // Volver a inicializar los listeners para los botones de eliminar y los selects
+        inicializarListenersDiagnostico();
+    });
+
+    // --- Lógica para eliminar formularios de Diagnóstico ---
+    diagnosticosContainer.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('delete-diagnostico-btn')) {
+            const formToDelete = e.target.closest('.diagnostico-form');
+            formToDelete.style.display = 'none'; // Ocultar el formulario
+            formToDelete.querySelector('input[id$="-DELETE"]').checked = true; // Marcar para eliminar
+        }
+    });
+
+    // --- Lógica para eliminar el último formulario de Diagnóstico ---
+    const removeDiagnosticoBtn = document.getElementById('remove-diagnostico-btn');
+    removeDiagnosticoBtn.addEventListener('click', function() {
+        const allDiagnosticoForms = diagnosticosContainer.querySelectorAll('.diagnostico-form');
+        // Solo eliminamos si hay más de un formulario, para no borrar el único que hay
+        if (allDiagnosticoForms.length > 1) {
+            const lastForm = allDiagnosticoForms[allDiagnosticoForms.length - 1];
+            const deleteInput = lastForm.querySelector('input[id$="-DELETE"]');
+            if (deleteInput && deleteInput.checked) {
+                // Si ya está marcado para borrar (está oculto), no hacemos nada.
+            } else {
+                lastForm.remove(); // Elimina el elemento del DOM
+            }
+        }
+    });
+    // --- Lógica para añadir formularios de Antecedentes ---
+    const addAntecedenteBtn = document.getElementById('add-antecedente-btn');
+    const antecedenteFormsContainer = document.getElementById('antecedente-forms-container');
+    const emptyAntecedenteTemplate = document.getElementById('empty-antecedente-form-template').innerHTML;
+    const totalAntecedenteInput = document.querySelector('#id_antecedentes-TOTAL_FORMS');
+
+    addAntecedenteBtn.addEventListener('click', function() {
+        let formNum = parseInt(totalAntecedenteInput.value);
+        let newFormHtml = emptyAntecedenteTemplate.replace(/__prefix__/g, formNum);
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = newFormHtml;
+        tempDiv.querySelector('.form-title').textContent = `Antecedente #${formNum + 1}`;
+        
+        // Crear la estructura de título y botón para el nuevo formulario de antecedente
+        const newTitleContainer = document.createElement('div');
+        newTitleContainer.className = 'd-flex justify-content-between align-items-center mb-3';
+
+        const newTitle = tempDiv.querySelector('.form-title');
+        newTitle.classList.add('mb-0');
+
+        const newDeleteBtn = document.createElement('button');
+        newDeleteBtn.type = 'button';
+        newDeleteBtn.className = 'btn btn-danger btn-sm delete-antecedente-btn';
+        newDeleteBtn.textContent = 'Eliminar';
+
+        newTitleContainer.append(newTitle, newDeleteBtn);
+        tempDiv.querySelector('.antecedente-form').prepend(newTitleContainer);
+
+        antecedenteFormsContainer.append(tempDiv.firstElementChild);
+        totalAntecedenteInput.value = formNum + 1;
+        
+        // Volver a inicializar los listeners para los botones de eliminar de antecedentes
+        inicializarListenersAntecedente();
+    });
+
+    // --- Lógica para eliminar formularios de Antecedentes ---
+    antecedenteFormsContainer.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('delete-antecedente-btn')) {
+            const formToDelete = e.target.closest('.antecedente-form');
+            formToDelete.style.display = 'none'; // Ocultar el formulario
+            formToDelete.querySelector('input[id$="-DELETE"]').checked = true; // Marcar para eliminar
+        }
+    });
+
+    // --- Lógica para eliminar el último formulario de Antecedente ---
+    const removeAntecedenteBtn = document.getElementById('remove-antecedente-btn');
+    removeAntecedenteBtn.addEventListener('click', function() {
+        const allAntecedenteForms = antecedenteFormsContainer.querySelectorAll('.antecedente-form');
+        let formNum = parseInt(totalAntecedenteInput.value);
+        // Solo eliminamos si hay más de un formulario
+        if (allAntecedenteForms.length > 1) {
+            const lastForm = allAntecedenteForms[allAntecedenteForms.length - 1];
+            lastForm.remove(); // Elimina el elemento del DOM
+            totalAntecedenteInput.value = formNum - 1; // Decrementa el contador
+        }
+    });
+
+
+    // --- Lógica para autocompletar campos de diagnóstico ---
+    // Obtenemos los datos de las enfermedades desde la vista de Django
+    const enfermedadesData = JSON.parse('{{ enfermedades_json|escapejs }}');
+
+    function actualizarCamposDiagnostico(selectElement) {
+        const formPrefixMatch = selectElement.id.match(/id_(diagnosticos-\d+)-/);
+        if (!formPrefixMatch) return;
+
+        const formPrefix = formPrefixMatch[1];
+        const selectedId = selectElement.value;
+
+        // Referencias a todos los campos del formulario
+        const hiddenIdInput = document.getElementById(`id_${formPrefix}-id_enfermedad`);
+        const codigoSelect = document.getElementById(`id_${formPrefix}-codigo_cie10_select`);
+        const nombreSelect = document.getElementById(`id_${formPrefix}-nombre_enfermedad_select`);
+        const categoriaInput = document.getElementById(`id_${formPrefix}-categoria_grupom`);
+        const grupoInput = document.getElementById(`id_${formPrefix}-grupo_mortalidad`);
+
+        // Sincronizar los dos selects
+        if (codigoSelect && nombreSelect) {
+            codigoSelect.value = selectedId;
+            nombreSelect.value = selectedId;
+        }
+
+        // Actualizar el campo oculto con el ID
+        if (hiddenIdInput) {
+            hiddenIdInput.value = selectedId;
+        }
+
+        // Rellenar los campos de solo lectura
+        if (selectedId && enfermedadesData[selectedId]) {
+            const enfermedad = enfermedadesData[selectedId];
+            if (categoriaInput) categoriaInput.value = enfermedad.categoria || '';
+            if (grupoInput) grupoInput.value = enfermedad.grupo || '';
+        } else {
+            // Limpiar si no se selecciona nada o no se encuentran datos
+            if (categoriaInput) categoriaInput.value = '';
+            if (grupoInput) grupoInput.value = '';
+        }
+    }
+
+    // Función para inicializar los listeners en los formularios de diagnóstico
+    function inicializarListenersDiagnostico() {
+        const allSelects = document.querySelectorAll('select[id$="-codigo_cie10_select"], select[id$="-nombre_enfermedad_select"]');
+        allSelects.forEach(select => {
+            // Evitar añadir el listener múltiples veces
+            if (!select.dataset.listenerAttached) {
+                select.addEventListener('change', function() {
+                    actualizarCamposDiagnostico(this);
+                });
+                select.dataset.listenerAttached = 'true';
+                // Llamada inicial por si el formulario ya tiene un valor al cargar la página
+                actualizarCamposDiagnostico(select);
+            }
+        });
+    }
+
+    // Inicializar para los formularios que ya existen al cargar la página
+    inicializarListenersDiagnostico();
+
+    // Volver a inicializar los listeners cuando se añade un nuevo formulario de diagnóstico
+    addDiagnosticoBtn.addEventListener('click', function() {
+        // Pequeño delay para asegurar que el nuevo formulario se ha añadido al DOM
+        setTimeout(inicializarListenersDiagnostico, 100);
+    });
+});
+</script>
+{% endblock scripts %}
+{% endblock content %}

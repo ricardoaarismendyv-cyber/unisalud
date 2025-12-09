@@ -19,13 +19,15 @@ class Roles(models.Model):
     def __str__(self):
         return self.nombre_rol
 
+#en roles me sale error de: manytomanyfield 'Usuarios.roles', es decir, Django te está diciendo: "He visto que has puesto un comentario aquí, pero no sé dónde ponerlo en la base de datos para este tipo de campo, así que lo voy a ignorar".
+#para ello se elimina el parámetro db_comment en el ManyToManyField de Roles en la clase Usuarios
 class Usuarios(models.Model):
     id_usuario = models.AutoField(primary_key=True, db_comment='ID autoincremental del usuario')
-    roles = models.ManyToManyField('Roles', db_comment='Roles asignados para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
+    roles = models.ManyToManyField('Roles')
     nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
     contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
     email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
-    numero_documento= models.CharField(max_length=20, blank=True, null=True, db_comment='Documento de identidad del usuario')
+    
     class Meta:
         managed = True
         db_table = 'usuarios'
@@ -181,17 +183,13 @@ class CentrosMedicos(models.Model):
     id_centro_medico = models.AutoField(primary_key=True, db_comment='ID autoincremental')
     nombre_centro = models.CharField(max_length=150, db_comment='Nombre del centro medico')
     id_red_salud = models.ForeignKey('RedesSalud', models.DO_NOTHING, db_column='id_red_salud', blank=True, null=True, db_comment='Referencia a redessalud')
-    id_nivel_atencion = models.ForeignKey('NivelesAtencion', models.DO_NOTHING, db_column='id_nivel_atencion', db_comment='Referencia a NIVELES_ATENCION')
-    id_ciudad = models.ForeignKey('Ciudad', models.DO_NOTHING, db_column='id_ciudad', db_comment='Referencia a CIUDAD')
+    id_nivel_atencion = models.ForeignKey('NivelesAtencion', models.DO_NOTHING, db_column='id_nivel_atencion', null=True, db_comment='Referencia a NIVELES_ATENCION')
+    id_ciudad = models.ForeignKey('Ciudad', models.DO_NOTHING, db_column='id_ciudad', null=True, db_comment='Referencia a CIUDAD')
     direccion = models.CharField(max_length=255, db_comment='Direccion centro medico')
-    telefono = models.CharField(max_length=15, blank=True, null=True, db_comment='Telefono centro medico')
-    celular = models.CharField(max_length=15, blank=True, null=True, db_comment='Celular centro medico')
+    celular = models.CharField(max_length=60, blank=True, null=True, db_comment='Celular centro medico')
+    telefono = models.CharField(max_length=60, blank=True, null=True, db_comment='Telefono centro medico')
     correo = models.CharField(max_length=100, blank=True, null=True, db_comment='Correo entro medico')
-    sitio_web = models.CharField(max_length=150, blank=True, null=True, db_comment='Sitio web centro medico')
-    codigo_habilitacion = models.CharField(unique=True, max_length=50, blank=True, null=True, db_comment='Codigo de habilitacion REPS')
-    fecha_habilitacion = models.DateField(blank=True, null=True, db_comment='Fecha de habilitacion REPS')
-    estado_centro = models.CharField(max_length=10, blank=True, null=True, db_comment='Esta activa, inactiva')
-
+    
     class Meta:
         managed = True
         db_table = 'centros_medicos'
@@ -231,9 +229,9 @@ class TiposAfiliacion(models.Model):
 
 class Especialidades(models.Model):
     id_especialidad = models.AutoField(primary_key=True, db_comment='ID autoincremental')
-    nombre_especialidad = models.CharField(unique=0, max_length=100, db_comment='refiere a la especialidad medica: neurologia, cardiologia, etc')
+    codigo_especialidad = models.IntegerField(default=0, db_comment='Codigo unico para la especialidad medica')
+    nombre_especialidad = models.CharField(unique=True, max_length=100, db_comment='refiere a la especialidad medica: neurologia, cardiologia, etc')
     descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion')
-    nivel_formacion = models.CharField(max_length=15, blank=True, null=True, db_comment='Nivel de formacion')
 
     class Meta:
         managed = True
@@ -245,28 +243,27 @@ class Especialidades(models.Model):
 
 class Medicamentos(models.Model):
     id_medicamento = models.AutoField(primary_key=True, db_comment='ID autoincremental')
+    codigo_medicamento = models.IntegerField(default=0, db_comment='Codigo unico del medicamento')
     nombre_generico = models.CharField(max_length=200, blank=True, null=True, db_comment='Nombre generico medicamento')
-    principio_activo = models.CharField(max_length=100, blank=True, null=True, db_comment='Principio activo medicamento')
-    concentracion = models.CharField(max_length=50, blank=True, null=True, db_comment='Concentracion medicamento')
-    forma_farmaceutica = models.CharField(max_length=50, blank=True, null=True, db_comment='Forma farmaceutica medicamento')
-    registro_invima = models.CharField(unique=True, max_length=100, db_comment='Registro INVIMA del medicamento')
+    principio_activo = models.CharField(max_length=500, blank=True, null=True, db_comment='Principio activo medicamento')
+    concentracion = models.CharField(max_length=350, blank=True, null=True, db_comment='Concentracion medicamento')
+    forma_farmaceutica = models.CharField(max_length=350, blank=True, null=True, db_comment='Forma farmaceutica medicamento')
+    registro_invima = models.CharField(unique=True, max_length=500, db_comment='Registro INVIMA del medicamento')
     
     class Meta:
         managed = True
         db_table = 'medicamentos'
 
     def __str__(self):
-        return self.nombre_comercial
+        return self.nombre_generico
 
 
 class Servicios(models.Model):
     id_servicio = models.AutoField(primary_key=True, db_comment='ID autoincremental del servicio')
-    nombre_servicio = models.CharField(max_length=200, db_comment='Nombre del servicio medico')
-    descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion detallada del servicio medico')
-    tipo_servicio = models.CharField(max_length=21, db_comment='Categoria: imagenologia, laboratorio, etc')
+    codigo_servicio = models.IntegerField(default=0, db_comment='Codigo unico del servicio medico')
+    nombre_servicio = models.CharField(max_length=500, db_comment='Nombre del servicio medico')
+    tipo_servicio = models.CharField(max_length=550, db_comment='Categoria: imagenologia, laboratorio, etc')
     id_especialidad = models.ForeignKey('Especialidades', models.DO_NOTHING, db_column='id_especialidad', blank=True, null=True, db_comment='Especialidad requerida (opcional)')
-    estado = models.CharField(max_length=10, blank=True, null=True, db_comment='Esta activo, inactivo, etc')
-    fecha_registro = models.DateTimeField(blank=True, null=True, db_comment='Fecha de creacion')
 
     class Meta:
         managed = True
@@ -278,17 +275,18 @@ class Servicios(models.Model):
 
 class Enfermedades(models.Model):
     id_enfermedad = models.AutoField(primary_key=True, db_comment='ID autoincremental')
-    codigo_cie10 = models.CharField(unique=True, max_length=10, db_comment='Codigo CIE-10 para clasificar diagnosticos, sintomas')
+    codigo_cie10 = models.CharField(max_length=300, unique=True, db_comment='Codigo CIE-10 para clasificar diagnosticos, sintomas')
     nombre_enfermedad = models.CharField(max_length=300, db_comment='Nombre de la enfermedad')
     descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion clinica de la enfermedad')
-    categoria = models.CharField(max_length=100, blank=True, null=True, db_comment='refiere si es aguda, cronica, infecciosa, etc')
+    categoria_grupom = models.CharField(max_length=300, blank=True, null=True, db_comment='refiere al grupo de mortalidad CIE10')
+    grupo_mortalidad = models.CharField(max_length=250, blank=True, null=True, db_comment='de acuerdo con la CIE-10 ')
 
     class Meta:
         managed = True
         db_table = 'enfermedades'
 
     def __str__(self):
-        return self.nombre_enfermedad
+        return f'{self.codigo_cie10} - {self.nombre_enfermedad}'
 
 
 class EstadoOrden(models.Model):
@@ -433,16 +431,16 @@ class Consulta(models.Model):
 
 class OrdenMedica(models.Model):
     id_orden = models.AutoField(primary_key=True, db_comment='ID autoincremental')
-    id_paciente = models.ForeignKey('Pacientes', models.DO_NOTHING, db_column='id_paciente', db_comment='Referencia a PACIENTE')
-    id_profesional = models.ForeignKey('ProfesionalSalud', models.DO_NOTHING, db_column='id_profesional', db_comment='Referencia a PROFESIONAL_SALUD')
-    id_medicamento = models.ForeignKey('Medicamentos', models.DO_NOTHING, db_column='id_medicamento', db_comment='Referencia a MEDICAMENTO')
-    id_tipo_orden = models.ForeignKey('TipoOrden', models.DO_NOTHING, db_column='id_tipo_orden', db_comment='Referencia a TIPO_ORDEN')
-    id_servicio = models.ForeignKey('Servicios', models.DO_NOTHING, db_column='id_servicio', blank=True, null=True, db_comment='Referencia a SERVICIOS')
-    dosis = models.CharField(max_length=100, blank=True, null=True, db_comment='Dosis del medicamento')
-    duracion_tratamiento = models.CharField(max_length=100, blank=True, null=True, db_comment='De acuerdo al diagnostico')
-    frecuencia = models.CharField(max_length=50, blank=True, null=True, db_comment='Frecuencia de acuerdo al diagnostico')
-    cantidad = models.IntegerField(blank=True, null=True, db_comment='Cantidad de acuerdo al diagnostico')
-    indicaciones = models.TextField(blank=True, null=True, db_comment='Indicaciones tratamiento y-o procedimiento')
+    id_paciente = models.ForeignKey('Pacientes', on_delete=models.CASCADE, db_column='id_paciente', db_comment='Referencia a PACIENTE')
+    id_profesional = models.ForeignKey('ProfesionalSalud', on_delete=models.CASCADE, db_column='id_profesional', db_comment='Referencia a PROFESIONAL_SALUD')
+    id_medicamento = models.ForeignKey('Medicamentos', on_delete=models.CASCADE, db_column='id_medicamento', null=True, blank=True, db_comment='Referencia a MEDICAMENTO')
+    id_tipo_orden = models.ForeignKey('TipoOrden', on_delete=models.CASCADE, db_column='id_tipo_orden', db_comment='Referencia a TIPO_ORDEN')
+    id_servicio = models.ForeignKey('Servicios', on_delete=models.CASCADE, db_column='id_servicio', null=True, blank=True, db_comment='Referencia a SERVICIOS')
+    dosis = models.CharField(max_length=100, null=True, blank=True, db_comment='Dosis del medicamento')
+    duracion_tratamiento = models.CharField(max_length=100, null=True, blank=True, db_comment='De acuerdo al diagnostico')
+    frecuencia = models.CharField(max_length=50, null=True, blank=True, db_comment='Frecuencia de acuerdo al diagnostico')
+    cantidad = models.IntegerField(null=True, blank=True, db_comment='Cantidad de acuerdo al diagnostico')
+    indicaciones = models.TextField(null=True, blank=True, db_comment='Indicaciones tratamiento y-o procedimiento')
     id_centro_medico = models.ForeignKey('CentrosMedicos', models.DO_NOTHING, db_column='id_centro_medico', db_comment='Centro medico donde se emite')
     id_estado_orden = models.ForeignKey('EstadoOrden', models.DO_NOTHING, db_column='id_estado_orden', db_comment='Referencia a ESTADO_ORDEN')
     fecha_emision = models.DateTimeField(blank=True, null=True, db_comment='Fecha de emision de la orden')
@@ -500,11 +498,30 @@ class Turnos(models.Model):
 class AntecedentesPaciente(models.Model):
     id_antecedente = models.AutoField(primary_key=True, db_comment='ID autoincremental')
     id_paciente = models.ForeignKey('Pacientes', models.DO_NOTHING, db_column='id_paciente', db_comment='Referencia a PACIENTES')
-    tipo_antecedente = models.CharField(max_length=13, db_comment='si es: familiar, personal, etc')
+    TIPO_ANTECEDENTE_CHOICES = [
+        ('Familiar', 'Familiar'),
+        ('Personal', 'Personal'),
+        ('Laboral', 'Laboral'),
+    ]
+    tipo_antecedente = models.CharField(
+        max_length=13,
+        choices=TIPO_ANTECEDENTE_CHOICES,
+        db_comment='si es: familiar, personal, etc'
+    )
     descripcion = models.TextField(db_comment='Descripcion')
     fecha_registro = models.DateField(blank=True, null=True, db_comment='Fecha de registro')
-    severidad = models.CharField(max_length=8, blank=True, null=True, db_comment='es: leve, moderada, etc')
-    estado_antecedente = models.CharField(max_length=14, blank=True, null=True, db_comment='Esta: activo, resuelto, etc')
+    SEVERIDAD_CHOICES = [
+        ('Leve', 'Leve'),
+        ('Moderada', 'Moderada'),
+        ('Alta', 'Alta'),
+    ]
+    severidad = models.CharField(max_length=8, choices=SEVERIDAD_CHOICES, blank=True, null=True, db_comment='es: leve, moderada, etc')
+    ESTADO_ANTECEDENTE_CHOICES = [
+        ('Activo', 'Activo'),
+        ('Resuelto', 'Resuelto'),
+        ('Pendiente', 'Pendiente'),
+    ]
+    estado_antecedente = models.CharField(max_length=14, choices=ESTADO_ANTECEDENTE_CHOICES, blank=True, null=True, db_comment='Esta: activo, resuelto, etc')
 
     class Meta:
         managed = True

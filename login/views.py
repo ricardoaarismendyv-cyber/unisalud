@@ -33,16 +33,18 @@ def login_view(request):
                     except ProfesionalSalud.DoesNotExist:
                         messages.warning(request, 'El usuario tiene un rol profesional, pero no un perfil de profesional de salud asociado.')
 
-                # Priorizamos roles de personal de salud
+                # Lógica de redirección por roles
                 if any(rol in roles_profesionales for rol in roles_usuario):
+                    # Prioridad 1: Rol profesional. Si tiene perfil, redirige.
                     if 'id_profesional' in request.session:
-                        return redirect('profesionalS/turnos/')
-                # Si no es profesional, verificamos si es paciente
+                        return redirect('consultas_prof_salud')
                 elif 'paciente' in roles_usuario:
+                    # Prioridad 2: Rol paciente. Si no es profesional pero es paciente, redirige.
                     if 'id_paciente' in request.session:
                         return redirect('inicio-usuario')
-                else:
-                    messages.error(request, 'Rol no reconocido o sin página de inicio definida.')
+                
+                # Si el usuario está autenticado pero no tiene un perfil válido para redirigir, mostramos el error.
+                messages.error(request, 'Rol no reconocido o sin página de inicio definida.')
             else:
                 messages.error(request, 'Nombre de usuario o contraseña incorrectos.')
         except Usuarios.DoesNotExist:
@@ -51,7 +53,9 @@ def login_view(request):
 
 # para cerrar sesion y redirige al login
 def logout_view(request):
-    logout(request)
+    # logout(request) funciona con el sistema de auth de Django.
+    # Para limpiar la sesión manual, usamos flush().
+    request.session.flush()
     return redirect('login')
 
 

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Orden Médica #{{ orden.id_orden }}</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        h1, h2 { color: #333; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .info-section { margin-bottom: 15px; }
+        .info-section p { margin: 2px 0; }
+        .info-section strong { display: inline-block; width: 150px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 0.8em; color: #777; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Orden Médica</h1>
+        <h2>Centro Médico: {{ orden.id_centro_medico.nombre_centro }}</h2>
+    </div>
+
+    <div class="info-section">
+        <h2>Datos del Paciente</h2>
+        <p><strong>Paciente:</strong> {{ orden.id_paciente.nombre1 }} {{ orden.id_paciente.apellido1 }}</p>
+        <p><strong>Documento:</strong> {{ orden.id_paciente.id_tipo_identificacion.identificacion }} {{ orden.id_paciente.numero_documento }}</p>
+    </div>
+
+    <div class="info-section">
+        <h2>Detalles de la Orden</h2>
+        <p><strong>Número de Orden:</strong> {{ orden.id_orden }}</p>
+        <p><strong>Fecha de Emisión:</strong> {{ orden.fecha_emision|date:"d/m/Y H:i" }}</p>
+        <p><strong>Tipo de Orden:</strong> {{ orden.id_tipo_orden.nombre_tipo }}</p>
+        {# Las indicaciones generales se mostrarán por cada servicio en la tabla de abajo #}
+    </div>
+
+    <div class="section">
+        <h2>Servicios Solicitados</h2>
+        {% if servicios %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Servicio</th>
+                        <th>Código Servicio</th>
+                        <th>Nombre Servicio</th>
+                        <th>Tipo Servicio</th>
+                        <th>Indicaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in servicios %}
+                    <tr>
+                        <td>{{ d.id_servicio.codigo_servicio }}</td>
+                        <td>{{ d.id_servicio.nombre_servicio }}</td>
+                        <td>{{ d.id_servicio.tipo_servicio }}</td>
+                        <td>{{ d.indicaciones|default:"-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No se registraron servicios.</p>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        <p>Firma Profesional: {{ orden.id_profesional.nombre1 }} {{ orden.id_profesional.apellido1 }}</p>
+    </div>
+
+</body>
+</html>
