@@ -1,0 +1,22 @@
+{% extends "plantilla_ps.html" %}
+{% load static %}
+{% block title %}Ver Orden Médica PDF{% endblock title %}
+
+{% block content %}
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <div class="col-lg-10 col-md-10">
+                <a class="btn btn-main btn-nav" href="{% url 'om_prof_salud' %}">Volver a Órdenes Médicas</a>
+                <a class="btn btn-main btn-nav" href="{% url 'generar_omedica_pdf' orden.id_orden %}" download>Descargar PDF</a>
+                
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Orden Médica #{{ orden.id_orden }}</h1>
+                    <p>A continuación se muestra el PDF de la orden médica generada. Puedes descargarlo usando el botón de arriba.</p>
+                    <iframe src="{% url 'generar_omedica_pdf' orden.id_orden %}" width="100%" height="800px" style="border: none;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
