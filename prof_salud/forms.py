@@ -1,6 +1,6 @@
 #para diligenciar la HC
 from django import forms
-from usuario.models import Consulta, Pacientes, Enfermedades, AntecedentesPaciente, OrdenMedica, Medicamentos, Servicios, TipoOrden, EstadoOrden
+from usuario.models import Consulta, Pacientes, Enfermedades, AntecedentesPaciente, OrdenMedica, Servicios
 from django.forms import formset_factory
 
 class ConsultaForm(forms.ModelForm):
@@ -52,7 +52,6 @@ class ConsultaForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ConsultaForm, self).__init__(*args, **kwargs)
         for field in self.fields:
-            # Asegurarse de no sobreescribir clases ya definidas en widgets
             self.fields[field].widget.attrs['class'] = self.fields[field].widget.attrs.get('class', '') + ' form-control mb-2'
 
 
@@ -74,7 +73,7 @@ class NombreEnfermedadChoiceField(forms.ModelChoiceField):
 class DiagnosticoPacienteForm(forms.Form):
     """Formulario para un único diagnóstico."""
     # Campo oculto que guardará el ID de la enfermedad seleccionada.
-    id_enfermedad = forms.ModelChoiceField(queryset=Enfermedades.objects.none(), widget=forms.HiddenInput(), required=True)
+    id_enfermedad = forms.ModelChoiceField(queryset=Enfermedades.objects.all(), widget=forms.HiddenInput(), required=False)
 
     codigo_cie10_select = CodigoCIE10ChoiceField(
         queryset=Enfermedades.objects.all(),
@@ -94,7 +93,8 @@ class DiagnosticoPacienteForm(forms.Form):
         choices=[('', 'Seleccione un tipo'), ('Principal', 'Principal'), ('Presuntivo', 'Presuntivo'), ('Secundario', 'Secundario')],
         label="Tipo de Diagnóstico",
         initial='', # Asegura que la opción por defecto sea la vacía
-        widget=forms.Select(attrs={'class': 'form-control'})
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=False # Lo hacemos opcional para que los formsets vacíos pasen la validación
     )
     notas = forms.CharField(
         label="Notas del Diagnóstico",
@@ -112,10 +112,18 @@ class DiagnosticoPacienteForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': True})
     )
 
+    def clean(self):
+        cleaned_data = super().clean()
+        # Si el formulario se va a eliminar, no se requiere validación adicional.
+        if cleaned_data.get('DELETE'):
+            return cleaned_data
 
+        # Si se selecciona un tipo de diagnóstico, el ID de la enfermedad es obligatorio.
+        if cleaned_data.get('tipo_diagnostico') and not cleaned_data.get('id_enfermedad'):
+            self.add_error('id_enfermedad', 'Este campo es obligatorio si se especifica un tipo de diagnóstico.')
+        return cleaned_data
 
 DiagnosticoFormSet = formset_factory(DiagnosticoPacienteForm, extra=1, can_delete=True)
-
 
 class AntecedenteForm(forms.ModelForm):
     """Formulario para un único antecedente."""
@@ -141,69 +149,131 @@ class AntecedenteForm(forms.ModelForm):
 
 AntecedenteFormSet = formset_factory(AntecedenteForm, extra=1, can_delete=True)
 
-
 class OrdenMedicaForm(forms.ModelForm):
-    """Formulario para crear una Orden Médica."""
     class Meta:
         model = OrdenMedica
-        fields = [
-            'id_orden',
+        # Excluimos los campos que se asignarán automáticamente en la vista o que no se usan en este formulario.
+        exclude = [
+            'id_orden', 
             'id_profesional',
-            'id_paciente',
-            'id_tipo_orden',
-            'id_medicamento',
-            'id_servicio',
-            'dosis',
-            'frecuencia',
-            'cantidad',
-            'duracion_tratamiento',
-            'indicaciones',
             'id_centro_medico',
             'id_estado_orden',
             'fecha_emision',
             'fecha_cumplimiento',
             'codigo_qr',
             'id_consulta',
+            'id_medicamento', # Excluimos medicamento
+            'id_servicio',    # Excluimos servicio
         ]
+        # Añadimos los campos de medicamento a la lista de exclusión
+        exclude.extend(['dosis', 'duracion_tratamiento', 'frecuencia', 'cantidad'])
         widgets = {
-            'id_paciente': forms.Select(attrs={'class': 'form-control'}),
-            'id_tipo_orden': forms.Select(attrs={'class': 'form-control'}),
-            'id_medicamento': forms.Select(attrs={'class': 'form-control'}),
-            'id_servicio': forms.Select(attrs={'class': 'form-control'}),
-            'dosis': forms.TextInput(attrs={'class': 'form-control'}),
-            'frecuencia': forms.TextInput(attrs={'class': 'form-control'}),
-            'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
-            'duracion_tratamiento': forms.TextInput(attrs={'class': 'form-control'}),
-            'nombre_servicio': forms.TextInput(attrs={'class': 'form-control'}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'tipo_servicio': forms.Select(attrs={'class': 'form-control'}),
-            'estado': forms.Select(attrs={'class': 'form-control'}),
-            'fecha_registro': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'id_paciente': forms.Select(attrs={'class': 'form-control mb-2'}),
+            'id_tipo_orden': forms.Select(attrs={'class': 'form-control mb-2'}),
             'indicaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'id_estado_orden': forms.Select(attrs={'class': 'form-control'}),
-        }
-        labels = {
-            'id_paciente': 'Paciente',
-            'id_profesional': 'Profesional de Salud',
-            'id_centro_medico': 'Centro Médico',
-            'id_consulta': 'Consulta Asociada',
-            'id_tipo_orden': 'Tipo de Orden',
-            'id_medicamento': 'Medicamento',
-            'id_servicio': 'Servicio Solicitado',
-            'duracion_tratamiento': 'Duración del Tratamiento',
-            'id_estado_orden': 'Estado de la Orden',
         }
 
     def __init__(self, *args, **kwargs):
         super(OrdenMedicaForm, self).__init__(*args, **kwargs)
-        # Hacemos que el medicamento y el servicio no sean obligatorios en el formulario
-        self.fields['id_medicamento'].required = False
-        self.fields['id_servicio'].required = False
+        # Añadimos la clase de Bootstrap a todos los campos que no son widgets personalizados.
+        for field_name, field in self.fields.items():
+            if not field.widget.attrs.get('class'):
+                field.widget.attrs['class'] = 'form-control mb-2'
+        
+        # Personalizamos las etiquetas para que sean más amigables
+        self.fields['id_paciente'].label = "Paciente"
+        self.fields['id_tipo_orden'].label = "Tipo de Orden"
 
-        # Añadimos un texto de ayuda y una opción vacía
-        self.fields['id_paciente'].empty_label = "Seleccione un paciente"
-        self.fields['id_tipo_orden'].empty_label = "Seleccione el tipo"
-        self.fields['id_medicamento'].empty_label = "N/A - No aplica medicamento"
-        self.fields['id_servicio'].empty_label = "N/A - No aplica servicio"
-        self.fields['id_estado_orden'].empty_label = "Seleccione un estado"
-    
+class OrdenMedicamentoForm(forms.ModelForm):
+    """
+    Formulario específico para crear órdenes de medicamentos.
+    """
+    class Meta:
+        model = OrdenMedica
+        fields = [
+            'id_paciente',
+            'id_medicamento',
+            'dosis',
+            'duracion_tratamiento',
+            'frecuencia',
+            'cantidad',
+            'indicaciones'
+        ]
+        widgets = {
+            'id_paciente': forms.Select(attrs={'class': 'form-control mb-2'}),
+            'id_medicamento': forms.Select(attrs={'class': 'form-control mb-2'}),
+            'indicaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(OrdenMedicamentoForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            if not field.widget.attrs.get('class'):
+                field.widget.attrs['class'] = 'form-control mb-2'
+        self.fields['duracion_tratamiento'].label = "Duración del Tratamiento"
+        self.fields['id_paciente'].label = "Paciente"
+        self.fields['id_medicamento'].label = "Medicamento"
+
+class ServiciosForm(forms.ModelChoiceField):
+    """
+    Campo personalizado para mostrar el código y nombre del servicio en las opciones.
+    """
+    def label_from_instance(self, obj):
+        return f"{obj.codigo_servicio} - {obj.nombre_servicio} - {obj.tipo_servicio}"
+
+class codigoServicioChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.codigo_servicio
+
+class nombreServicioChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.nombre_servicio
+
+class TipoServicioChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.tipo_servicio
+
+class TipoOrdenForm(forms.Form):
+    """Formulario para un único servicio en la orden médica."""
+    # Campo oculto que guardará el ID del servicio seleccionado.
+    id_servicio = forms.ModelChoiceField(queryset=Servicios.objects.all(), widget=forms.HiddenInput(), required=False)
+
+    codigo_servicio_select = codigoServicioChoiceField(
+        queryset=Servicios.objects.all(),
+        label="Código Servicio",
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        empty_label="Seleccione un código",
+        required=False
+    )
+    nombre_servicio_select = nombreServicioChoiceField(
+        queryset=Servicios.objects.all(),
+        label="Nombre Servicio",
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        empty_label="Seleccione un servicio",
+        required=False
+    )
+
+    tipo_servicio = forms.CharField(
+        label="Tipo de Servicio",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': True}),
+        required=False
+    )
+
+    indicaciones = forms.CharField(
+        label="Indicaciones",
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+        required=False
+    )   
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # Si el formulario se va a eliminar, no se requiere validación adicional.
+        if cleaned_data.get('DELETE'):
+            return cleaned_data
+
+        # Si se selecciona un servicio, el ID del servicio es obligatorio.
+        if (cleaned_data.get('codigo_servicio_select') or cleaned_data.get('nombre_servicio_select') or cleaned_data) and not cleaned_data.get('id_servicio'):
+            self.add_error('id_servicio', 'Este campo es obligatorio si se especifica un servicio.')
+        return cleaned_data
+
+serviciosFormSet = formset_factory(TipoOrdenForm, extra=1, can_delete=True) 
