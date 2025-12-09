@@ -17,7 +17,7 @@
                     <p>La historia clínica se ha guardado y generado correctamente. A continuación puede previsualizar el documento.</p>
                     
                     <div class="my-3">
-                        <a href="{% url 'generar_hc_pdf' consulta.id_consulta %}" class="btn btn-primary" download="HC_{{ consulta.id_paciente.numero_documento }}_{{ consulta.fecha_atencion|date:'Ymd' }}.pdf">Descargar PDF</a>
+                        <a href="{% url 'generar_hc_pdf' consulta.id_consulta %}" class="btn btn-primary" download="HC_{{ consulta.id_paciente.numero_documento }}_{{ consulta.fecha_atencion|date:'Ymd' }}.pdf">Descargar Historia Clinica</a>
                         <a href="{% url 'inicio_prof_salud' %}" class="btn btn-secondary">Volver al Inicio</a>
                     </div>
 
