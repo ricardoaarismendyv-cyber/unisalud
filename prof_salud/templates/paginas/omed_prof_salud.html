@@ -42,8 +42,8 @@
                 <div class="col-lg-10 col-md-10">
                 <div class="container border border-dark rounded p-4 my-5 div-main">
                     <h1>Crear orden de medicamentos</h1>
-                        <p>Por favor diligencie el siguiente formulario para crear la orden médica del paciente.</p>
-                        <a class="btn btn-main btn-nav" href="{% static 'docs/omediligencia.pdf' %}">Diligenciar</a>
+                        <p>Haga clic en el botón para crear una nueva orden de medicamentos para el paciente.</p>
+                        <a class="btn btn-main btn-nav" href="{% url 'diligenciar_omedicamentos' %}">Diligenciar Nueva Orden</a>
                         <p>Recuerde que la información debe ser precisa y completa para garantizar la atención</p>
                     <div>
                         <object data="{% static 'docs/ordenmedicaej.pdf' %}" type="application/pdf" width="100%" height="500px" class="mb-3"></object>
