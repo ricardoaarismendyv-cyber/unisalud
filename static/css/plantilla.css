@@ -637,5 +637,5 @@ body.color-blind-mode {
 
 body.color-blind-mode .mainHeader,
 body.color-blind-mode .footer-bar {
-    filter: none !important; 
+    position: fixed !important;
 }
