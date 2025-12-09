@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, DiagnosticoPaciente, AntecedentesPaciente, Enfermedades, Consulta, OrdenMedica, Servicios, EstadoOrden, TipoOrden
+from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, DiagnosticoPaciente, AntecedentesPaciente, Enfermedades, Consulta, OrdenMedica, Servicios, EstadoOrden, TipoOrden, Medicamentos
 from login.decorators import role_required
-from .forms import ConsultaForm, DiagnosticoFormSet, AntecedenteFormSet, OrdenMedicaForm, serviciosFormSet, OrdenMedicamentoForm
+from .forms import ConsultaForm, DiagnosticoFormSet, AntecedenteFormSet, OrdenMedicaForm, serviciosFormSet, OrdenMedicamentoForm, MedicamentoFormSet
 from django.utils import timezone
 import json
 from django.http import HttpResponse
@@ -240,52 +240,38 @@ def diligenciar_omedica(request):
 
         if orden_medica_form.is_valid() and servicios_formset.is_valid():
             try:
-                nueva_orden_medica = orden_medica_form.save(commit=False)
                 # Obtenemos los datos comunes del formulario principal, pero no lo guardamos aún.
                 orden_base = orden_medica_form.cleaned_data
                 estado_pendiente = EstadoOrden.objects.get(nombre_estado_orden='Pendiente')
-                
-                # Asignar los datos que no vienen del formulario
-                nueva_orden_medica.id_profesional = profesional
-                nueva_orden_medica.id_centro_medico = profesional.id_centro_medico
-                nueva_orden_medica.fecha_emision = timezone.now()
-                estado_pendiente = EstadoOrden.objects.get(nombre_estado_orden='Pendiente')
-                nueva_orden_medica.id_estado_orden = estado_pendiente
-                nueva_orden_medica.save()
                 orden_creada_id = None # Variable para guardar el ID de la última orden creada
 
                 # Guardar los servicios del formset
-                for form in servicios_formset:
-                    if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
-                        servicios_obj = form.cleaned_data.get('id_servicio')
-                        # Creamos una nueva instancia de OrdenMedica para cada servicio
-                        OrdenMedica.objects.create(
-                            id_paciente=nueva_orden_medica.id_paciente,)
+                for servicio_form in servicios_formset:
+                    if servicio_form.cleaned_data and not servicio_form.cleaned_data.get('DELETE', False):
+                        servicios_obj = servicio_form.cleaned_data.get('id_servicio')
                         # Si no hay servicio, no creamos la orden
                         if not servicios_obj:
                             continue
                     
-
+                        # Creamos una nueva instancia de OrdenMedica para CADA servicio válido
                         nueva_orden = OrdenMedica.objects.create(
                             id_paciente=orden_base.get('id_paciente'),
+                            id_tipo_orden=orden_base.get('id_tipo_orden'),
                             id_profesional=profesional,
                             id_centro_medico=profesional.id_centro_medico,
-                            id_tipo_orden=nueva_orden_medica.id_tipo_orden,
                             id_servicio=servicios_obj,
-                            indicaciones=form.cleaned_data.get('indicaciones', ''),
+                            indicaciones=servicio_form.cleaned_data.get('indicaciones', ''),
                             id_estado_orden=estado_pendiente,
                             fecha_emision=timezone.now(), 
                         )
                         orden_creada_id = nueva_orden.id_orden # Actualizamos el ID con la última orden
 
-                messages.success(request, f'Orden Médica para el paciente {nueva_orden_medica.id_paciente} guardada con éxito.')                
-                # Redirigir a la nueva vista para ver el PDF de la orden médica
-                return redirect('ver_omedica_pdf', orden_id=nueva_orden_medica.id_orden)
                 if orden_creada_id:
                     messages.success(request, f'Orden(es) Médica(s) para el paciente {orden_base.get("id_paciente")} guardada(s) con éxito.')
                     # Redirigir a la vista PDF de la última orden creada
                     return redirect('ver_omedica_pdf', orden_id=orden_creada_id)
                 else:
+                    # Si el bucle termina y no se creó ninguna orden
                     messages.warning(request, 'No se añadió ningún servicio, por lo que no se guardó ninguna orden.')
                     return redirect('diligenciar_omedica')
 
@@ -331,12 +317,23 @@ def generar_omedica_pdf(request, orden_id):
     """
     try:
         orden = OrdenMedica.objects.get(id_orden=orden_id)
-        # Asumiendo que los servicios están en otras órdenes con el mismo tipo y paciente,
-        # sería mejor buscar las órdenes relacionadas si se crearon por separado.
-        # Por ahora, nos centraremos en la orden principal.
+        
+        # Para mostrar todos los servicios de una "orden lógica" (una única submission),
+        # asumimos que comparten el mismo paciente, profesional, centro, tipo de orden
+        # y la misma fecha de emisión (o una muy cercana).
+        # Es crucial que en diligenciar_omedica se use un único timezone.now() para todas las órdenes de un batch.
+        servicios_solicitados = OrdenMedica.objects.filter(
+            id_paciente=orden.id_paciente,
+            id_profesional=orden.id_profesional,
+            id_centro_medico=orden.id_centro_medico,
+            id_tipo_orden=orden.id_tipo_orden,
+            fecha_emision=orden.fecha_emision, # Asumimos que todas las órdenes del batch tienen la misma fecha_emision
+            id_servicio__isnull=False # Solo queremos las órdenes que son de tipo servicio
+        ).select_related('id_servicio') # Optimiza la consulta para obtener los detalles del servicio
 
         context = {
             'orden': orden,
+            'servicios': servicios_solicitados,
         }
         pdf = render_to_pdf('pdf/omedica_pdf_template.html', context)
 
@@ -362,27 +359,56 @@ def diligenciar_omedicamentos(request):
     profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
 
     if request.method == 'POST':
-        form = OrdenMedicamentoForm(request.POST)
-        if form.is_valid():
+        medicamento_formset = MedicamentoFormSet(request.POST, prefix='medicamentos')
+
+        if medicamento_formset.is_valid():
             try:
-                nueva_orden = form.save(commit=False)
-                
-                # Asignar los datos que no vienen del formulario
-                nueva_orden.id_profesional = profesional
-                nueva_orden.id_centro_medico = profesional.id_centro_medico
-                nueva_orden.fecha_emision = timezone.now()
-                # Asignar un estado inicial y tipo de orden
-                # nueva_orden.id_estado_orden_id = EstadoOrden.objects.get(nombre_estado_orden='Pendiente').id_estado_orden
-                # nueva_orden.id_tipo_orden_id = TipoOrden.objects.get(nombre_tipo='Medicamentos').id_tipo_orden
-                nueva_orden.save()
+                orden_creada_id = None
+                for form in medicamento_formset:
+                    if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                        nueva_orden = form.save(commit=False)
+                        # El método clean del formulario ya ha puesto el medicamento en cleaned_data
+                        medicamento_seleccionado = form.cleaned_data.get('id_medicamento')
+                        if not medicamento_seleccionado:
+                            messages.error(request, 'Debe seleccionar un medicamento válido.')
+                            # Volvemos a renderizar el formulario con el error
+                            return render(request, 'paginas/diligenciar_omedicamentos.html', {'medicamento_formset': medicamento_formset, 'medicamentos_json': medicamentos_json})
+                        
+                        nueva_orden.id_medicamento = medicamento_seleccionado
+
+                        # Asignar los datos que no vienen del formulario
+                        nueva_orden.id_profesional = profesional
+                        nueva_orden.id_centro_medico = profesional.id_centro_medico
+                        nueva_orden.fecha_emision = timezone.now()
+                        # Asignar un estado inicial y tipo de orden
+                        nueva_orden.id_estado_orden = EstadoOrden.objects.get(nombre_estado_orden='Pendiente')
+                        nueva_orden.id_tipo_orden = TipoOrden.objects.get(nombre_tipo='Medicamentos')
+                        nueva_orden.save()
+                        orden_creada_id = nueva_orden.id_orden
 
                 messages.success(request, f'Orden de Medicamentos para el paciente {nueva_orden.id_paciente} guardada con éxito.')
                 return redirect('omed_prof_salud') # Redirigir a la lista de órdenes de medicamentos
             except Exception as e:
                 messages.error(request, f'Ocurrió un error al guardar la orden: {e}')
+        else:
+             messages.error(request, 'Por favor, corrija los errores en el formulario.')
     else:
-        form = OrdenMedicamentoForm()
+        medicamento_formset = MedicamentoFormSet(prefix='medicamentos')
+
+    # Preparar datos de medicamentos para JavaScript
+    medicamentos_data = {
+        m.id_medicamento: {
+            'codigo_medicamento': m.codigo_medicamento,
+            'nombre_generico': m.nombre_generico,
+             'principio_activo': m.principio_activo,
+            'concentracion': m.concentracion,
+            'forma_farmaceutica': m.forma_farmaceutica,
+        } for m in Medicamentos.objects.all()
+    }
+    medicamentos_json = json.dumps(medicamentos_data, cls=DjangoJSONEncoder)
+
 
     return render(request, 'paginas/diligenciar_omedicamentos.html', {
-        'form': form
+        'medicamento_formset': medicamento_formset,
+        'medicamentos_json': medicamentos_json,
     })
