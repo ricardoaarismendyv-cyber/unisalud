@@ -1,8 +1,10 @@
 from django.shortcuts import redirect
 from django.contrib import messages
+from functools import wraps
 
 def role_required(allowed_roles=[]):
     def decorator(view_func):
+        @wraps(view_func)
         def wrapper(request, *args, **kwargs):
             # Verificamos si el 'id_usuario' está en la sesión, en lugar de usar request.user.is_authenticated.
             if 'id_usuario' not in request.session:
