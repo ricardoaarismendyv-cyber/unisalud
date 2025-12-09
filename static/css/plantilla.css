@@ -73,8 +73,8 @@ main.dark-mode{
 }
 
 /* css de inicio */
-.main {
-    margin-top: 40px;
+main {
+    margin-top: 20px;
     margin-bottom: 40px;
 }
 
@@ -619,7 +619,6 @@ body.dyslexia-font {
 }
 
 /*ESTILOS PARA EL MODO DALTONISMO (CORRECCIÓN DE LAYOUT Y ESTABILIDAD)  */
-
 body.color-blind-mode {
     filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='deuteranopia'><feColorMatrix type='matrix' values='0.33 0.67 0 0 0  0.33 0.67 0 0 0  0 0 1 0 0  0 0 0 1 0'/></filter></svg>#deuteranopia") !important;
     

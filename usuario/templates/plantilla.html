@@ -259,9 +259,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
     //Daltonismo
-document.ElementById("daltoniafont").addEventListener("Click", () => {
-    document.body.classList.toggle("daltonia");
+document.getelementById("daltonia-font").addEventListener("click", () => {
+    document.body.classList.toggle("daltonia-font");
+    localStorage.setItem("access_daltonia",
+      document.body.classList.contains("daltonia-font") ? "1" : "0"
+    );
 });
+
   // Restablecer todo
   if (resetBtn) resetBtn.addEventListener('click', () => {
     // tamaño por defecto
