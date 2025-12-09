@@ -1,0 +1,42 @@
+{% extends 'plantilla_ps.html' %}
+{% load static %}
+{% block title %}Diligenciar Orden de Medicamentos{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock estilo %}
+
+{% block content %}
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <div class="col-lg-10 col-md-10">
+                <a class="btn btn-main btn-nav" href='{% url "omed_prof_salud" %}'>Volver</a>
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Diligenciar Orden Medicamentos</h1>
+                    <p>Complete todos los campos para registrar orden médica del paciente.</p>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="row">
+                    {% for field in form %}
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<div class="invalid-feedback d-block">{{ field.errors.0 }}</div>{% endif %}
+                        {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <a href="{% url 'omed_prof_salud' %}" class="btn btn-secondary me-2">Cancelar</a>
+                    <button type="submit" class="btn btn-success">Guardar Orden</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
