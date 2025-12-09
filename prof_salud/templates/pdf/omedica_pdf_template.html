@@ -31,11 +31,40 @@
         <p><strong>Número de Orden:</strong> {{ orden.id_orden }}</p>
         <p><strong>Fecha de Emisión:</strong> {{ orden.fecha_emision|date:"d/m/Y H:i" }}</p>
         <p><strong>Tipo de Orden:</strong> {{ orden.id_tipo_orden.nombre_tipo }}</p>
-        <p><strong>Indicaciones Generales:</strong> {{ orden.indicaciones|default:"N/A" }}</p>
+        {# Las indicaciones generales se mostrarán por cada servicio en la tabla de abajo #}
+    </div>
+
+    <div class="section">
+        <h2>Servicios Solicitados</h2>
+        {% if servicios %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Servicio</th>
+                        <th>Código Servicio</th>
+                        <th>Nombre Servicio</th>
+                        <th>Tipo Servicio</th>
+                        <th>Indicaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in servicios %}
+                    <tr>
+                        <td>{{ d.id_servicio.codigo_servicio }}</td>
+                        <td>{{ d.id_servicio.nombre_servicio }}</td>
+                        <td>{{ d.id_servicio.tipo_servicio }}</td>
+                        <td>{{ d.indicaciones|default:"-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No se registraron servicios.</p>
+        {% endif %}
     </div>
 
     <div class="footer">
-        <p>Profesional: {{ orden.id_profesional.nombre1 }} {{ orden.id_profesional.apellido1 }}</p>
+        <p>Firma Profesional: {{ orden.id_profesional.nombre1 }} {{ orden.id_profesional.apellido1 }}</p>
     </div>
 
 </body>
