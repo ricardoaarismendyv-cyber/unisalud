@@ -85,10 +85,22 @@
     </div>
 
     <div class="section">
-        <h2>Anamnesis y Examen Físico</h2>
+        <h2>Detalles de la Consulta</h2>
         <p><span class="label">Motivo de Consulta:</span> {{ consulta.motivo_consulta|default:"N/A" }}</p>
         <p><span class="label">Anamnesis:</span> {{ consulta.anamnesis|default:"N/A" }}</p>
         <p><span class="label">Examen Físico:</span> {{ consulta.examen_fisico|default:"N/A" }}</p>
+        <p><span class="label">Frecuencia Cardiaca:</span> {{ consulta.frecuencia_cardiaca|default:"N/A" }}</p>
+        <p><span class="label">Frecuencia Respiratoria:</span> {{ consulta.frecuencia_respiratoria|default:"N/A" }}</p>
+        <p><span class="label">Temperatura:</span> {{ consulta.temperatura|default:"N/A" }}</p>
+        <p><span class="label">Saturación de Oxígeno:</span> {{ consulta.saturacion_oxigeno|default:"N/A" }}</p>
+        <p><span class="label">Presión Arterial:</span> {{ consulta.presion_arterial|default:"N/A" }}</p>
+        <p><span class="label">Peso:</span> {{ consulta.peso|default:"N/A" }}</p>
+        <p><span class="label">Talla:</span> {{ consulta.talla|default:"N/A" }}</p>
+        <p><span class="label">IMC:</span> {{ consulta.imc|default:"N/A" }}</p>
+        <p><span class="label">Revisión Sistemas:</span> {{ consulta.revision_sistemas|default:"N/A" }}</p>
+        <p><span class="label">Diagnóstico Presuntivo:</span> {{ consulta.diagnostico_presuntivo|default:"N/A" }}</p>
+        <p><span class="label">Tratamiento:</span> {{ consulta.tratamiento|default:"N/A" }}</p>
+        <p><span class="label">Observaciones:</span> {{ consulta.observaciones|default:"N/A" }}</p>
     </div>
 
     <div class="section">
