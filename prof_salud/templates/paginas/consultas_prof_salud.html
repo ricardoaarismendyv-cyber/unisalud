@@ -4,16 +4,15 @@
 
 {% block estilo %}
 {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/turnos.css' %}">
-
+<link rel="stylesheet" href="{% static 'css/turnos.css' %}">
 {% endblock estilo %}
             
 {% block auth_button %}
-{# En esta página, reemplazamos el botón de login por el de logout #}
 <li>
-    {# Enlace funcional a la vista 'logout' (ajustar nombre si es distinto) #}
     <a class="navButton0 login-btn" href="{% url 'login' %}">
-        <img class="img-button" src="{% static 'img/log-in.svg' %}" alt="Icono login"> Cerrar Sesión</a>
+        <img class="img-button" src="{% static 'img/log-in.svg' %}" alt="Icono login"> 
+        Cerrar Sesión
+    </a>
 </li>
 {% endblock auth_button %}
 
@@ -22,15 +21,17 @@
 <section class="main">
     <div class="container-fluid">
         <div class="row justify-content-center p-4">
-            <!-- Columna para el contenido principal -->
             <div class="col-lg-10 col-md-10">
                 <div class="row justify-content-center">
                     <div class="col-lg-10 col-md-10">
                         <div class="container border border-dark rounded p-4 my-5 div-main">
+
                             <h1>Consultas Pacientes</h1>
-                        <div class="turnos-container">
-                            {% for profesional in profesionales %}
-                                {% for turno in profesional.turnos %}
+
+                            <div class="turnos-container">
+
+                                {% if turnos %}
+                                {% for turno in turnos %}
                                     <div class="turno-card">
                                         <div class="paciente">
                                             {{ turno.id_paciente.nombre_completo }}
@@ -40,12 +41,17 @@
                                         </div>
                                     </div>
                                 {% empty %}
-                                    <!-- Si no hay turnos en ningún profesional -->
                                     <p class="text-center mt-4">No hay turnos asignados actualmente.</p>
                                 {% endfor %}
-                            {% endfor %}
-                        </div>
+
+                                {% else %}
+                                    <p class="text-center mt-4">
+                                        No hay turnos asignados actualmente.
+                                    </p>
+                                {% endif %}
+
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -53,4 +59,5 @@
         </div>
     </div>
 </section>
+
 {% endblock content %}

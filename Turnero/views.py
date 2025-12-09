@@ -22,8 +22,16 @@ def gestionar_turnero(request):
 
 def llamar_turno(request, id_turno):
     turno = get_object_or_404(Turnos, id_turno=id_turno)
+
+    # Obtener profesional que está logueado
+    id_profesional = request.session.get("id_profesional")
+
+    if id_profesional:
+        turno.id_profesional_id = id_profesional  # Asignar profesional
+
     turno.estado = "llamando"
     turno.save()
+
     return redirect("gestionar_turnos")
 
 
@@ -68,9 +76,13 @@ def pantalla_turnos(request):
 def volver_llamar(request, id_turno):
     turno = get_object_or_404(Turnos, id_turno=id_turno)
 
+    id_profesional = request.session.get("id_profesional")
+    if id_profesional:
+        turno.id_profesional_id = id_profesional
+
     turno.estado = "llamando"
     turno.save()
 
-    messages.success(request, f"El turno {turno.letra}{turno.numero} fue vuelto a llamar.")
     return redirect("gestionar_turnos")
+
 

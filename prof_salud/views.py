@@ -1,8 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, Turnos
 from login.decorators import role_required
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+
 
 ALLOWED_PROF_ROLES = ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']
 
@@ -62,26 +64,23 @@ def registro_prof_salud(request):
     }
     return render(request, 'paginas/registro_prof_salud.html', context)
 
-@login_required
-def consultas_pacientes(request):
 
-    # Obtener el profesional de salud logueado
-    profesional = ProfesionalSalud.objects.get(usuario=request.user)
+def consultas_prof_salud(request):
+    # Obtener id del profesional desde la sesión
+    id_prof = request.session.get("id_profesional")
 
-    # Turnos asignados a ese profesional
-    turnos = (
-        Turnos.objects
-        .filter(id_profesional=profesional)
-        .exclude(estado__iexact="cerrado")
-        .order_by("id_turno")
-    )
+    if not id_prof:
+        return HttpResponse("No se encontró un profesional en sesión")
 
-    # ORGANIZAR DATOS PARA EL TEMPLATE COMO EL TEMPLATE LOS ESPERA
-    profesionales = [{
-        "consultorio": profesional.id_centro_medico,   # O tu campo de consultorio real
-        "turnos": turnos
-    }]
+    # Obtener profesional
+    profesional = ProfesionalSalud.objects.get(id_profesional=id_prof)
 
-    return render(request, "profesional/consultas_pacientes.html", {
-        "profesionales": profesionales
-    })
+    # Obtener turnos asignados a ese profesional
+    turnos = Turnos.objects.filter(id_profesional=id_prof).order_by('fecha', 'hora')
+
+    context = {
+        "profesional": profesional,
+        "turnos": turnos,
+    }
+
+    return render(request, 'paginas/consultas_prof_salud.html', context)
