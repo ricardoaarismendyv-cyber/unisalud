@@ -264,11 +264,11 @@ class OrdenMedicamentoForm(forms.ModelForm):
     """
     Formulario específico para crear órdenes de medicamentos con autocompletado.
     """
-    # Campo oculto que guardará el ID del medicamento seleccionado.
-    id_medicamento_hidden = forms.ModelChoiceField(
+    # Campo oculto que guardará el ID del medicamento seleccionado. Renombrado para claridad.
+    id_medicamento = forms.ModelChoiceField(
         queryset=Medicamentos.objects.all(), 
         widget=forms.HiddenInput(), 
-        required=False, 
+        required=False, # Se valida en el método clean
         label=""
     )
 
@@ -294,7 +294,6 @@ class OrdenMedicamentoForm(forms.ModelForm):
     class Meta:
         model = OrdenMedica
         fields = [
-            'id_paciente',
             'dosis',
             'duracion_tratamiento',
             'frecuencia',
@@ -302,7 +301,6 @@ class OrdenMedicamentoForm(forms.ModelForm):
             'indicaciones'
         ]
         widgets = {
-            'id_paciente': forms.Select(attrs={'class': 'form-control mb-2'}),
             'indicaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
         }
 
@@ -312,20 +310,22 @@ class OrdenMedicamentoForm(forms.ModelForm):
             if not field.widget.attrs.get('class'):
                 field.widget.attrs['class'] = 'form-control mb-2'
         self.fields['duracion_tratamiento'].label = "Duración del Tratamiento"
-        self.fields['id_paciente'].label = "Paciente"
 
     def clean(self):
         cleaned_data = super().clean()
-        id_medicamento = cleaned_data.get('id_medicamento_hidden')
+        # Si el formulario se va a eliminar, no se requiere validación adicional.
+        if self.has_changed() and not cleaned_data.get('DELETE'):
+            id_medicamento = cleaned_data.get('id_medicamento')
+            codigo_select = cleaned_data.get('codigo_medicamento_select')
+            nombre_select = cleaned_data.get('nombre_generico_select')
 
-        # Si se seleccionó un medicamento, lo asignamos al campo 'id_medicamento' del modelo
-        if id_medicamento:
-            cleaned_data['id_medicamento'] = id_medicamento
-        # Si no se seleccionó, pero es un campo obligatorio en el modelo, lanzamos un error.
-        # Si es opcional (null=True en el modelo), no hacemos nada.
-        elif not self.Meta.model._meta.get_field('id_medicamento').null:
-             self.add_error(None, 'Debe seleccionar un medicamento.')
-        
+            # Un medicamento es requerido si el formulario no está vacío
+            if not id_medicamento and (codigo_select or nombre_select):
+                self.add_error(None, 'Debe seleccionar un medicamento válido de la lista.')
+            elif not id_medicamento:
+                # Si no hay medicamento pero otros campos sí, también es un error.
+                if any(cleaned_data.get(f) for f in ['dosis', 'cantidad', 'frecuencia']):
+                    self.add_error('id_medicamento', 'Se requiere un medicamento para estos detalles.')
         return cleaned_data
 
 
