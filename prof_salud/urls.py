@@ -3,7 +3,6 @@ from usuario import views as usuario_views
 from administrativo import views as admin_views
 from . import views
 
-
 urlpatterns = [ 
     path('inicio/', views.inicio_prof_salud, name='inicio_prof_salud'),
     path('historia_clinica/', views.hc_prof_salud, name='hc_prof_salud'), # Se mantiene una sola ruta con este nombre
@@ -17,7 +16,7 @@ urlpatterns = [
     path('ordenes_medicamentos/', views.omed_prof_salud, name='omed_prof_salud'),
     path('ordenes_medicamentos/diligenciar/', views.diligenciar_omedicamentos, name='diligenciar_omedicamentos'),
     path('ordenes_medicamentos/ver-pdf/<int:orden_id>/', views.ver_omedicamentos_pdf, name='ver_omedicamentos_pdf'),
-    path('ordenes_medicamentos/generar-pdf/<int:orden_id>/', views.generar_omedicamentos_pdf, name='generar_omedicamentos_pdf'),
+    path('ordenes_medicamentos/generar-pdf/<int:orden_id>/', views.generar_omedicamentos_pdf, name='generar_omedicamentos_pdf'),  
     path('turnos/', views.consultas_prof_salud, name='consultas_prof_salud'),
     path('preguntas-frecuentes', views.preguntasfrecuentes_prof_salud, name='preguntas-frecuentes_prof_salud'),
     path('uso-del-sistema', views.usosistema_prof_salud, name='usosistema_prof_salud'),
