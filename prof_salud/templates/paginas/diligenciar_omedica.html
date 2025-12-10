@@ -71,9 +71,11 @@
                             <button type="button" id="add-servicio-btn" class="btn btn-secondary">Añadir Otro Servicio</button>
                             <button type="button" id="remove-servicio-btn" class="btn btn-outline-danger">Eliminar Último</button>
                         </div>
-                        <hr>
-
-                        <button type="submit" class="btn btn-primary mt-3">Guardar Orden Médica</button>
+                        
+                        <div class="d-flex justify-content-end mt-4">
+                            <a href="{% url 'omed_prof_salud' %}" class="btn btn-secondary me-2">Cancelar</a>
+                            <button type="submit" class="btn btn-success">Guardar Orden Médica</button>
+                        </div>
                     </form>
                 </div>
             </div>
