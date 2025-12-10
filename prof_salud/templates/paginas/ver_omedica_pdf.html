@@ -2,18 +2,24 @@
 {% load static %}
 {% block title %}Ver Orden Médica PDF{% endblock title %}
 
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock estilo %}
+
 {% block content %}
 <section class="main">
     <div class="container-fluid">
         <div class="row justify-content-center p-4">
             <div class="col-lg-10 col-md-10">
                 <a class="btn btn-main btn-nav" href="{% url 'om_prof_salud' %}">Volver a Órdenes Médicas</a>
-                <a class="btn btn-main btn-nav" href="{% url 'generar_omedica_pdf' orden.id_orden %}" download>Descargar PDF</a>
+                <a class="btn btn-main btn-nav" href="{% url 'generar_omedica_pdf' orden.id_orden %}" download="OM_{{ orden.id_paciente.numero_documento }}_{{ orden.fecha_emision|date:'Ymd' }}.pdf">Descargar PDF</a>
                 
                 <div class="container border border-dark rounded p-4 my-5 div-main">
-                    <h1>Orden Médica #{{ orden.id_orden }}</h1>
-                    <p>A continuación se muestra el PDF de la orden médica generada. Puedes descargarlo usando el botón de arriba.</p>
-                    <iframe src="{% url 'generar_omedica_pdf' orden.id_orden %}" width="100%" height="800px" style="border: none;"></iframe>
+                    <h1>Visualizador de Orden Médica #{{ orden.id_orden }}</h1>
+                    <p>El PDF de la orden se muestra a continuación. Puede usar los controles del visor o el botón de descarga para guardarlo.</p>
+
+                    <iframe src="{% url 'generar_omedica_pdf' orden.id_orden %}" width="100%" height="800px" style="border: none;" title="Visor de PDF de Orden Médica"></iframe>
                 </div>
             </div>
         </div>
