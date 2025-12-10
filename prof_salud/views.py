@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, DiagnosticoPaciente, AntecedentesPaciente, Enfermedades, Consulta, OrdenMedica, Servicios, EstadoOrden, TipoOrden, Medicamentos
+from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, DiagnosticoPaciente, AntecedentesPaciente, Enfermedades, Consulta, OrdenMedica, Servicios, EstadoOrden, TipoOrden, Medicamentos, Pacientes
 from login.decorators import role_required
 from .forms import ConsultaForm, DiagnosticoFormSet, AntecedenteFormSet, OrdenMedicaForm, serviciosFormSet, OrdenMedicamentoForm, MedicamentoFormSet
 from django.utils import timezone
@@ -360,38 +360,54 @@ def diligenciar_omedicamentos(request):
 
     if request.method == 'POST':
         medicamento_formset = MedicamentoFormSet(request.POST, prefix='medicamentos')
+        paciente_id = request.POST.get('paciente')
 
-        if medicamento_formset.is_valid():
+        if medicamento_formset.is_valid() and paciente_id:
             try:
                 orden_creada_id = None
+                paciente = Pacientes.objects.get(pk=paciente_id)
+                fecha_emision_batch = timezone.now() # Usar la misma fecha para todo el lote
+
                 for form in medicamento_formset:
                     if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
                         nueva_orden = form.save(commit=False)
-                        # El método clean del formulario ya ha puesto el medicamento en cleaned_data
                         medicamento_seleccionado = form.cleaned_data.get('id_medicamento')
-                        if not medicamento_seleccionado:
-                            messages.error(request, 'Debe seleccionar un medicamento válido.')
-                            # Volvemos a renderizar el formulario con el error
-                            return render(request, 'paginas/diligenciar_omedicamentos.html', {'medicamento_formset': medicamento_formset, 'medicamentos_json': medicamentos_json})
                         
+                        if not medicamento_seleccionado:
+                            # Si el formulario no tiene medicamento, pero ha cambiado, es un formset vacío o incompleto.
+                            # Lo saltamos para no guardar una orden vacía.
+                            if form.has_changed():
+                                continue
+
+                        # Asignar los datos que no vienen del formulario
+                        nueva_orden.id_paciente = paciente
                         nueva_orden.id_medicamento = medicamento_seleccionado
 
                         # Asignar los datos que no vienen del formulario
                         nueva_orden.id_profesional = profesional
                         nueva_orden.id_centro_medico = profesional.id_centro_medico
-                        nueva_orden.fecha_emision = timezone.now()
+                        nueva_orden.fecha_emision = fecha_emision_batch
                         # Asignar un estado inicial y tipo de orden
-                        nueva_orden.id_estado_orden = EstadoOrden.objects.get(nombre_estado_orden='Pendiente')
-                        nueva_orden.id_tipo_orden = TipoOrden.objects.get(nombre_tipo='Medicamentos')
+                        nueva_orden.id_estado_orden, _ = EstadoOrden.objects.get_or_create(nombre_estado_orden__iexact='Pendiente', defaults={'nombre_estado_orden': 'Pendiente'})
+                        nueva_orden.id_tipo_orden, _ = TipoOrden.objects.get_or_create(nombre_tipo__iexact='Medicamentos', defaults={'nombre_tipo': 'Medicamentos'})
                         nueva_orden.save()
                         orden_creada_id = nueva_orden.id_orden
 
-                messages.success(request, f'Orden de Medicamentos para el paciente {nueva_orden.id_paciente} guardada con éxito.')
-                return redirect('omed_prof_salud') # Redirigir a la lista de órdenes de medicamentos
-            except Exception as e:
+                if orden_creada_id:
+                    messages.success(request, f'Orden de Medicamentos para el paciente {nueva_orden.id_paciente} guardada con éxito.')
+                    # Redirigir a la vista que muestra el PDF de la última orden creada
+                    return redirect('ver_omedicamentos_pdf', orden_id=orden_creada_id)
+                else:
+                    messages.warning(request, 'No se añadió ningún medicamento, por lo que no se guardó ninguna orden.')
+            except Pacientes.DoesNotExist:
+                messages.error(request, 'El paciente seleccionado no es válido.')
+            except Exception as e: # Captura de otros posibles errores
                 messages.error(request, f'Ocurrió un error al guardar la orden: {e}')
         else:
-             messages.error(request, 'Por favor, corrija los errores en el formulario.')
+            # Si el formset no es válido, los errores se mostrarán en la plantilla.
+            # Si el paciente no fue seleccionado, el 'required' del HTML lo manejará.
+            if not paciente_id:
+                messages.error(request, 'Debe seleccionar un paciente para la orden.')
     else:
         medicamento_formset = MedicamentoFormSet(prefix='medicamentos')
 
@@ -400,15 +416,64 @@ def diligenciar_omedicamentos(request):
         m.id_medicamento: {
             'codigo_medicamento': m.codigo_medicamento,
             'nombre_generico': m.nombre_generico,
-             'principio_activo': m.principio_activo,
+            'principio_activo': m.principio_activo,
             'concentracion': m.concentracion,
             'forma_farmaceutica': m.forma_farmaceutica,
         } for m in Medicamentos.objects.all()
     }
     medicamentos_json = json.dumps(medicamentos_data, cls=DjangoJSONEncoder)
 
+    pacientes = Pacientes.objects.all()
 
     return render(request, 'paginas/diligenciar_omedicamentos.html', {
+        'pacientes': pacientes,
         'medicamento_formset': medicamento_formset,
         'medicamentos_json': medicamentos_json,
     })
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+def ver_omedicamentos_pdf(request, orden_id):
+    """
+    Muestra una página con el PDF de la Orden de Medicamentos incrustado.
+    """
+    try:
+        orden = OrdenMedica.objects.get(id_orden=orden_id)
+        return render(request, 'paginas/ver_omedicamentos_pdf.html', {'orden': orden})
+    except OrdenMedica.DoesNotExist:
+        messages.error(request, 'La orden de medicamentos solicitada no existe.')
+        return redirect('omed_prof_salud')
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+def generar_omedicamentos_pdf(request, orden_id):
+    """
+    Genera un PDF para una orden de medicamentos específica.
+    """
+    try:
+        orden = OrdenMedica.objects.get(id_orden=orden_id)
+        
+        # Asumimos que todas las órdenes de medicamentos de una misma sumisión
+        # comparten paciente, profesional y fecha de emisión.
+        medicamentos_solicitados = OrdenMedica.objects.filter(
+            id_paciente=orden.id_paciente,
+            id_profesional=orden.id_profesional,
+            fecha_emision=orden.fecha_emision,
+            id_medicamento__isnull=False # Solo órdenes que son de medicamentos
+        ).select_related('id_medicamento')
+
+        context = {
+            'orden': orden,
+            'medicamentos': medicamentos_solicitados,
+        }
+        pdf = render_to_pdf('pdf/omedicamentos_pdf_template.html', context)
+
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = f'inline; filename="orden_medicamentos_{orden.id_orden}.pdf"'
+            return response
+        
+        messages.error(request, 'No se pudo generar el PDF de la orden de medicamentos.')
+        return redirect('omed_prof_salud')
+
+    except OrdenMedica.DoesNotExist:
+        messages.error(request, 'La orden de medicamentos solicitada no existe.')
+        return redirect('omed_prof_salud')
