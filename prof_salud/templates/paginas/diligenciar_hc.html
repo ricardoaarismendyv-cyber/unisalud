@@ -95,8 +95,11 @@
                             <button type="button" id="add-antecedente-btn" class="btn btn-secondary">Añadir Otro Antecedente</button>
                             <button type="button" id="remove-antecedente-btn" class="btn btn-outline-danger">Eliminar Último</button>
                         </div>
-
-                        <button type="submit" class="btn btn-primary mt-3">Guardar Historia Clínica</button>
+                        
+                        <div class="d-flex justify-content-end mt-4">
+                            <a href="{% url 'omed_prof_salud' %}" class="btn btn-secondary me-2">Cancelar</a>
+                            <button type="submit" class="btn btn-success">Guardar Historia Clínica</button>
+                        </div>
                     </form>
                 </div>
             </div>
