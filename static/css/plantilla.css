@@ -74,7 +74,7 @@ main.dark-mode{
 
 /* css de inicio */
 main {
-    margin-top: 20px;
+    margin-top: 0px;
     margin-bottom: 40px;
 }
 
@@ -634,5 +634,5 @@ body.color-blind-mode {
 
 body.color-blind-mode .mainHeader,
 body.color-blind-mode .footer-bar {
-    position: fixed !important;
+    position: static !important;
 }
