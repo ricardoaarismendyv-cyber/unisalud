@@ -46,12 +46,12 @@ def login_view(request):
                 # REDIRECCIÓN PRINCIPAL
                 # ----------------------
 
-                # Si es profesional → IR DIRECTO A TURNOS
-                if any(r in roles_prof for r in roles_usuario):
-                    return redirect(
-                        'consultas_prof_salud',
-                        id_prof=request.session['id_profesional']
-                    )
+# Si es profesional → IR DIRECTO A TURNOS
+            if any(r in roles_prof for r in roles_usuario):
+                prof = ProfesionalSalud.objects.get(usuario=usuario)
+                return redirect('consultas_prof_salud', id_profesional=prof.id_profesional)
+
+
 
                 # Si es paciente
                 if 'paciente' in roles_usuario:

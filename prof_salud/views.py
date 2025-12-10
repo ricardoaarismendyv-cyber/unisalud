@@ -64,23 +64,12 @@ def registro_prof_salud(request):
     }
     return render(request, 'paginas/registro_prof_salud.html', context)
 
+def consultas_prof_salud(request, id_profesional):
 
-def consultas_prof_salud(request):
-    # Obtener id del profesional desde la sesión
-    id_prof = request.session.get("id_profesional")
+    turnos = Turnos.objects.filter(
+        id_profesional=id_profesional
+    ).select_related('id_paciente').order_by('fecha_hora_turno')
 
-    if not id_prof:
-        return HttpResponse("No se encontró un profesional en sesión")
-
-    # Obtener profesional
-    profesional = ProfesionalSalud.objects.get(id_profesional=id_prof)
-
-    # Obtener turnos asignados a ese profesional
-    turnos = Turnos.objects.filter(id_profesional=id_prof).order_by('fecha', 'hora')
-
-    context = {
-        "profesional": profesional,
-        "turnos": turnos,
-    }
-
-    return render(request, 'paginas/consultas_prof_salud.html', context)
+    return render(request, 'paginas/consultas_prof_salud.html', {
+        'turnos': turnos
+    })

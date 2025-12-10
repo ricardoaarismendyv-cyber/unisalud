@@ -96,9 +96,10 @@
                             </div>
                             <h3>Consultas y Agenda</h3>
                             <p>Revise su agenda de consultas programadas, gestione la disponibilidad y atienda a sus pacientes de manera organizada.</p>
-                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url "consultas_prof_salud" %}'">
+                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url "consultas_prof_salud" profesional.id_profesional %}'">
                                 Ver Agenda
                             </button>
+
                         </div>
                     </div>
                 </div>

@@ -26,30 +26,62 @@
                     <div class="col-lg-10 col-md-10">
                         <div class="container border border-dark rounded p-4 my-5 div-main">
 
-                            <h1>Consultas Pacientes</h1>
+                            <h1 class="text-center">Turnos del Profesional</h1>
 
                             <div class="turnos-container">
-
                                 {% if turnos %}
-                                {% for turno in turnos %}
-                                    <div class="turno-card">
-                                        <div class="paciente">
-                                            {{ turno.id_paciente.nombre_completo }}
-                                        </div>
-                                        <div class="consultorio">
-                                            Consultorio #{{ profesional.consultorio }}
-                                        </div>
-                                    </div>
-                                {% empty %}
-                                    <p class="text-center mt-4">No hay turnos asignados actualmente.</p>
-                                {% endfor %}
+                                    {% for turno in turnos %}
+                                        <div class="turno-card">
 
+                                            <!-- Paciente -->
+                                            <div class="paciente">
+                                                {% if turno.id_paciente %}
+                                                    <div class="d-grid gap-2">
+                                                        <button
+                                                            type="button"
+                                                            name=""
+                                                            id=""
+                                                            class="navButton1"
+                                                            onclick="window.location.href='{% url "inicio_prof_salud" %}'"
+                                                        >
+                                                            {{ turno.id_paciente.nombre1 }} {{ turno.id_paciente.apellido1 }}
+                                                        </button>
+                                                    </div>
+                                                {% else %}
+                                                    <span class="text-muted">Paciente sin asignar</span>
+                                                {% endif %}
+                                            </div>
+
+                                            <!-- Turno -->
+                                            <div class="turno-numero">
+                                                Turno: <strong>{{ turno.letra }}{{ turno.numero }}</strong>
+                                            </div>
+
+                                            <!-- Fecha y hora -->
+                                            <div class="fecha-hora">
+                                                {{ turno.fecha_hora_turno|date:"d/m/Y h:i" }}
+                                            </div>
+
+                                            <!-- Estado -->
+                                            <div class="estado">
+                                                Estado: {{ turno.estado|default:"Sin estado" }}
+                                            </div>
+
+                                            <!-- Categoría -->
+                                            <div class="categoria">
+                                                Categoría: {{ turno.categoria_turno|default:"No definida" }}
+                                            </div>
+
+                                            <!-- Módulo -->
+                                            <div class="modulo">
+                                                Módulo: {{ turno.modulo_asignado|default:"No asignado" }}
+                                            </div>
+
+                                        </div>
+                                    {% endfor %}
                                 {% else %}
-                                    <p class="text-center mt-4">
-                                        No hay turnos asignados actualmente.
-                                    </p>
+                                    <p class="text-center mt-4">No hay turnos asignados actualmente.</p>
                                 {% endif %}
-
                             </div>
 
                         </div>
