@@ -4,39 +4,97 @@
     <meta charset="UTF-8">
     <title>Orden Medicamentos #{{ orden.id_orden }}</title>
     <style>
-        body { font-family: sans-serif; margin: 20px; }
-        h1, h2 { color: #333; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .info-section { margin-bottom: 15px; }
-        .info-section p { margin: 2px 0; }
-        .info-section strong { display: inline-block; width: 150px; }
-        .footer { text-align: center; margin-top: 30px; font-size: 0.8em; color: #777; }
+            @page {
+            size: letter;
+            margin: 1in;
+        }
+        body {
+            font-family: "Helvetica", sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #333;
+        }
+        h1, h2, h3 {
+            font-weight: bold;
+            color: #000;
+        }
+        h1 {
+            font-size: 24pt;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        h2 {
+            font-size: 16pt;
+            margin-top: 25px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+        h3 {
+            font-size: 13pt;
+            margin-top: 20px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .grid-container {
+            display: -pdf-grid;
+            -pdf-grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .grid-item {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            padding: 10px;
+        }
+        .label {
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Orden Medicamentos</h1>
-        <h2>Centro Médico: {{ orden.id_centro_medico.nombre_centro }}</h2>
-    </div>
+    <h1>Orden de Medicamentos</h1>
 
-    <div class="info-section">
-        <h2>Datos del Paciente</h2>
-        <p><strong>Paciente:</strong> {{ orden.id_paciente.nombre1 }} {{ orden.id_paciente.apellido1 }}</p>
-        <p><strong>Documento:</strong> {{ orden.id_paciente.id_tipo_identificacion.identificacion }} {{ orden.id_paciente.numero_documento }}</p>
-    </div>
-
-    <div class="info-section">
-        <h2>Detalles de la Orden</h2>
+    <div class="section">
+        <h2>Datos de la Orden Medicamentos</h2>
         <p><strong>Número de Orden:</strong> {{ orden.id_orden }}</p>
         <p><strong>Fecha de Emisión:</strong> {{ orden.fecha_emision|date:"d/m/Y H:i" }}</p>
-        <p><strong>Tipo de Orden:</strong> {{ orden.id_tipo_orden.nombre_tipo }}</p>
-        {# Las indicaciones generales se mostrarán por cada servicio en la tabla de abajo #}
+        <p><strong>Centro Médico:</strong> {{ orden.id_centro_medico.nombre_centro }}</p>
+        <p><strong>Profesional que Emite:</strong> {{ orden.id_profesional.nombre1 }} {{ orden.id_profesional.apellido1 }}</p>
     </div>
 
     <div class="section">
+        <h2>Datos del Paciente</h2>
+        <p><strong>Paciente:</strong> {{ orden.id_paciente.nombre1 }} {{ orden.id_paciente.apellido1 }}</p>
+        <p><strong>Documento:</strong> {{ orden.id_paciente.id_tipo_identificacion.identificacion }} {{ orden.id_paciente.numero_documento }}</p>
+        <p><strong>EPS:</strong> {{ orden.id_paciente.id_eps.nombre_eps }}</p>
+        <p><strong>Dirección:</strong> {{ orden.id_paciente.direccion }}</p>
+        <p><strong>Teléfono:</strong> {{ orden.id_paciente.telefono }}</p>
+        <p><strong>Correo Electrónico:</strong> {{ orden.id_paciente.correo_electronico }}</p>
+        <p><strong>Edad:</strong> {{ orden.id_paciente.get_edad }} años</p>
+        <p><strong>Género:</strong> {{ orden.id_paciente.get_genero_display }}</p>
+    </div>
+
+    <div class="section">
+        <h2>Detalles de la Orden</h2>
+        <p><strong>Número de Orden:</strong> {{ orden.id_orden }}</p>
         <h2>Medicamentos Solicitados</h2>
-        {% if medicamentos, servicios %} 
+        {% if medicamentos %} 
             <table>
                 <thead>
                     <tr>
@@ -46,17 +104,19 @@
                         <th>Frecuencia</th>
                         <th>Duración</th>
                         <th>Cantidad</th>
+                        <th>Indicaciones</th>   
                     </tr>
                 </thead>
                 <tbody>
-                    {% for d in medicamentos, servicios %}
+                    {% for d in medicamentos %}
                     <tr>
-                        <td>{{ d.id_servicio.codigo_medicamento }}</td>
-                        <td>{{ d.id_servicio.nombre_generico }}</td>
-                        <td>{{ d.id_servicio.dosis }}</td>
-                        <td>{{ d.id_servicio.frecuencia }}</td>
-                        <td>{{ d.id_servicio.duracion }}</td>
-                        <td>{{ d.cantidad }}</td>
+                        <td>{{ d.id_medicamento.codigo_medicamento }}</td>
+                        <td>{{ d.id_medicamento.nombre_generico }}</td>
+                        <td>{{ d.id_medicamento.dosis }}</td>
+                        <td>{{ d.id_medicamento.frecuencia }}</td>
+                        <td>{{ d.id_medicamento.duracion }}</td>
+                        <td>{{ d.id_medicamento.cantidad }}</td>
+                        <td>{{ d.indicaciones|default:"-" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
