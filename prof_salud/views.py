@@ -8,8 +8,13 @@ import json
 from django.http import HttpResponse
 from django.template.loader import get_template #obtener o descargar una plantilla de diseño web
 from xhtml2pdf import pisa #conversión real que realiza el trabajo de transformar el contenido HTML y CSS en el formato PDF.
+import qrcode # Para generar códigos QR
+import uuid # Para generar el id_lote
 from io import BytesIO #generar un archivo (como un PDF o una imagen) y enviarlo inmediatamente a un usuario a través de una API web, sin tocar el sistema de archivos del servidor.
+from django.urls import reverse # <--- AÑADIR ESTA LÍNEA
 from django.core.serializers.json import DjangoJSONEncoder
+import base64
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 ALLOWED_PROF_ROLES = ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']
 
@@ -21,7 +26,9 @@ def inicio_prof_salud(request):
                 if not profesional_id:
                         messages.error(request, 'No se encontró un perfil de profesional de salud en su sesión.')
                         return redirect('login')
-                request.session['active_role'] = 'profesional_salud' # <--- AÑADIR ESTA LÍNEA
+                #  asegura que el rol activo se mantenga consistente a lo largo de la sesión del usuario, especialmente cuando navega entre diferentes perfiles si tiene más de uno.
+                if 'active_role' not in request.session:
+                        request.session['active_role'] = 'profesional_salud'
                 profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
                 return render(request, 'paginas/inicio_prof_salud.html', {'profesional': profesional, 'roles': request.session.get('roles', [])})
         except ProfesionalSalud.DoesNotExist:
@@ -249,6 +256,7 @@ def ver_hc_pdf(request, consulta_id):
         return redirect('hc_prof_salud')
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
+@xframe_options_sameorigin # Permite que esta vista se cargue en un iframe del mismo sitio.
 def generar_hc_pdf(request, consulta_id):
     """
     Genera un PDF para una consulta de historia clínica específica.
@@ -258,18 +266,33 @@ def generar_hc_pdf(request, consulta_id):
         diagnosticos = DiagnosticoPaciente.objects.filter(id_consulta=consulta)
         antecedentes = AntecedentesPaciente.objects.filter(id_paciente=consulta.id_paciente)
 
+        # 1. Construir la URL de verificación para el QR
+        verification_url = request.build_absolute_uri(
+            reverse('ver_hc_pdf', args=[consulta.id_consulta])
+        )
+
+        # 2. Generar la imagen del QR en memoria
+        qr_img = qrcode.make(verification_url, box_size=6)
+        qr_buffer = BytesIO()
+        qr_img.save(qr_buffer, format='PNG')
+        qr_b64 = base64.b64encode(qr_buffer.getvalue()).decode('utf-8')
+        qr_code_data_uri = f'data:image/png;base64,{qr_b64}'
+
         context = {
             'consulta': consulta,
             'diagnosticos': diagnosticos,
             'antecedentes': antecedentes,
+            'qr_code': qr_code_data_uri, # Pasar la imagen como Data URI
         }
         pdf = render_to_pdf('pdf/hc_pdf_template.html', context)
 
         if pdf:
             # Creamos la respuesta HTTP con los bytes del PDF
             response = HttpResponse(pdf, content_type='application/pdf')
-            # Esta cabecera le indica al navegador que muestre el archivo en línea
-            response['Content-Disposition'] = f'inline; filename="hc_{consulta.id_consulta}.pdf"'
+            # La cabecera 'inline' sugiere al navegador mostrar el PDF en línea.
+            # El navegador del usuario decide si lo muestra o lo descarga
+            filename = f"hc_{consulta.id_paciente.numero_documento}_{consulta.fecha_atencion.strftime('%Y%m%d')}.pdf"
+            response['Content-Disposition'] = f'inline; filename="{filename}"'
             return response
         
         messages.error(request, 'No se pudo generar el PDF.')
@@ -298,6 +321,9 @@ def diligenciar_omedica(request):
                 orden_base = orden_medica_form.cleaned_data
                 estado_pendiente = EstadoOrden.objects.get(nombre_estado_orden='Pendiente')
                 orden_creada_id = None # Variable para guardar el ID de la última orden creada
+                # Generamos un ID de lote único para esta transacción.
+                lote_id = uuid.uuid4()
+                fecha_emision_batch = timezone.now()
 
                 # Guardar los servicios del formset
                 for servicio_form in servicios_formset:
@@ -316,7 +342,8 @@ def diligenciar_omedica(request):
                             id_servicio=servicios_obj,
                             indicaciones=servicio_form.cleaned_data.get('indicaciones', ''),
                             id_estado_orden=estado_pendiente,
-                            fecha_emision=timezone.now(), 
+                            id_lote=lote_id, # Asignamos el ID de lote.
+                            fecha_emision=fecha_emision_batch, 
                         )
                         orden_creada_id = nueva_orden.id_orden # Actualizamos el ID con la última orden
 
@@ -357,7 +384,6 @@ def ver_omedica_pdf(request, orden_id):
     Muestra una página con el PDF de la Orden Médica incrustado y opciones para descargar o volver.
     """
     try:
-        # Verificamos que la orden exista para evitar errores
         orden = OrdenMedica.objects.get(id_orden=orden_id)
         return render(request, 'paginas/ver_omedica_pdf.html', {'orden': orden})
     except OrdenMedica.DoesNotExist:
@@ -365,35 +391,43 @@ def ver_omedica_pdf(request, orden_id):
         return redirect('om_prof_salud')
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
+@xframe_options_sameorigin # Permite que esta vista se cargue en un iframe del mismo sitio.
 def generar_omedica_pdf(request, orden_id):
     """
     Genera un PDF para una orden médica específica.
     """
     try:
         orden = OrdenMedica.objects.get(id_orden=orden_id)
-        
-        # Para mostrar todos los servicios de una "orden lógica" (una única submission),
-        # asumimos que comparten el mismo paciente, profesional, centro, tipo de orden
-        # y la misma fecha de emisión (o una muy cercana).
-        # Es crucial que en diligenciar_omedica se use un único timezone.now() para todas las órdenes de un batch.
+
+        # Usamos el id_lote para agrupar todos los servicios de la misma orden.
         servicios_solicitados = OrdenMedica.objects.filter(
-            id_paciente=orden.id_paciente,
-            id_profesional=orden.id_profesional,
-            id_centro_medico=orden.id_centro_medico,
-            id_tipo_orden=orden.id_tipo_orden,
-            fecha_emision=orden.fecha_emision, # Asumimos que todas las órdenes del batch tienen la misma fecha_emision
-            id_servicio__isnull=False # Solo queremos las órdenes que son de tipo servicio
+            id_lote=orden.id_lote,
+            id_servicio__isnull=False
         ).select_related('id_servicio') # Optimiza la consulta para obtener los detalles del servicio
+
+        # 1. Construir la URL de verificación para el QR
+        verification_url = request.build_absolute_uri(
+            reverse('ver_omedica_pdf', args=[orden.id_orden])
+        )
+
+        # 2. Generar la imagen del QR en memoria
+        qr_img = qrcode.make(verification_url, box_size=6)
+        qr_buffer = BytesIO()
+        qr_img.save(qr_buffer, format='PNG')
+        qr_b64 = base64.b64encode(qr_buffer.getvalue()).decode('utf-8')
+        qr_code_data_uri = f'data:image/png;base64,{qr_b64}'
 
         context = {
             'orden': orden,
             'servicios': servicios_solicitados,
+            'qr_code': qr_code_data_uri,
         }
         pdf = render_to_pdf('pdf/omedica_pdf_template.html', context)
 
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition'] = f'inline; filename="orden_medica_{orden.id_orden}.pdf"'
+            filename = f"OM_{orden.id_paciente.numero_documento}_{orden.fecha_emision.strftime('%Y%m%d')}.pdf"
+            response['Content-Disposition'] = f'inline; filename="{filename}"'
             return response
         
         messages.error(request, 'No se pudo generar el PDF de la orden médica.')
@@ -420,7 +454,8 @@ def diligenciar_omedicamentos(request):
             try:
                 orden_creada_id = None
                 paciente = Pacientes.objects.get(pk=paciente_id)
-                fecha_emision_batch = timezone.now() # Usar la misma fecha para todo el lote
+                lote_id = uuid.uuid4() # Generamos un ID de lote único.
+                fecha_emision_batch = timezone.now()
 
                 for form in medicamento_formset:
                     if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
@@ -436,6 +471,7 @@ def diligenciar_omedicamentos(request):
                         # Asignar los datos que no vienen del formulario
                         nueva_orden.id_paciente = paciente
                         nueva_orden.id_medicamento = medicamento_seleccionado
+                        nueva_orden.id_lote = lote_id # Asignamos el ID de lote.
 
                         # Asignar los datos que no vienen del formulario
                         nueva_orden.id_profesional = profesional
@@ -498,31 +534,43 @@ def ver_omedicamentos_pdf(request, orden_id):
         return redirect('omed_prof_salud')
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
+@xframe_options_sameorigin # Permite que esta vista se cargue en un iframe del mismo sitio.
 def generar_omedicamentos_pdf(request, orden_id):
     """
     Genera un PDF para una orden de medicamentos específica.
     """
     try:
         orden = OrdenMedica.objects.get(id_orden=orden_id)
-        
-        # Asumimos que todas las órdenes de medicamentos de una misma sumisión
-        # comparten paciente, profesional y fecha de emisión.
+
+        # Usamos el id_lote para agrupar todos los medicamentos de la misma orden.
         medicamentos_solicitados = OrdenMedica.objects.filter(
-            id_paciente=orden.id_paciente,
-            id_profesional=orden.id_profesional,
-            fecha_emision=orden.fecha_emision,
+            id_lote=orden.id_lote,
             id_medicamento__isnull=False # Solo órdenes que son de medicamentos
         ).select_related('id_medicamento')
+
+        # 1. Construir la URL de verificación para el QR
+        verification_url = request.build_absolute_uri(
+            reverse('ver_omedicamentos_pdf', args=[orden.id_orden])
+        )
+
+        # 2. Generar la imagen del QR en memoria
+        qr_img = qrcode.make(verification_url, box_size=6)
+        qr_buffer = BytesIO()
+        qr_img.save(qr_buffer, format='PNG')
+        qr_b64 = base64.b64encode(qr_buffer.getvalue()).decode('utf-8')
+        qr_code_data_uri = f'data:image/png;base64,{qr_b64}'
 
         context = {
             'orden': orden,
             'medicamentos': medicamentos_solicitados,
+            'qr_code': qr_code_data_uri,
         }
         pdf = render_to_pdf('pdf/omedicamentos_pdf_template.html', context)
 
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition'] = f'inline; filename="orden_medicamentos_{orden.id_orden}.pdf"'
+            filename = f"OMed_{orden.id_paciente.numero_documento}_{orden.fecha_emision.strftime('%Y%m%d')}.pdf"
+            response['Content-Disposition'] = f'inline; filename="{filename}"'
             return response
         
         messages.error(request, 'No se pudo generar el PDF de la orden de medicamentos.')
