@@ -9,7 +9,7 @@ class ConsultaForm(forms.ModelForm):
         queryset=Pacientes.objects.all(),
         label="Paciente",
         widget=forms.Select(attrs={'class': 'form-control'}),
-        help_text="Seleccione el paciente que está siendo atendido."
+        empty_label="Seleccione el paciente que está siendo atendido."
     )
 
     class Meta:
@@ -39,13 +39,25 @@ class ConsultaForm(forms.ModelForm):
         ]
         widgets = {
             # Usar Textarea para campos de texto largos
-            'motivo_consulta': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'anamnesis': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
-            'examen_fisico': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
-            'revision_sistemas': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
-            'impresion_diagnostica': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'plan_tratamiento': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'notas_adicionales': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'motivo_consulta': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Dolor de cabeza, fiebre...'}),
+            'anamnesis': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Descripción detallada de los síntomas y su evolución...'}),
+            'examen_fisico': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Hallazgos durante el examen físico...'}),
+            'frecuencia_cardiaca': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'lpm'}),
+            'frecuencia_respiratoria': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'rpm'}),
+            'temperatura': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '°C'}),
+            'saturacion_oxigeno': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '%'}),
+            'presion_arterial_sistolica': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'mmHg'}),
+            'presion_arterial_diastolica': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'mmHg'}),
+            'peso': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'kg'}),
+            'talla': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'm'}),
+            'imc': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Índice de Masa Corporal'}),
+            'habitos_fumador': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Describir hábitos de tabaquismo...'}),
+            'habitos_alcohol': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Describir consumo de alcohol...'}),
+            'habitos_ejercicio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Describir rutina de ejercicio...'}),
+            'revision_sistemas': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Revisión por sistemas (cardiovascular, respiratorio, etc.)...'}),
+            'impresion_diagnostica': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Diagnóstico principal o diferencial basado en la evaluación...'}),
+            'plan_tratamiento': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Pasos a seguir, medicamentos recetados, terapias...'}),
+            'notas_adicionales': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Cualquier otra observación relevante...'}),
         }
 
     # Añadir clases de Bootstrap a todos los campos
@@ -132,7 +144,7 @@ class AntecedenteForm(forms.ModelForm):
         fields = ['tipo_antecedente', 'descripcion', 'severidad', 'estado_antecedente']
         widgets = {
             'tipo_antecedente': forms.Select(attrs={'class': 'form-control'}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Describa el antecedente...'}),
             'severidad': forms.Select(attrs={'class': 'form-control'}),
             'estado_antecedente': forms.Select(attrs={'class': 'form-control'}),
         }
@@ -302,6 +314,10 @@ class OrdenMedicamentoForm(forms.ModelForm):
         ]
         widgets = {
             'indicaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'dosis': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'mg'}),
+            'duracion_tratamiento': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'días'}),
+            'frecuencia': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'día/hora'}),
+            'cantidad': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 12 tabletas'}),
         }
 
     def __init__(self, *args, **kwargs):
