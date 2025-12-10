@@ -40,7 +40,7 @@ def hc_prof_salud(request):
         profesional_id = request.session.get('id_profesional')
         if profesional_id:
             profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
-            # Buscamos la última consulta atendida por este profesional
+            # Se busca la última consulta atendida por este profesional
             ultima_consulta = Consulta.objects.filter(id_profesional=profesional, estado='Atendido').order_by('-fecha_atencion').first()
 
             # Si encontramos una última consulta, buscamos el historial de ese paciente
@@ -58,11 +58,64 @@ def hc_prof_salud(request):
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def om_prof_salud(request):
-    return render(request, 'paginas/om_prof_salud.html') #Vista de Orden Médica para el profesional de salud
+    """
+    Vista de Orden Médica para el profesional de salud.
+    Muestra la última orden médica registrada por el profesional.
+    """
+    ultima_orden_medica = None
+    historial_ordenes_medicas = None
+    try:
+        profesional_id = request.session.get('id_profesional')
+        if profesional_id:
+            profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
+            # Se busca la última OrdenMedica atendida por este profesional
+            ultima_orden_medica = OrdenMedica.objects.filter(id_profesional=profesional).order_by('-fecha_emision').first()
+
+            # Si encontramos una última orden médica, buscamos el historial de ese paciente
+            if ultima_orden_medica:
+                paciente = ultima_orden_medica.id_paciente
+                # Obtenemos las últimas órdenes médicas de ese paciente, ordenadas por fecha
+                historial_ordenes_medicas = OrdenMedica.objects.filter(id_paciente=paciente).order_by('-fecha_emision')[:5] # Puedes ajustar el límite
+
+    except ProfesionalSalud.DoesNotExist:
+        messages.error(request, 'No se pudo encontrar el perfil del profesional.')
+    except Exception as e:
+        messages.error(request, f'Ocurrió un error inesperado: {e}')
+
+    return render(request, 'paginas/om_prof_salud.html', {'ultima_orden_medica': ultima_orden_medica, 'historial_ordenes_medicas': historial_ordenes_medicas})
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def omed_prof_salud(request):
-    return render(request, 'paginas/omed_prof_salud.html') #Vista de Orden de Medicamentos para el profesional de salud.
+    """
+    Vista de Órdenes de Medicamentos para el profesional de salud.
+    Muestra la última orden de medicamentos registrada por el profesional y el historial del paciente.
+    """
+    ultima_orden_medicamentos = None
+    historial_ordenes_medicamentos = None
+    try:
+        profesional_id = request.session.get('id_profesional')
+        if profesional_id:
+            profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
+            # Buscamos la última OrdenMedicamentos atendida por este profesional
+            ultima_orden_medicamentos = OrdenMedica.objects.filter(
+                id_profesional=profesional, 
+                id_medicamento__isnull=False
+            ).order_by('-fecha_emision').first()
+
+            # Si encontramos una última orden médicamentos, buscamos el historial de ese paciente
+            if ultima_orden_medicamentos:
+                paciente = ultima_orden_medicamentos.id_paciente
+                # Obtenemos las últimas 5 órdenes de medicamentos de ese paciente.
+                historial_ordenes_medicamentos = OrdenMedica.objects.filter(
+                    id_paciente=paciente, id_medicamento__isnull=False
+                ).order_by('-fecha_emision')[:5]
+
+    except ProfesionalSalud.DoesNotExist:
+        messages.error(request, 'No se pudo encontrar el perfil del profesional.')
+    except Exception as e:
+        messages.error(request, f'Ocurrió un error inesperado: {e}')
+
+    return render(request, 'paginas/omed_prof_salud.html', {'ultima_orden_medicamentos': ultima_orden_medicamentos, 'historial_ordenes_medicamentos': historial_ordenes_medicamentos})
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def consultas_prof_salud(request):
@@ -117,8 +170,9 @@ def diligenciar_hc(request):
                 nueva_consulta.fecha_programada = timezone.now() # O la fecha de la cita real
                 nueva_consulta.fecha_atencion = timezone.now()
                 nueva_consulta.estado = 'Atendido'
-                paciente_obj = nueva_consulta.id_paciente # El paciente ya está asignado al guardar el form
-                nueva_consulta.id_paciente = paciente_obj
+                # El paciente se obtiene de los datos limpios del formulario.
+                paciente_obj = consulta_form.cleaned_data['paciente']
+                nueva_consulta.id_paciente = paciente_obj # Asignamos el objeto Paciente directamente.
                 nueva_consulta.save()
 
                 # Guardar los diagnósticos del formset
