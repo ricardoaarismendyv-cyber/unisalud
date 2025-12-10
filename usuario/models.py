@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password #para codificar y verificar las contraseñas de forma segura
+import uuid
 
 # aqui cambio los nombres de las clases a tipo CamelCase (nombre pegado con cada primera letra de la palabra en mayuscula)
 #cambio las tablas de db_table a su respectivo en minuscula y un guion bajo
@@ -433,6 +434,7 @@ class OrdenMedica(models.Model):
     id_orden = models.AutoField(primary_key=True, db_comment='ID autoincremental')
     id_paciente = models.ForeignKey('Pacientes', on_delete=models.CASCADE, db_column='id_paciente', db_comment='Referencia a PACIENTE')
     id_profesional = models.ForeignKey('ProfesionalSalud', on_delete=models.CASCADE, db_column='id_profesional', db_comment='Referencia a PROFESIONAL_SALUD')
+    id_lote = models.UUIDField(default=uuid.uuid4, editable=False, help_text='Identificador para agrupar órdenes de un mismo lote.')
     id_medicamento = models.ForeignKey('Medicamentos', on_delete=models.CASCADE, db_column='id_medicamento', null=True, blank=True, db_comment='Referencia a MEDICAMENTO')
     id_tipo_orden = models.ForeignKey('TipoOrden', on_delete=models.CASCADE, db_column='id_tipo_orden', db_comment='Referencia a TIPO_ORDEN')
     id_servicio = models.ForeignKey('Servicios', on_delete=models.CASCADE, db_column='id_servicio', null=True, blank=True, db_comment='Referencia a SERVICIOS')
