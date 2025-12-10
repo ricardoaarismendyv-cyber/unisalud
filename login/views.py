@@ -43,21 +43,20 @@ def login_view(request):
                         messages.warning(request, 'El usuario es profesional, pero no tiene perfil asignado.')
 
                 # ----------------------
-                # REDIRECCIÓN PRINCIPAL
+                # REDIRECCIONES
                 # ----------------------
 
-# Si es profesional → IR DIRECTO A TURNOS
-            if any(r in roles_prof for r in roles_usuario):
-                prof = ProfesionalSalud.objects.get(usuario=usuario)
-                return redirect('consultas_prof_salud', id_profesional=prof.id_profesional)
+                # Profesional → a Turnos
+                if any(r in roles_prof for r in roles_usuario):
+                    return redirect('consultas_prof_salud', id_profesional=request.session['id_profesional'])
 
-
-
-                # Si es paciente
+                # Paciente → a inicio paciente
                 if 'paciente' in roles_usuario:
                     return redirect('inicio-usuario')
 
                 messages.error(request, 'Rol no reconocido.')
+                return redirect('login')
+
             else:
                 messages.error(request, 'Nombre de usuario o contraseña incorrectos.')
 
@@ -65,6 +64,7 @@ def login_view(request):
             messages.error(request, 'Nombre de usuario o contraseña incorrectos.')
 
     return render(request, 'paginas/login.html')
+
 
 # para cerrar sesion y redirige al login
 def logout_view(request):

@@ -22,7 +22,7 @@
                         <select class="form-select form-select-lg" id="roleSelector">
                             <option value="{% url 'inicio_admin' %}">Administrativo</option>
                             <option value="{% url 'inicio-usuario' %}">Usuario</option>
-                            <option value="{% url 'consultas_prof_salud' %}">Profesional de salud</option>
+                            <option onclick="window.location.href='{% url 'consultas_prof_salud' profesional.id_profesional %}'">Profesional de salud</option>
                             <option value="{% url 'inicio-turnero' %}" selected>Turnero</option>
                         </select>
                     </div>

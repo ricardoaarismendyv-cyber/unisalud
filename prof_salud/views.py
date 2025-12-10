@@ -64,6 +64,7 @@ def registro_prof_salud(request):
     }
     return render(request, 'paginas/registro_prof_salud.html', context)
 
+@role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def consultas_prof_salud(request, id_profesional):
 
     turnos = Turnos.objects.filter(

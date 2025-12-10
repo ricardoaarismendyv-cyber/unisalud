@@ -57,12 +57,9 @@ def turnosusuario(request):
         try:
             turno_existente = Turnos.objects.get(id_turno=turno_id_session)
 
-            # 🔴 Si el turno ya NO está pendiente → borrar sesión para generar uno nuevo
             if turno_existente.estado != "pendiente":
                 del request.session["turno_id"]
-
             else:
-                # 🟢 Si sigue pendiente → mostrar el mismo QR
                 qr = qrcode.make(turno_existente.solicitud_turno)
                 buffer = BytesIO()
                 qr.save(buffer, format="PNG")
@@ -74,15 +71,32 @@ def turnosusuario(request):
                 })
 
         except Turnos.DoesNotExist:
-            # Si el turno desapareció de la BD, limpiar la sesión
             if "turno_id" in request.session:
                 del request.session["turno_id"]
 
+    # ---------- CORRECCIÓN IMPORTANTE ----------
+    # Obtener usuario REAL desde tu modelo Usuarios
+    from usuario.models import Usuarios, Pacientes
+    usuario_real = Usuarios.objects.get(id_usuario=request.session['id_usuario'])
 
-    # --- Usuario con o sin login ---
-    paciente = request.user.paciente if request.user.is_authenticated and hasattr(request.user, "paciente") else None
+    # Buscar si ya existe paciente
+    try:
+        paciente = Pacientes.objects.get(usuario=usuario_real)
+    except Pacientes.DoesNotExist:
+        paciente = None
 
-    # --- Inicializar letra y número ---
+    # Si no existe paciente, crearlo automáticamente
+    if paciente is None:
+        paciente = Pacientes.objects.create(
+            usuario=usuario_real,
+            nombre1=usuario_real.nombre_usuario,  # Temporal
+            apellido1="",
+            numero_documento="N/A",
+            id_tipo_identificacion_id=1,
+            id_genero_id=1
+        )
+
+    # ---------- Inicializar letra y número ----------
     if "letra" not in request.session:
         request.session["letra"] = "A"
     if "numero" not in request.session:
@@ -93,7 +107,7 @@ def turnosusuario(request):
 
     turno_texto = f"{letra}{numero:03d}"
 
-    # --- Crear turno nuevo ---
+    # ---------- Crear nuevo turno ----------
     nuevo_turno = Turnos.objects.create(
         id_paciente=paciente,
         id_profesional_id=1,
@@ -107,10 +121,9 @@ def turnosusuario(request):
         numero=numero
     )
 
-    # Guardar ID del turno en sesión (clave principal)
     request.session["turno_id"] = nuevo_turno.id_turno
 
-    # --- Actualizar letra y número siguiente turno ---
+    # ---------- Actualizar letra y número ----------
     if numero < 999:
         request.session["numero"] += 1
     else:
@@ -120,7 +133,7 @@ def turnosusuario(request):
         request.session["letra"] = letras[pos + 1] if pos < 25 else "A"
         request.session["numero"] = 1
 
-    # --- Generar QR del turno ---
+    # ---------- Generar QR ----------
     qr = qrcode.make(turno_texto)
     buffer = BytesIO()
     qr.save(buffer, format="PNG")
@@ -130,7 +143,6 @@ def turnosusuario(request):
         "turno": turno_texto,
         "qr_base64": qr_base64,
     })
-    
 
 
 
