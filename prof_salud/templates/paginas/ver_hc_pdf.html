@@ -12,10 +12,14 @@
     <div class="container-fluid">
         <div class="row justify-content-center p-4">
             <div class="col-lg-10 col-md-10">
+                <a class="btn btn-main btn-nav" href="{% url 'hc_prof_salud' %}">Volver a Historia Clínica</a>
+                <a class="btn btn-main btn-nav" href="{% url 'generar_hc_pdf' consulta.id_consulta %}" download>Descargar PDF</a>
+                
                 <div class="container border border-dark rounded p-4 my-5 div-main">
-                    <h1>Historia Clínica Generada</h1>
-                    <p>La historia clínica se ha guardado y generado correctamente. A continuación puede previsualizar el documento.</p>
-                    
+                    <h1>Historia Clínica #{{ consulta.id_consulta }}</h1>
+                    <p>A continuación se muestra el PDF de la historia clínica generada. Puedes descargarlo usando el botón de arriba.
+                    <iframe src="{% url 'generar_hc_pdf' consulta.id_consulta %}" width="100%" height="800px" style="border: none;"></iframe>
+                        
                     <div class="my-3">
                         <a href="{% url 'generar_hc_pdf' consulta.id_consulta %}" class="btn btn-primary" download="HC_{{ consulta.id_paciente.numero_documento }}_{{ consulta.fecha_atencion|date:'Ymd' }}.pdf">Descargar Historia Clinica</a>
                         <a href="{% url 'inicio_prof_salud' %}" class="btn btn-secondary">Volver al Inicio</a>
