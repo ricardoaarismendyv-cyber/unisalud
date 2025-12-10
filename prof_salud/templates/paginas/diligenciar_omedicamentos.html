@@ -25,6 +25,17 @@
                             <div class="alert alert-danger">{{ medicamento_formset.non_form_errors }}</div>
                         {% endif %}
                         
+                        {# Campo de Paciente fuera del formset #}
+                        <div class="mb-3">
+                            <label for="paciente-select" class="form-label">Paciente</label>
+                            <select name="paciente" id="paciente-select" class="form-control" required>
+                                <option value="">Seleccione un paciente...</option>
+                                {% for paciente in pacientes %}
+                                    <option value="{{ paciente.pk }}">{{ paciente }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
                         <hr>
                         <h3>Detalles del Medicamento</h3>
                         
@@ -39,8 +50,7 @@
                                     {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
                                     {% for field in form %}{% if field.errors %}<div class="alert alert-warning p-2 mt-1">{{ field.label }}: {{ field.errors|striptags }}</div>{% endif %}{% endfor %}
 
-                                    {{ form.id_medicamento_hidden }} {# Campo oculto para el ID real #}
-                                    <p>{{ form.id_paciente.label_tag }} {{ form.id_paciente }}</p>
+                                    {{ form.id_medicamento }} {# Campo oculto para el ID real #}
                                     <p>{{ form.codigo_medicamento_select.label_tag }} {{ form.codigo_medicamento_select }}</p>
                                     <p>{{ form.nombre_generico_select.label_tag }} {{ form.nombre_generico_select }}</p>
                                     <p>{{ form.principio_activo.label_tag }} {{ form.principio_activo }}</p>
@@ -60,19 +70,18 @@
                         <div id="empty-form-template" style="display: none;">
                             <div class="medicamento-form border p-3 mb-3">
                                 <h5 class="form-title">Medicamento #__prefix__</h5>
-                                {{ medicamento_formset.empty_form.id_medicamento_hidden }}
+                                {{ medicamento_formset.empty_form.id_medicamento }}
                                 <p>{{ medicamento_formset.empty_form.codigo_medicamento_select.label_tag }} {{ medicamento_formset.empty_form.codigo_medicamento_select }}</p>
                                 <p>{{ medicamento_formset.empty_form.nombre_generico_select.label_tag }} {{ medicamento_formset.empty_form.nombre_generico_select }}</p>
                                 <p>{{ medicamento_formset.empty_form.principio_activo.label_tag }} {{ medicamento_formset.empty_form.principio_activo }}</p>
                                 <p>{{ medicamento_formset.empty_form.concentracion.label_tag }} {{ medicamento_formset.empty_form.concentracion }}</p>
                                 <p>{{ medicamento_formset.empty_form.forma_farmaceutica.label_tag }} {{ medicamento_formset.empty_form.forma_farmaceutica }}</p>
 
-                                <p>{{ medicamento_formset.empty_form.id_paciente.label_tag }} {{ medicamento_formset.empty_form.id_paciente }}</p>
                                 <p>{{ medicamento_formset.empty_form.dosis.label_tag }} {{ medicamento_formset.empty_form.dosis }}</p>
                                 <p>{{ medicamento_formset.empty_form.duracion_tratamiento.label_tag }} {{ medicamento_formset.empty_form.duracion_tratamiento }}</p>
                                 <p>{{ medicamento_formset.empty_form.frecuencia.label_tag }} {{ medicamento_formset.empty_form.frecuencia }}</p>
                                 <p>{{ medicamento_formset.empty_form.cantidad.label_tag }} {{ medicamento_formset.empty_form.cantidad }}</p>
-                                 <p>{{ medicamento_formset.empty_form.indicaciones.label_tag }} {{ medicamento_formset.empty_form.indicaciones }}</p>
+                                <p>{{ medicamento_formset.empty_form.indicaciones.label_tag }} {{ medicamento_formset.empty_form.indicaciones }}</p>
                                 <div style="display: none;">{{ medicamento_formset.empty_form.DELETE }}</div>
                             </div>
                         </div>
@@ -84,12 +93,12 @@
 
                         <div class="d-flex justify-content-end mt-4">
                             <a href="{% url 'omed_prof_salud' %}" class="btn btn-secondary me-2">Cancelar</a>
-                            <button type="submit" class="btn btn-success">Guardar Orden</button>
+                            <button type="submit" class="btn btn-success">Guardar Orden Medicamento</button>
                         </div>
                     </form>
                 </div>
             </div>
-       </div>
+        </div>
     </div>
 </section>
 
@@ -117,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedId = selectElement.value;
 
         // Get references to all fields within the current form
-        const hiddenIdInput = document.getElementById(`id_${formPrefix}-id_medicamento_hidden`);
+        const hiddenIdInput = document.getElementById(`id_${formPrefix}-id_medicamento`);
         const codigoMSelect = document.getElementById(`id_${formPrefix}-codigo_medicamento_select`);
         const nombreGSelect = document.getElementById(`id_${formPrefix}-nombre_generico_select`);
         const principioActivoInput = document.getElementById(`id_${formPrefix}-principio_activo`);
