@@ -205,7 +205,7 @@ def diligenciar_hc(request):
                         antecedente.save()
 
                 messages.success(request, f'Historia clínica para el paciente {nueva_consulta.id_paciente} guardada con éxito.')
-                return redirect('ver_hc_pdf', consulta_id=nueva_consulta.id_consulta)
+                return redirect('prof_salud:ver_hc_pdf', consulta_id=nueva_consulta.id_consulta)
             except Exception as e:
                 messages.error(request, f'Ocurrió un error al guardar la historia clínica: {e}')
     else:
@@ -255,7 +255,7 @@ def ver_hc_pdf(request, consulta_id):
         messages.error(request, 'La consulta solicitada no existe.')
         return redirect('hc_prof_salud')
 
-@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+@role_required(allowed_roles=ALLOWED_PROF_ROLES + ['paciente'])
 @xframe_options_sameorigin # Permite que esta vista se cargue en un iframe del mismo sitio.
 def generar_hc_pdf(request, consulta_id):
     """
@@ -268,7 +268,7 @@ def generar_hc_pdf(request, consulta_id):
 
         # 1. Construir la URL de verificación para el QR
         verification_url = request.build_absolute_uri(
-            reverse('ver_hc_pdf', args=[consulta.id_consulta])
+            reverse('prof_salud:ver_hc_pdf', args=[consulta.id_consulta])
         )
 
         # 2. Generar la imagen del QR en memoria
@@ -296,11 +296,11 @@ def generar_hc_pdf(request, consulta_id):
             return response
         
         messages.error(request, 'No se pudo generar el PDF.')
-        return redirect('hc_prof_salud')
+        return redirect('prof_salud:hc_prof_salud')
 
     except Consulta.DoesNotExist:
         messages.error(request, 'La consulta solicitada no existe.')
-        return redirect('hc_prof_salud')
+        return redirect('prof_salud:hc_prof_salud')
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def diligenciar_omedica(request):
@@ -350,7 +350,7 @@ def diligenciar_omedica(request):
                 if orden_creada_id:
                     messages.success(request, f'Orden(es) Médica(s) para el paciente {orden_base.get("id_paciente")} guardada(s) con éxito.')
                     # Redirigir a la vista PDF de la última orden creada
-                    return redirect('ver_omedica_pdf', orden_id=orden_creada_id)
+                    return redirect('prof_salud:ver_omedica_pdf', orden_id=orden_creada_id)
                 else:
                     # Si el bucle termina y no se creó ninguna orden
                     messages.warning(request, 'No se añadió ningún servicio, por lo que no se guardó ninguna orden.')
@@ -390,7 +390,7 @@ def ver_omedica_pdf(request, orden_id):
         messages.error(request, 'La orden médica solicitada no existe.')
         return redirect('om_prof_salud')
 
-@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+@role_required(allowed_roles=ALLOWED_PROF_ROLES + ['paciente'])
 @xframe_options_sameorigin # Permite que esta vista se cargue en un iframe del mismo sitio.
 def generar_omedica_pdf(request, orden_id):
     """
@@ -407,7 +407,7 @@ def generar_omedica_pdf(request, orden_id):
 
         # 1. Construir la URL de verificación para el QR
         verification_url = request.build_absolute_uri(
-            reverse('ver_omedica_pdf', args=[orden.id_orden])
+            reverse('prof_salud:ver_omedica_pdf', args=[orden.id_orden])
         )
 
         # 2. Generar la imagen del QR en memoria
@@ -486,7 +486,7 @@ def diligenciar_omedicamentos(request):
                 if orden_creada_id:
                     messages.success(request, f'Orden de Medicamentos para el paciente {nueva_orden.id_paciente} guardada con éxito.')
                     # Redirigir a la vista que muestra el PDF de la última orden creada
-                    return redirect('ver_omedicamentos_pdf', orden_id=orden_creada_id)
+                    return redirect('prof_salud:ver_omedicamentos_pdf', orden_id=orden_creada_id)
                 else:
                     messages.warning(request, 'No se añadió ningún medicamento, por lo que no se guardó ninguna orden.')
             except Pacientes.DoesNotExist:
@@ -533,7 +533,7 @@ def ver_omedicamentos_pdf(request, orden_id):
         messages.error(request, 'La orden de medicamentos solicitada no existe.')
         return redirect('omed_prof_salud')
 
-@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+@role_required(allowed_roles=ALLOWED_PROF_ROLES + ['paciente'])
 @xframe_options_sameorigin # Permite que esta vista se cargue en un iframe del mismo sitio.
 def generar_omedicamentos_pdf(request, orden_id):
     """
@@ -550,7 +550,7 @@ def generar_omedicamentos_pdf(request, orden_id):
 
         # 1. Construir la URL de verificación para el QR
         verification_url = request.build_absolute_uri(
-            reverse('ver_omedicamentos_pdf', args=[orden.id_orden])
+            reverse('prof_salud:ver_omedicamentos_pdf', args=[orden.id_orden])
         )
 
         # 2. Generar la imagen del QR en memoria
