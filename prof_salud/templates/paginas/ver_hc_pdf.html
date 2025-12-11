@@ -12,12 +12,12 @@
     <div class="container-fluid">
         <div class="row justify-content-center p-4">
             <div class="col-lg-10 col-md-10">
-                <a class="btn btn-main btn-nav" href="{% url 'hc_prof_salud' %}">Volver a Historia Clínica</a>
-                <a class="btn btn-main btn-nav" href="{% url 'generar_hc_pdf' consulta.id_consulta %}" download="HC_{{ consulta.id_paciente.numero_documento }}_{{ consulta.fecha_atencion|date:'Ymd' }}.pdf">Descargar PDF</a>
+                <a class="btn btn-main btn-nav" href="{% url 'prof_salud:hc_prof_salud' %}">Volver a Historia Clínica</a>
+                <a class="btn btn-main btn-nav" href="{% url 'prof_salud:generar_hc_pdf' consulta.id_consulta %}" download="HC_{{ consulta.id_paciente.numero_documento }}_{{ consulta.fecha_atencion|date:'Ymd' }}.pdf">Descargar PDF</a>
                                 
                 <div class="container border border-dark rounded p-4 my-5 div-main">
                     <h1>Visualizador de Historia Clínica #{{ consulta.id_consulta }}</h1>
-                    <iframe src="{% url 'generar_hc_pdf' consulta.id_consulta %}" width="100%" height="800px" style="border: none;" title="Visor de PDF de Historia Clínica"></iframe>
+                    <iframe src="{% url 'prof_salud:generar_hc_pdf' consulta.id_consulta %}" width="100%" height="800px" style="border: none;" title="Visor de PDF de Historia Clínica"></iframe>
                 </div>
             </div>
         </div>
