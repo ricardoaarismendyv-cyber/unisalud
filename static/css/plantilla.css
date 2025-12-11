@@ -74,7 +74,7 @@ main.dark-mode{
 
 /* css de inicio */
 main {
-    margin-top: 0px;
+    margin-top: 30px;
     margin-bottom: 40px;
 }
 
@@ -414,7 +414,7 @@ h1, h2, h3, h4, h5, h6 {
 
 
 .dark-mode .footer-nav{
-    background: linear-gradient(135deg, #0d1117, #1e3a8a);
+    background: linear-gradient(135deg, #0d1117, dark-mode);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -536,6 +536,25 @@ body.high-contrast {
     color: #fff !important;
 }
 
+body.high-contrast .highlighted-text {
+    color: #ffff00 ;
+    font-weight: 700 !important;
+    font-size: 1.1rem;
+    background: rgb(234, 40, 40) ;
+    padding: 16px 20px;
+    border-left:red;
+    margin: 0px;
+}
+
+body.high-contrast .accordion-body {
+    background-color: rgb(234, 40, 40);
+    color:#ffff00;
+    padding: 20px 25px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    line-height: 1.6;
+    font-size: 15px;
+}
 body.high-contrast header.mainHeader,
 body.high-contrast .mainNav,
 body.high-contrast footer,
@@ -544,7 +563,7 @@ body.high-contrast main,
 body.high-contrast .sidebar {
     background-image: none !important;
     background-color: black!important;
-    color: #fff !important;
+    color: #ffffff !important;
     border-color: #fff !important;
 }
 
@@ -569,7 +588,7 @@ body.high-contrast .div-main {
     background-image: none;
     background-color: #000 !important;
     color: #fff !important;
-    border-color: #fff !important;
+    border-color: #5f1414 !important;
 }
 
 body.high-contrast h1 {
@@ -616,6 +635,13 @@ body.dyslexia-font {
     background-color: rgb(234, 40, 40) !important;
     color: #000 !important;
     border: 2px solid #000 !important;
+}
+
+/* 1. Estilos para los iconos del encabezado en modo Alto Contraste activando el modo oscuro */
+body.high-contrast #theme-toggle-img,
+body.high-contrast #moon-icon,
+body.high-contrast #accessibility-icon {
+    filter: brightness(0) invert(1) !important; 
 }
 
 /*ESTILOS PARA EL MODO DALTONISMO (CORRECCIÓN DE LAYOUT Y ESTABILIDAD)  */
