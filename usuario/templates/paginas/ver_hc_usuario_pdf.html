@@ -1,0 +1,36 @@
+{% extends "plantilla.html" %}
+{% load static %}
+{% block title %}Historia Clínica{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static "css/custom.css" %}">
+{% endblock estilo %}
+
+{% block auth_button %}
+<li>
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio-usuario" %}'">
+        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    </button>
+</li>
+{% endblock auth_button %}
+
+{% block content %}
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <div class="col-lg-10 col-md-10">
+                <a class="btn btn-main btn-nav"href="{% url 'historia-clinica-usuario' %}">Volver</a>
+                <a class="btn btn-main btn-nav" href="{% url 'prof_salud' %}">Volver a Historia Clínica</a>
+                <a class="btn btn-main btn-nav" href="{% url 'prof_salud:generar_hc_pdf' consulta.id_consulta %}"download="HC_{{ consulta.id_paciente.numero_documento }}_{{ consulta.fecha_atencion|date:'Ymd' }}.pdf">Descargar PDF Historia Clínica</a>
+
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Historia Clínica</h1>
+                    <iframe src="{% url 'prof_salud:generar_hc_pdf' consulta.id_consulta %}" width="100%" height="800px" style="border: none;" title="Visor de PDF de Historia Clínica"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
