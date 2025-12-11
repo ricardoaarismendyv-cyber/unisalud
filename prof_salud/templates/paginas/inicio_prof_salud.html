@@ -54,7 +54,7 @@
                             </div>
                             <h3>Historia Clínica</h3>
                             <p>Acceda para revisar, actualizar y documentar la información médica, diagnósticos y plan de tratamiento del paciente en la Historia Clínica Electrónica (HCE), cumpliendo con la normativa de confidencialidad.</p>
-                            <a class="btn btn-primary" href="{% url 'hc_prof_salud' %}">
+                            <a class="btn btn-primary" href="{% url 'prof_salud:hc_prof_salud' %}">
                                 Gestionar Historias
                             </a>
                         </div>
@@ -68,7 +68,7 @@
                             </div>
                             <h3>Órdenes Médicas</h3>
                             <p>Acceda para emitir, revisar y gestionar ordenes médicas (medicamentos, laboratorios, procedimientos) y solicitudes de interconsulta, documentando el plan de tratamiento activo del paciente.</p>
-                            <a class="btn btn-primary" href='{% url "om_prof_salud" %}'>
+                            <a class="btn btn-primary" href='{% url "prof_salud:om_prof_salud" %}'>
                                 Gestionar Órdenes
                             </a>
                         </div>
@@ -82,7 +82,7 @@
                             </div>
                             <h3>Órdenes de Medicamentos</h3>
                             <p>Acceda para prescribir, modificar o suspender medicamentos del paciente (incluyendo dosis, vía y frecuencia), verificando las alertas de seguridad y documentando la farmacoterapia actual.</p>
-                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url "omed_prof_salud" %}'">
+                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url "prof_salud:omed_prof_salud" %}'">
                                 Gestionar Medicamentos
                             </button>
                         </div>
@@ -96,7 +96,7 @@
                             </div>
                             <h3>Consultas y Agenda</h3>
                             <p>Revise su agenda de consultas programadas, gestione la disponibilidad y atienda a sus pacientes de manera organizada.</p>
-                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url "consultas_prof_salud" %}'">
+                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url "prof_salud:consultas_prof_salud" %}'">
                                 Ver Agenda
                             </button>
                         </div>
