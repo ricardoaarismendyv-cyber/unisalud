@@ -16,59 +16,71 @@
 {% endblock auth_button %}
 
 {% block content %}
-
 <section class="main">
     <div class="container-fluid">
         <div class="row justify-content-center p-4">
-            <!-- Columna para el contenido principal -->
             <div class="col-lg-10 col-md-10">
                 <div>
                     <a class="btn btn-main btn-nav" href='{% url "inicio-usuario" %}'>Volver</a>
+                </div>
                     <select name="filtrarhc" id="" class="btn btn-main btn-nav">
                         <option disabled selected value="">Filtrar por</option>
                         <option value="fecha">Recientes a antiguas</option>
-                        <option value="especialidad">Especialidad</option>
                         <option value="nombreMedico">Nombre del médico</option> 
                     </select>                    
                 </div>
             </div>
             <div class="row justify-content-center">
-                <div class="col-lg-10 col-md-10">
-                    <div class="container border border-dark rounded p-4 my-5 div-main">
-                        <h1>Historia clinica más reciente</h1>
-                        <p>Aquí puede visualizar su historia clínica más reciente</p>
-                        <object data="{% static 'docs/HCdiligenciada.pdf' %}" type="application/pdf" width="100%" height="500px" class="mb-3"> <p>Su navegador o dispositivo no permite visualizar el pdf correctamente, por favor descarguelo para visualizarlo.</p></object>
-                        <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#historialCompleto" aria-expanded="false" aria-controls="historialCompleto">
-                            Ver historial de historias clínicas
-                        </button>
-                        <a class="btn btn-main btn-nav" href="{% static "docs/HCdiligenciada.pdf" %}">Descargar PDF historia clínica reciente</a>
-                        <!-- Contenido colapsable con el historial -->
-                        <div class="collapse mt-3" id="historialCompleto">
-                            <div class="card card-body div-main p-2">
-                                <h5 class="card-title">Historial Completo</h5>
-                                <p>A continuación se listan sus historias clínicas anteriores.</p>
-                                <ul class="list-group list-group-flush itemList">
-                                    <!-- Ejemplo de item. Esto debería generarse con un bucle en Django -->
-                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                                        <a href="#">Consulta General - <span>Dr. Ramirez</span></a>
-                                        <span class="badge bg-primary rounded-pill">15/03/2024</span>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                                        <a href="#">Consulta Cardiología - <span>Dr. Humberto</span></a>
-                                        <span class="badge bg-primary rounded-pill">22/01/2024</span>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                                        <a href="#">Exámenes de Laboratorio</a>
-                                        <span class="badge bg-primary rounded-pill">10/12/2023</span>
-                                    </li>
-                                </ul>
+    <div class="col-lg-10 col-md-10">
+        <div class="container border border-dark rounded p-4 my-5 div-main">
+
+            {% if consulta %}
+                <h1>Ver Historia clínica más reciente #{{ consulta.id_consulta }}</h1>
+                <p>Aquí puede visualizar su historia clínica más reciente</p>
+
+                <iframe src="{% url 'prof_salud:generar_hc_pdf' consulta.id_consulta %}"
+                        width="100%" height="800px"
+                        style="border: none;"
+                        title="Visor de PDF de Historia Clínica">
+                </iframe>
+
+                <a class="btn btn-main btn-nav"
+                   href="{% url 'prof_salud:generar_hc_pdf' consulta.id_consulta %}"
+                   download="HC_{{ consulta.id_paciente.numero_documento }}_{{ consulta.fecha_atencion|date:'Ymd' }}.pdf">
+                    Descargar PDF Historia Clínica
+                </a>
+
+            {% else %}
+                <h3>No hay historia clínica registrada.</h3>
+                <p>Cuando tenga una consulta médica, podrá visualizarla aquí.</p>
+            {% endif %}
+
+        </div>
+
+        <!-- Historial completo -->
+        <div class="collapse mt-3" id="RegistroClinicoCompleto">
+            <div class="card card-body div-main">
+                <h5 class="card-title">Registro del Historial Clínico</h5>
+                <p>A continuación se muestra un listado de historias clínicas del paciente.</p>
+
+                <ul class="list-group list-group-flush itemList">
+                    {% for hc in historial_paciente %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                            <a href="{% url 'prof_salud:generar_hc_pdf' hc.id_consulta %}" target="_blank">
+                                Historia Clínica del {{ hc.fecha_atencion|date:"d/m/Y" }}
+                            </a>
+                            <div class="text-nowrap">
+                                <span class="badge bg-primary rounded-pill">
+                                    {{ hc.fecha_atencion|date:"d/m/Y H:i" }}
+                                </span>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item div-main">No hay historial clínico para mostrar.</li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     </div>
-</section>
-
+</div>
 {% endblock content %}
