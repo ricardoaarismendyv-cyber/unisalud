@@ -37,7 +37,7 @@
                 {% if request.session.active_role == 'admin_centro_medico' %}   
                     <button type="button" class="navButton1" onclick="window.location.href='{% url "preguntas-frecuentes_admin" %}'">Preguntas frecuentes</button>
                 {% elif request.session.active_role == 'profesional_salud' %}
-                    <button type="button" class="navButton1" onclick="window.location.href='{% url "preguntas-frecuentes_prof_salud" %}'">Preguntas frecuentes</button>
+                    <button type="button" class="navButton1" onclick="window.location.href='{% url "preguntas-frecuentes" %}'">Preguntas frecuentes</button>
                 {% else %}
                     <button type="button" class="navButton1" onclick="window.location.href='{% url "preguntas-frecuentes" %}'">Preguntas frecuentes</button>
                 {% endif %}
@@ -46,7 +46,7 @@
                 {% if request.session.active_role == 'admin_centro_medico' %}
                     <button type="button" class="navButton1" onclick="window.location.href='{% url "usosistema_admin" %}'">¿Cómo usar el sistema?</button>
                 {% elif request.session.active_role == 'profesional_salud' %}
-                    <button type="button" class="navButton1" onclick="window.location.href='{% url "usosistema_prof_salud" %}'">¿Cómo usar el sistema?</button>
+                    <button type="button" class="navButton1" onclick="window.location.href='{% url "usosistema" %}'">¿Cómo usar el sistema?</button>
                 {% else %}
                     <button type="button" class="navButton1" onclick="window.location.href='{% url "usosistema" %}'">¿Cómo usar el sistema?</button>
                 {% endif %}
@@ -100,7 +100,7 @@
                             <a href="{% url "contactanos_admin" %}"><input class="foot-button" type="button" value="¡Contáctanos!"></a>
 
                         {% elif request.session.active_role == 'profesional_salud' %}
-                            <a href="{% url "contactanos_prof_salud" %}"><input class="foot-button" type="button" value="¡Contáctanos!"></a>
+                            <a href="{% url "contactanos" %}"><input class="foot-button" type="button" value="¡Contáctanos!"></a>
                         {% else %}
                             <a href="{% url "contactanos" %}"><input class="foot-button" type="button" value="¡Contáctanos!"></a>
                         {% endif %}
@@ -109,7 +109,7 @@
                         {% if request.session.active_role == 'admin_centro_medico' %}
                             <a href="{% url "buzonsugerencias_admin" %}"><input class="foot-button" type="button" value="Buzón de sugerencias"></a>
                         {% elif request.session.active_role == 'profesional_salud' %}
-                            <a href="{% url "buzonsugerencias_prof_salud" %}"><input class="foot-button" type="button" value="Buzón de sugerencias"></a>
+                            <a href="{% url "buzonsugerencias" %}"><input class="foot-button" type="button" value="Buzón de sugerencias"></a>
                         {% else %}
                             <a href="{% url "buzonsugerencias" %}"><input class="foot-button" type="button" value="Buzón de sugerencias"></a>
                         {% endif %}
