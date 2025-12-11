@@ -12,7 +12,7 @@
     <div class="container-fluid">
         <div class="row justify-content-center p-4">
             <div class="col-lg-10 col-md-10">
-                <a class="btn btn-main btn-nav" href='{% url "hc_prof_salud" %}'>Volver</a>
+                <a class="btn btn-main btn-nav" href='{% url "prof_salud:hc_prof_salud" %}'>Volver</a>
                 <div class="container border border-dark rounded p-4 my-5 div-main">
                     <h1>Diligenciar Orden Médica</h1>
                     <p>Complete todos los campos para registrar orden médica del paciente.</p>
@@ -73,7 +73,7 @@
                         </div>
                         
                         <div class="d-flex justify-content-end mt-4">
-                            <a href="{% url 'omed_prof_salud' %}" class="btn btn-secondary me-2">Cancelar</a>
+                            <a href="{% url 'prof_salud:omed_prof_salud' %}" class="btn btn-secondary me-2">Cancelar</a>
                             <button type="submit" class="btn btn-success">Guardar Orden Médica</button>
                         </div>
                     </form>
