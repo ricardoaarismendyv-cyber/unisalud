@@ -23,7 +23,6 @@
 <section class="main">
     <div class="container-fluid">
         <div class="row justify-content-center p-4">
-            <!-- Columna para el contenido principal -->
             <div class="col-lg-10 col-md-10">
                 <div>
                     <a class="btn btn-main btn-nav" href='{% url "inicio-usuario" %}'>Volver</a>
@@ -34,59 +33,43 @@
                         <option value="nombreMedico">Nombre del médico</option>
                         <option value="estadoOrden">Estado de la orden</option> 
                     </select>
-                    <a class="btn btn-main btn-nav" href="{% static "docs/omeejemplo.pdf" %}">Descargar PDF orden de medicamentos reciente</a>
-                    <!-- Botón para activar el modal del QR -->
-                    <button type="button" class="btn btn-main btn-nav" data-bs-toggle="modal" data-bs-target="#qrModal">
-                        Generar QR de la orden medica reciente
-                    </button>
                 </div>
             </div>
-            <div class="row justify-content-center">
-                <div class="col-lg-10 col-md-10">
-                <div class="container border border-dark rounded p-4 my-5 div-main">
-                    <h1>Órden de medicamentos más reciente</h1>
-                    <p>Aquí puede visualizar su orden de medicamentos más reciente, pare ver las demás haga click en el botón "ver historial de ordenes médicas"</p>
-                    <div>
-                        <object data="{% static 'docs/omeejemplo.pdf' %}" type="application/pdf" width="100%" height="500px" class="mb-3"></object>
-                            </div>
-                        <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#historialCompleto" aria-expanded="false" aria-controls="historialCompleto">
-                            Ver historial de ordenes de medicamentos
-                        </button>
+            <div class="col-lg-10 col-md-10">
+                {% if ultima_orden %}
+                    <div class="container border border-dark rounded p-4 my-5 div-main">
+                        <h1>Ver Orden Medicamentos más reciente #{{ ultima_orden.id_orden }}</h1>
+                        <p>Aquí puede visualizar su orden medicamento más reciente</p>
+                        <iframe src="{% url 'prof_salud:generar_omedicamentos_pdf' ultima_orden.id_orden %}" width="100%" height="800px" style="border: none;" title="Visor de PDF de Orden Medicamentos"></iframe>
+                        <a class="btn btn-main btn-nav" href="{% url 'prof_salud:generar_omedicamentos_pdf' ultima_orden.id_orden %}" download="OM_{{ ultima_orden.id_paciente.numero_documento }}_{{ ultima_orden.fecha_emision|date:'Ymd' }}.pdf">Descargar PDF Orden Medicamentos</a>
+                    </div>
+                {% else %}
+                    <div class="container border border-dark rounded p-4 my-5 div-main">
+                        <h1>Órdenes Medicamentos</h1>
+                        <p>Aún no tiene órdenes medicamentos registradas.</p>
+                    </div>
+                {% endif %}
                         <!-- Contenido colapsable con el historial -->
-                        <div class="collapse mt-3" id="historialCompleto">
+                        <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#historialOrdenes" aria-expanded="false" aria-controls="historialOrdenes">
+                            Ver historial de órdenes medicamentos
+                        </button>
+                        <div class="collapse mt-3" id="historialOrdenes">
                             <div class="card card-body div-main">
-                                <h5 class="card-title">Historial Completo</h5>
-                                <p>A continuación se listan sus ordenes de medicamentos anteriores.</p>
+                                <h5 class="card-title">Registro de Ordenes Medicamentos</h5>
+                                <p>A continuación se muestra un listado de la órdenes Medicamentos del paciente.</p>
                                 <ul class="list-group list-group-flush itemList">
-                                    <!-- Ejemplo de item. Esto debería generarse con un bucle en Django -->
-                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                                        <a href="#">Medicamento para dolor de cabeza y musculoesqueletico - <span>Dra. Maria Torres</span></a>
-                                        <div class="text-nowrap">
-                                            <span class="me-3">Estado: Activa</span>
-                                            <span class="badge bg-primary rounded-pill">28/04/2025</span>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                                        <a href="#">Medicamento para infeccion respiratoria - <span>Dr. Juan Perez<</span></a>
-                                        <div class="text-nowrap">
-                                            <span class="me-3">Estado: Pendiente</span>
-                                            <span class="badge bg-primary rounded-pill">16/03/2025</span>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                                        <a href="#">Medicamento para control de presion arterial - <span>Dra. Sofia Hernandez</span></a>
-                                        <div class="text-nowrap">
-                                            <span class="me-3">Estado: Vencida</span>
-                                            <span class="badge bg-primary rounded-pill">20/12/2024</span>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                                        <a href="#">Medicamento para control del Asma - <span>Dra. Ana Garcia</span></a>
-                                        <div class="text-nowrap">
-                                            <span class="me-3">Estado: Entregada</span>
-                                            <span class="badge bg-primary rounded-pill">13/11/2024</span>
-                                        </div>
-                                    </li>
+                                    {% for orden in ordenes %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                            <a href="{% url 'ver_orden_medica_usuario_pdf' orden.id_orden %}" target="_blank">
+                                                Orden Médica del {{ orden.fecha_emision|date:"d/m/Y" }} (Lote: {{ orden.id_lote|slice:":8" }}...)
+                                            </a>
+                                            <div class="text-nowrap">
+                                                <span class="badge bg-primary rounded-pill">{{ orden.fecha_emision|date:"d/m/Y H:i" }}</span>
+                                            </div>
+                                        </li>
+                                    {% empty %}
+                                        <li class="list-group-item div-main">No hay historial de órdenes medicamentos para mostrar.</li>
+                                    {% endfor %}
                                 </ul>
                             </div>
                         </div>
@@ -96,24 +79,5 @@
         </div>
     </div>
 </section>
-<!-- Modal para el Código QR -->
-<div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content div-main">
-            <div class="modal-header">
-                <h5 class="modal-title" id="qrModalLabel">Código QR de la Orden Médica</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <p>Presente este código QR en la farmacia para validar su orden.</p>
-                <img src="{% static "img/qrejemplo.png" %}" alt="Código QR de la orden" class="img-fluid rounded">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 {% endblock content %}
