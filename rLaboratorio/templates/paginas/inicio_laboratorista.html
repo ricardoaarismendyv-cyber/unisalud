@@ -328,6 +328,16 @@
 {{ block.super }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // --- Inicializar Select2 para el campo de Paciente ---
+    // Usamos jQuery ($) porque Select2 lo requiere.
+    $(document).ready(function() {
+        $('.select2-paciente').select2({
+            placeholder: "Digite el nombre o documento del paciente para buscar...",
+            allowClear: true,
+            language: "es" // Opcional: para mensajes en español si tienes el archivo de idioma.
+        });
+    });
+    
     const roleSelector = document.getElementById('roleSelector');
     if (roleSelector) {
         roleSelector.addEventListener('change', function() {
