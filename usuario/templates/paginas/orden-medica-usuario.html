@@ -25,7 +25,6 @@
             <div class="col-lg-10 col-md-10">
                 <div>
                     <a class="btn btn-main btn-nav" href='{% url "inicio-usuario" %}'>Volver</a>
-                </div>
                     <select name="filtrarom" id="" class="btn btn-main btn-nav">
                         <option disabled selected value="">Filtrar por</option>
                         <option value="fecha">Recientes a antiguas</option>
@@ -36,10 +35,10 @@
             <div class="col-lg-10 col-md-10">
                 {% if ultima_orden %}
                     <div class="container border border-dark rounded p-4 my-5 div-main">
-                        <h1>Ver Orden Médica más reciente #{{ ultima_orden.id_orden }}</h1>
+                        <h2>Ver Orden Médica más reciente #{{ ultima_orden.id_orden }}</h2>
                         <p>Aquí puede visualizar su orden médica más reciente</p>
                         <iframe src="{% url 'prof_salud:generar_omedica_pdf' ultima_orden.id_orden %}" width="100%" height="800px" style="border: none;" title="Visor de PDF de Orden Médica"></iframe>
-                        <a class="btn btn-main btn-nav" href="{% url 'prof_salud:generar_omedica_pdf' ultima_orden.id_orden %}" download="OM_{{ ultima_orden.id_paciente.numero_documento }}_{{ ultima_orden.fecha_emision|date:'Ymd' }}.pdf">Descargar PDF Orden Médica</a>
+                        <a class="btn btn-outline-primary" href="{% url 'prof_salud:generar_omedica_pdf' ultima_orden.id_orden %}" download="OM_{{ ultima_orden.id_paciente.numero_documento }}_{{ ultima_orden.fecha_emision|date:'Ymd' }}.pdf">Descargar PDF Orden Médica</a>
                     </div>
                 {% else %}
                     <div class="container border border-dark rounded p-4 my-5 div-main">

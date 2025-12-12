@@ -35,7 +35,7 @@
         <div class="container border border-dark rounded p-4 my-5 div-main">
 
             {% if consulta %}
-                <h1>Ver Historia clínica más reciente #{{ consulta.id_consulta }}</h1>
+                <h2>Ver Historia clínica más reciente #{{ consulta.id_consulta }}</h2>
                 <p>Aquí puede visualizar su historia clínica más reciente</p>
 
                 <iframe src="{% url 'prof_salud:generar_hc_pdf' consulta.id_consulta %}"
@@ -44,7 +44,7 @@
                         title="Visor de PDF de Historia Clínica">
                 </iframe>
 
-                <a class="btn btn-main btn-nav"
+                <a class="btn btn-outline-primary"
                    href="{% url 'prof_salud:generar_hc_pdf' consulta.id_consulta %}"
                    download="HC_{{ consulta.id_paciente.numero_documento }}_{{ consulta.fecha_atencion|date:'Ymd' }}.pdf">
                     Descargar PDF Historia Clínica
