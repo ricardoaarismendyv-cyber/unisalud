@@ -18,6 +18,8 @@
             integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
             crossorigin="anonymous"
         />
+        <!-- Select2 CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
         {% block estilo %}
             <link rel="stylesheet" href="{% static 'css/plantilla.css' %}">
         {% endblock estilo %}
@@ -62,7 +64,7 @@
             {# Este bloque mostrará el botón de Iniciar Sesión por defecto #}
             <li>
                 <a class="navButton0 login-btn" href="{% url 'login' %}">
-                    <img class="img-button" src="{% static 'img/log-in.svg' %}" alt="Icono de login"> Iniciar Sesión</a>
+                    <img class="img-button" src="{% static 'img/log-in.svg' %}" alt="Icono de login"> Cerrar Sesión</a>
             </li>
             {% endblock auth_button %} 
             </ul>
@@ -115,6 +117,12 @@
             integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
             crossorigin="anonymous"
         ></script>
+
+        <!-- jQuery (necesario para Select2) -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+        <!-- Select2 JS activar el buscador con JavaScript-->
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
         <!-- Carga del script de la plantilla -->
         <script src="{% static 'js/plantilla.js' %}"></script>
