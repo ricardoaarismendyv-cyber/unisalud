@@ -411,9 +411,9 @@ class Consulta(models.Model):
     peso = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True, db_comment='Peso en kg')
     talla = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True, db_comment='Talla en cm')
     imc = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True, db_comment='Indice de Masa Corporal')
-    habitos_fumador = models.CharField(max_length=9, blank=True, null=True, db_comment='Fuma')
-    habitos_alcohol = models.CharField(max_length=9, blank=True, null=True, db_comment='Consume alcohol')
-    habitos_ejercicio = models.CharField(max_length=2, blank=True, null=True, db_comment='Realiza actividad fisica')
+    habitos_fumador = models.CharField(max_length=50, blank=True, null=True, db_comment='Fuma')
+    habitos_alcohol = models.CharField(max_length=50, blank=True, null=True, db_comment='Consume alcohol')
+    habitos_ejercicio = models.CharField(max_length=50, blank=True, null=True, db_comment='Realiza actividad fisica')
     revision_sistemas = models.TextField(blank=True, null=True, db_comment='Revision por sistemas')
     impresion_diagnostica = models.TextField(blank=True, null=True, db_comment='Diagnostico al paciente')
     plan_tratamiento = models.TextField(blank=True, null=True, db_comment='Plan de tratamiento para el paciente')
@@ -506,7 +506,7 @@ class AntecedentesPaciente(models.Model):
         ('Laboral', 'Laboral'),
     ]
     tipo_antecedente = models.CharField(
-        max_length=13,
+        max_length=50,
         choices=TIPO_ANTECEDENTE_CHOICES,
         db_comment='si es: familiar, personal, etc'
     )
