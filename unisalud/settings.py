@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'prof_salud',
     'administrativo',
     'login',
+    'rLaboratorio',
 ]
 
 
