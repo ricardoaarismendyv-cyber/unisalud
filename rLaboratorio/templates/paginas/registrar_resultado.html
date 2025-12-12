@@ -1,0 +1,80 @@
+{% extends "plantillaRl.html" %}
+{% load static %}
+
+{% block title %}Registrar Resultado de Laboratorio{% endblock title %}
+
+{% block content %}
+<section class="main">
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-md-11">
+
+                <!-- Botón para volver al inicio -->
+                <div class="mb-4">
+                    <a class="btn btn-outline-primary" href="{% url 'rLaboratorio:inicio_laboratorista' %}">
+                        <i class="fas fa-arrow-left me-2"></i> Volver al Inicio
+                    </a>
+                </div>
+
+                <div class="card shadow-lg border-0 rounded-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="text-center font-weight-light my-3">Registrar Nuevo Resultado de Laboratorio</h3>
+                    </div>
+                    <div class="card-body p-4 p-md-5">
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+
+                            <!-- Renderizar campos del formulario con clases de Bootstrap -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.id_paciente.id_for_label }}" class="form-label fw-bold">{{ form.id_paciente.label }}</label>
+                                    {{ form.id_paciente }}
+                                    {% if form.id_paciente.errors %}<div class="invalid-feedback d-block">{{ form.id_paciente.errors.as_text }}</div>{% endif %}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.id_servicio.id_for_label }}" class="form-label fw-bold">{{ form.id_servicio.label }}</label>
+                                    {{ form.id_servicio }}
+                                    {% if form.id_servicio.errors %}<div class="invalid-feedback d-block">{{ form.id_servicio.errors.as_text }}</div>{% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.tipo_examen.id_for_label }}" class="form-label fw-bold">{{ form.tipo_examen.label }}</label>
+                                    {{ form.tipo_examen }}
+                                    {% if form.tipo_examen.errors %}<div class="invalid-feedback d-block">{{ form.tipo_examen.errors.as_text }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.fecha_solicitud.id_for_label }}" class="form-label fw-bold">{{ form.fecha_solicitud.label }}</p>
+                                    {{ form.fecha_solicitud }}
+                                    {% if form.fecha_solicitud.errors %}<div class="invalid-feedback d-block">{{ form.fecha_solicitud.errors.as_text }}</div>{% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.resultado.id_for_label }}" class="form-label fw-bold">{{ form.resultado.label }}</label>
+                                {{ form.resultado }}
+                                {% if form.resultado.errors %}<div class="invalid-feedback d-block">{{ form.resultado.errors.as_text }}</div>{% endif %}
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="{{ form.observaciones.id_for_label }}" class="form-label fw-bold">{{ form.observaciones.label }}</label>
+                                {{ form.observaciones }}
+                                {% if form.observaciones.errors %}<div class="invalid-feedback d-block">{{ form.observaciones.errors.as_text }}</div>{% endif %}
+                            </div>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">Guardar Resultado</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Incluir Font Awesome para los íconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
