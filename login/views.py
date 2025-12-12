@@ -33,16 +33,20 @@ def login_view(request):
                     except ProfesionalSalud.DoesNotExist:
                         messages.warning(request, 'El usuario tiene un rol profesional, pero no un perfil de profesional de salud asociado.')
 
-                # Lógica de redirección por roles
-                if any(rol in roles_profesionales for rol in roles_usuario):
-                    # Prioridad 1: Rol profesional. Si tiene perfil, redirige.
+                # Lógica de redirección por roles (con prioridad)
+                if 'laboratorista' in roles_usuario:
+                    # Prioridad 1: Rol Laboratorista.
+                    if 'id_profesional' in request.session:
+                        return redirect('rLaboratorio:inicio_laboratorista')
+                elif 'profesional_salud' in roles_usuario:
+                    # Prioridad 2: Rol Profesional de Salud (general).
                     if 'id_profesional' in request.session:
                         return redirect('prof_salud:consultas_prof_salud')
                 elif 'paciente' in roles_usuario:
-                    # Prioridad 2: Rol paciente. Si no es profesional pero es paciente, redirige.
+                    # Prioridad 3: Rol Paciente.
                     if 'id_paciente' in request.session:
                         return redirect('inicio-usuario')
-                
+                        
                 # Si el usuario está autenticado pero no tiene un perfil válido para redirigir, mostramos el error.
                 messages.error(request, 'Rol no reconocido o sin página de inicio definida.')
             else:
