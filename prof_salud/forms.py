@@ -1,16 +1,22 @@
-#para diligenciar la HC
 from django import forms
 from usuario.models import Consulta, Pacientes, Enfermedades, AntecedentesPaciente, OrdenMedica, Servicios, Medicamentos
 from django.forms import formset_factory
 
+class PacienteChoiceField(forms.ModelChoiceField):
+    """
+    Campo personalizado para mostrar el nombre y documento del paciente.
+    """
+    #muestre el nombre y el número de documento del paciente
+    def label_from_instance(self, obj):
+        return f"{obj.nombre1} {obj.apellido1} - CC: {obj.numero_documento}"
+
 class ConsultaForm(forms.ModelForm):
-    # Campo para seleccionar un paciente
-    paciente = forms.ModelChoiceField(
-        queryset=Pacientes.objects.all(),
-        label="Paciente",
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        empty_label="Seleccione el paciente que está siendo atendido."
-    )
+    # El campo 'paciente' del modelo se convierte en un campo oculto.
+    paciente = forms.ModelChoiceField(queryset=Pacientes.objects.all(), widget=forms.HiddenInput(), required=False)
+    # Añadimos campos no ligados al modelo para la interacción en la plantilla.
+    numero_documento_paciente = forms.CharField(label="Documento del Paciente", required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite documento y presione Enter'}))
+    nombre_paciente = forms.CharField(label="Nombre del Paciente", required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': True}))
+
 
     class Meta:
         model = Consulta
@@ -162,36 +168,25 @@ class AntecedenteForm(forms.ModelForm):
 AntecedenteFormSet = formset_factory(AntecedenteForm, extra=1, can_delete=True)
 
 class OrdenMedicaForm(forms.ModelForm):
+    # Campo para seleccionar un paciente
+    # El campo del modelo se convierte en un campo oculto.
+    id_paciente = forms.ModelChoiceField(queryset=Pacientes.objects.all(), widget=forms.HiddenInput(), required=True)
+    # Añadimos campos no ligados al modelo para la interacción en la plantilla.
+    numero_documento_paciente = forms.CharField(label="Documento del Paciente", required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite documento y presione Enter'}))
+    nombre_paciente = forms.CharField(label="Nombre del Paciente", required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': True}))
+
     class Meta:
         model = OrdenMedica
-        # Excluimos los campos que se asignarán automáticamente en la vista o que no se usan en este formulario.
-        exclude = [
-            'id_orden', 
-            'id_profesional',
-            'id_centro_medico',
-            'id_estado_orden',
-            'fecha_emision',
-            'fecha_cumplimiento',
-            'codigo_qr',
-            'id_consulta',
-            'id_medicamento', # Excluimos medicamento
-            'id_servicio',    # Excluimos servicio
-            'indicaciones',   # Excluimos indicaciones, se manejan por servicio
+        fields = [
+            'id_paciente',
+            'id_tipo_orden',
         ]
-        # Añadimos los campos de medicamento a la lista de exclusión
-        exclude.extend(['dosis', 'duracion_tratamiento', 'frecuencia', 'cantidad'])
         widgets = {
-            'id_paciente': forms.Select(attrs={'class': 'form-control mb-2'}),
             'id_tipo_orden': forms.Select(attrs={'class': 'form-control mb-2'}),
         }
 
     def __init__(self, *args, **kwargs):
         super(OrdenMedicaForm, self).__init__(*args, **kwargs)
-        # Añadimos la clase de Bootstrap a todos los campos que no son widgets personalizados.
-        for field_name, field in self.fields.items():
-            if not field.widget.attrs.get('class'):
-                field.widget.attrs['class'] = 'form-control mb-2'
-        
         # Personalizamos las etiquetas para que sean más amigables
         self.fields['id_paciente'].label = "Paciente"
         self.fields['id_tipo_orden'].label = "Tipo de Orden"
@@ -273,6 +268,13 @@ class TipoOrdenForm(forms.Form):
 serviciosFormSet = formset_factory(TipoOrdenForm, extra=1, can_delete=True) 
 
 class OrdenMedicamentoForm(forms.ModelForm):
+    # Campo para seleccionar un paciente
+    # Este campo ahora será un campo oculto que llenaremos con JavaScript.
+    id_paciente = forms.IntegerField(widget=forms.HiddenInput(), required=True)
+    # Añadimos campos no ligados al modelo para la interacción en la plantilla.
+    numero_documento_paciente = forms.CharField(label="Documento del Paciente", required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    nombre_paciente = forms.CharField(label="Nombre del Paciente", required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': True}))
+
     """
     Formulario específico para crear órdenes de medicamentos con autocompletado.
     """
@@ -306,11 +308,25 @@ class OrdenMedicamentoForm(forms.ModelForm):
     class Meta:
         model = OrdenMedica
         fields = [
+            'id_paciente', # Añadimos el paciente a los campos del formulario
             'dosis',
             'duracion_tratamiento',
             'frecuencia',
             'cantidad',
             'indicaciones'
+        ]
+        # Excluimos los campos que se asignarán automáticamente en la vista
+        exclude = [
+            'id_profesional',
+            'id_centro_medico',
+            'id_estado_orden',
+            'id_tipo_orden',
+            'fecha_emision',
+            'fecha_cumplimiento',
+            'codigo_qr',
+            'id_consulta',
+            'id_lote',
+            'id_servicio'
         ]
         widgets = {
             'indicaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
@@ -321,7 +337,7 @@ class OrdenMedicamentoForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        super(OrdenMedicamentoForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
             if not field.widget.attrs.get('class'):
                 field.widget.attrs['class'] = 'form-control mb-2'
@@ -338,7 +354,7 @@ class OrdenMedicamentoForm(forms.ModelForm):
             # Un medicamento es requerido si el formulario no está vacío
             if not id_medicamento and (codigo_select or nombre_select):
                 self.add_error(None, 'Debe seleccionar un medicamento válido de la lista.')
-            elif not id_medicamento:
+            elif not id_medicamento and not cleaned_data.get('id_paciente'):
                 # Si no hay medicamento pero otros campos sí, también es un error.
                 if any(cleaned_data.get(f) for f in ['dosis', 'cantidad', 'frecuencia']):
                     self.add_error('id_medicamento', 'Se requiere un medicamento para estos detalles.')
