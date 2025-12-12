@@ -1,0 +1,339 @@
+{% extends "plantillaRl.html" %}
+{% load static %}
+{% block title %}Inicio Laboratorista{% endblock title %}
+
+{% block auth_button %}
+<li>
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "login" %}'">
+        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    </button>
+</li>
+{% endblock auth_button %}
+
+{% block content %}
+
+<section class="main"> <!-- Se corrige la doble etiqueta <section> y la clase inválida -->
+    <div class="container-fluid">
+        <div class="row p-4">
+            <!-- Columna para el contenido principal -->
+            <div class="col-lg-8 col-md-12 mt-4">
+                <div class="welcome-section mb-5">
+                    <h1 class="welcome-title">Bienvenido, <span class="patient-name">Profesional {{ profesional.nombre1 }} {{ profesional.apellido1 }}</span></h1>
+                    <p class="welcome-subtitle">Gestiona los resultados de laboratorio de manera fácil y segura</p>
+                </div>
+
+                <!-- Selector de roles -->
+                {% if request.session.roles|length > 1 %}
+                <div class="role-selector mb-5">
+                    <label for="roleSelector" class="form-label">Roles disponibles</label>
+                    <select class="form-select form-select-lg" id="roleSelector">
+                        {% if 'paciente' in request.session.roles %}
+                            <option value="{% url 'inicio-usuario' %}" selected>Paciente</option>
+                        {% endif %}
+                        {% if 'profesional_salud' in request.session.roles or 'laboratorista' in request.session.roles or 'recepcionista' in request.session.roles %}
+                            <option value="{% url 'inicio_prof_salud' %}">Profesional de salud</option>
+                        {% endif %}
+                        {% if 'admin_centro_medico' in request.session.roles %}
+                            <option value="{% url 'inicio_admin' %}">Administrativo</option>
+                        {% endif %}
+                    </select>
+                </div>
+                {% endif %}
+
+                <div class="row">
+                    <!-- Resultados laboratorio -->
+                    <div class="col-xl-6 col-md-6 mb-4">
+                        <div class="feature-card card-hover">
+                            <div class="feature-icon">
+                                <i class="fas fa-file-medical"></i>
+                            </div>
+                            <h3>Resultados Laboratorio</h3>
+                            <p>Acceda para diligenciar los resultados de laboratorio, cumpliendo con la normativa de confidencialidad.</p>
+                            <a class="btn btn-primary" href="{% url "rLaboratorio:registrar_resultado" %}">
+                                Registrar Resultados
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Subir Resultados laboratorio -->
+                    <div class="col-xl-6 col-md-6 mb-4">
+                        <div class="feature-card card-hover">
+                            <div class="feature-icon">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <h3>Cargar Resultados Laboratorio</h3>
+                            <p>Acceda para cargar los resultados de laboratorio, cumpliendo con la normativa de confidencialidad.</p>
+                            <a class="btn btn-primary" href='{% url "rLaboratorio:registrar_resultado" %}'>
+                                Cargar Resultados laboratorio
+                            </a>
+                        </div>    
+                    </div>
+                    <div class="col-lg-12 col-md-12">
+                        <div class="visual-section">
+                            <div class="image-container mb-4">
+                                <img src="{% static 'img/laboratorio.png' %}" alt="Profesional médico" class="img-fluid rounded shadow-lg">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+
+            <!-- Columna para las imágenes -->
+            <div class="col-lg-4 col-md-12">
+                <div class="visual-section">
+                    <div class="image-container mb-4">
+                        <img src="{% static 'img/doctor.png' %}" alt="Profesional médico" class="img-fluid rounded shadow-lg">
+                    </div>
+                    <div class="image-container">
+                        <img src="{% static 'img/infografíaunisalud.png' %}" alt="Infografía UniSalud" class="img-fluid rounded shadow-lg">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+/* Variables de colores */
+:root {
+    --primary-color: #2563eb;
+    --primary-light: #3b82f6;
+    --primary-dark: #1d4ed8;
+    --secondary-color: #10b981;
+    --accent-color: #8b5cf6;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --bg-light: #f8fafc;
+    --white: #ffffff;
+    --border-light: #e5e7eb;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos generales */
+.main {
+    background: linear-gradient(135deg, var(--bg-light) 0%, var(--white) 100%);
+    min-height: 100vh;
+    padding: 20px 0;
+}
+
+.welcome-section {
+    text-align: left;
+    padding: 1rem 0;
+}
+
+.welcome-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.patient-name {
+    color: var(--primary-color);
+    font-weight: 800;
+}
+
+.welcome-subtitle {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    font-weight: 400;
+}
+
+/* Selector de roles */
+.role-selector {
+    max-width: 400px;
+}
+
+.role-selector .form-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.role-selector .form-select {
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    background-color: var(--white);
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.role-selector .form-select:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Tarjetas de características */
+.feature-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2rem;
+    height: 100%;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary-light);
+}
+
+.feature-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: var(--white);
+}
+
+.feature-card h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+.feature-card p {
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+/* Botones */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    border: none;
+    border-radius: 50px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    color: var(--white);
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    color: var(--white);
+}
+
+/* Sección visual */
+.visual-section {
+    position: sticky;
+    top: 2rem;
+}
+
+.image-container {
+    overflow: hidden;
+    border-radius: 16px;
+}
+
+.image-container img {
+    transition: transform 0.3s ease;
+    width: 100%;
+}
+
+.image-container:hover img {
+    transform: scale(1.03);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .welcome-title {
+        font-size: 2rem;
+    }
+    
+    .feature-card {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .visual-section {
+        margin-top: 2rem;
+    }
+    
+    .welcome-section {
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .welcome-title {
+        font-size: 1.8rem;
+    }
+    
+    .welcome-subtitle {
+        font-size: 1rem;
+    }
+    
+    .feature-card h3 {
+        font-size: 1.2rem;
+    }
+    
+    .role-selector {
+        max-width: 100%;
+    }
+}
+
+/* Efectos de carga suave */
+.feature-card, .image-container {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Asegurar que el contenedor principal tenga buen espaciado */
+.container-fluid {
+    max-width: 1400px;
+}
+</style>
+
+<!-- Incluir Font Awesome para los íconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+{% endblock content %}
+
+{% block script %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelector = document.getElementById('roleSelector');
+    if (roleSelector) {
+        roleSelector.addEventListener('change', function() {
+            window.location.href = this.value;
+        });
+    }
+});
+</script>
+{% endblock script %}
