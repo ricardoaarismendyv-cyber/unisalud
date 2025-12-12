@@ -14,6 +14,7 @@ from io import BytesIO #generar un archivo (como un PDF o una imagen) y enviarlo
 from django.urls import reverse # <--- AÑADIR ESTA LÍNEA
 from django.core.serializers.json import DjangoJSONEncoder
 import base64
+from django.http import JsonResponse
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 ALLOWED_PROF_ROLES = ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']
@@ -177,9 +178,6 @@ def diligenciar_hc(request):
                 nueva_consulta.fecha_programada = timezone.now() # O la fecha de la cita real
                 nueva_consulta.fecha_atencion = timezone.now()
                 nueva_consulta.estado = 'Atendido'
-                # El paciente se obtiene de los datos limpios del formulario.
-                paciente_obj = consulta_form.cleaned_data['paciente']
-                nueva_consulta.id_paciente = paciente_obj # Asignamos el objeto Paciente directamente.
                 nueva_consulta.save()
 
                 # Guardar los diagnósticos del formset
@@ -200,7 +198,7 @@ def diligenciar_hc(request):
                 for form in antecedente_formset:
                     if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
                         antecedente = form.save(commit=False)
-                        antecedente.id_paciente = paciente_obj
+                        antecedente.id_paciente = nueva_consulta.id_paciente # Usamos el paciente de la consulta
                         antecedente.fecha_registro = timezone.now().date() # Extraer solo la fecha
                         antecedente.save()
 
@@ -448,14 +446,13 @@ def diligenciar_omedicamentos(request):
 
     if request.method == 'POST':
         medicamento_formset = MedicamentoFormSet(request.POST, prefix='medicamentos')
-        paciente_id = request.POST.get('paciente')
 
-        if medicamento_formset.is_valid() and paciente_id:
+        if medicamento_formset.is_valid():
             try:
                 orden_creada_id = None
-                paciente = Pacientes.objects.get(pk=paciente_id)
                 lote_id = uuid.uuid4() # Generamos un ID de lote único.
                 fecha_emision_batch = timezone.now()
+                paciente = None # Inicializamos la variable paciente
 
                 for form in medicamento_formset:
                     if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
@@ -468,8 +465,11 @@ def diligenciar_omedicamentos(request):
                             if form.has_changed():
                                 continue
 
+                        # El paciente se toma del primer formulario válido
+                        if not paciente:
+                            paciente = form.cleaned_data.get('id_paciente')
+
                         # Asignar los datos que no vienen del formulario
-                        nueva_orden.id_paciente = paciente
                         nueva_orden.id_medicamento = medicamento_seleccionado
                         nueva_orden.id_lote = lote_id # Asignamos el ID de lote.
 
@@ -489,15 +489,11 @@ def diligenciar_omedicamentos(request):
                     return redirect('prof_salud:ver_omedicamentos_pdf', orden_id=orden_creada_id)
                 else:
                     messages.warning(request, 'No se añadió ningún medicamento, por lo que no se guardó ninguna orden.')
-            except Pacientes.DoesNotExist:
-                messages.error(request, 'El paciente seleccionado no es válido.')
             except Exception as e: # Captura de otros posibles errores
                 messages.error(request, f'Ocurrió un error al guardar la orden: {e}')
         else:
             # Si el formset no es válido, los errores se mostrarán en la plantilla.
-            # Si el paciente no fue seleccionado, el 'required' del HTML lo manejará.
-            if not paciente_id:
-                messages.error(request, 'Debe seleccionar un paciente para la orden.')
+            messages.error(request, 'Por favor, corrija los errores en el formulario.')
     else:
         medicamento_formset = MedicamentoFormSet(prefix='medicamentos')
 
@@ -513,10 +509,7 @@ def diligenciar_omedicamentos(request):
     }
     medicamentos_json = json.dumps(medicamentos_data, cls=DjangoJSONEncoder)
 
-    pacientes = Pacientes.objects.all()
-
     return render(request, 'paginas/diligenciar_omedicamentos.html', {
-        'pacientes': pacientes,
         'medicamento_formset': medicamento_formset,
         'medicamentos_json': medicamentos_json,
     })
@@ -532,6 +525,25 @@ def ver_omedicamentos_pdf(request, orden_id):
     except OrdenMedica.DoesNotExist:
         messages.error(request, 'La orden de medicamentos solicitada no existe.')
         return redirect('omed_prof_salud')
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+def buscar_paciente_por_documento(request):
+    """
+    Vista para AJAX. Busca un paciente por número de documento.
+    """
+    numero_documento = request.GET.get('numero_documento', None)
+    if not numero_documento:
+        return JsonResponse({'error': 'Número de documento no proporcionado.'}, status=400)
+
+    try:
+        paciente = Pacientes.objects.get(numero_documento=numero_documento)
+        data = {
+            'id_paciente': paciente.id_paciente,
+            'nombre_completo': f'{paciente.nombre1} {paciente.apellido1} {paciente.apellido2}'.strip()
+        }
+        return JsonResponse(data)
+    except Pacientes.DoesNotExist:
+        return JsonResponse({'error': 'Paciente no encontrado.'}, status=404)
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES + ['paciente'])
 @xframe_options_sameorigin # Permite que esta vista se cargue en un iframe del mismo sitio.
