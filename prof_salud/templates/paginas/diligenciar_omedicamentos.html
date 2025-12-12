@@ -10,103 +10,156 @@
 {% block content %}
 <section class="main">
     <div class="container-fluid">
-       <div class="row justify-content-center p-4">
+        <div class="row justify-content-center p-4">
             <div class="col-lg-10 col-md-10">
-                <a class="btn btn-main btn-nav" href='{% url "prof_salud:omed_prof_salud" %}'>Volver</a>
-                <div class="container border border-dark rounded p-4 my-5 div-main">
-                    <h1>Diligenciar Orden Medicamentos</h1>
-                    <p>Complete todos los campos para registrar orden médica del paciente.</p>
-                    
-                    <form method="post">
-                        {% csrf_token %}
+                <div class="mb-4">
+                <a class="btn btn-outline-primary" href='{% url "prof_salud:omed_prof_salud" %}'>
+                    <i class="fas fa-arrow-left me-6"></i> Volver
+                    </a>
+                </div>
+                
+                <div class="card shadow-lg border-0 rounded-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="text-center font-weight-light my-3">Diligenciar Orden Medicamentos</h2>
+                        <h6 class="text-center font-weight-light my-3">Complete todos los campos para registrar la orden de medicamentos del paciente.</h6>
+                    </div>
+                    <div class="card-body p-4 p-md-5">
+                        <form method="post" novalidate>
+                            {% csrf_token %}
 
-                        {# Mostrar errores generales del formulario #}
-                        {% if medicamento_formset.non_form_errors %}
-                            <div class="alert alert-danger">{{ medicamento_formset.non_form_errors }}</div>
-                        {% endif %}
-                        
-                        {# Campo de Paciente fuera del formset #}
-                        <div class="mb-3">
-                            <label for="paciente-select" class="form-label">Paciente</label>
-                            <select name="paciente" id="paciente-select" class="form-control" required>
-                                <option value="">Seleccione un paciente...</option>
-                                {% for paciente in pacientes %}
-                                    <option value="{{ paciente.pk }}">{{ paciente }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <hr>
-                        <h3>Detalles del Medicamento</h3>
-                        
-                        {{ medicamento_formset.management_form }}
-                        <div id="medicamentos-container">
-                            {% for form in medicamento_formset %}
-                                <div class="medicamento-form border p-3 mb-3">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h4 class="form-title mb-0">Medicamento #{{ forloop.counter }}</h4>
-                                    </div>
-                                    {# Mostrar errores de este formulario específico #}
-                                    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
-                                    {% for field in form %}{% if field.errors %}<div class="alert alert-warning p-2 mt-1">{{ field.label }}: {{ field.errors|striptags }}</div>{% endif %}{% endfor %}
-
-                                    {{ form.id_medicamento }} {# Campo oculto para el ID real #}
-                                    <p>{{ form.codigo_medicamento_select.label_tag }} {{ form.codigo_medicamento_select }}</p>
-                                    <p>{{ form.nombre_generico_select.label_tag }} {{ form.nombre_generico_select }}</p>
-                                    <p>{{ form.principio_activo.label_tag }} {{ form.principio_activo }}</p>
-                                    <p>{{ form.concentracion.label_tag }} {{ form.concentracion }}</p>
-                                    <p>{{ form.forma_farmaceutica.label_tag }} {{ form.forma_farmaceutica }}</p>
-
-                                    <p>{{ form.dosis.label_tag }} {{ form.dosis }}</p>
-                                    <p>{{ form.duracion_tratamiento.label_tag }} {{ form.duracion_tratamiento }}</p>
-                                    <p>{{ form.frecuencia.label_tag }} {{ form.frecuencia }}</p>
-                                    <p>{{ form.cantidad.label_tag }} {{ form.cantidad }}</p>
-                                    <p>{{ form.indicaciones.label_tag }} {{ form.indicaciones }}</p>
-                                    <div style="display: none;">{{ form.DELETE }}</div>
+                            {# Mostrar errores generales del formulario #}
+                            {% if medicamento_formset.non_form_errors %}
+                                <div class="alert alert-danger">{{ medicamento_formset.non_form_errors }}</div>
+                            {% endif %}
+                            
+                            <!-- Nuevos campos para búsqueda de paciente -->
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    {{ medicamento_formset.forms.0.numero_documento_paciente.label_tag }}
+                                    {{ medicamento_formset.forms.0.numero_documento_paciente }}
                                 </div>
-                            {% endfor %}
-                        </div>
-
-                        <div id="empty-form-template" style="display: none;">
-                            <div class="medicamento-form border p-3 mb-3">
-                                <h5 class="form-title">Medicamento #__prefix__</h5>
-                                {{ medicamento_formset.empty_form.id_medicamento }}
-                                <p>{{ medicamento_formset.empty_form.codigo_medicamento_select.label_tag }} {{ medicamento_formset.empty_form.codigo_medicamento_select }}</p>
-                                <p>{{ medicamento_formset.empty_form.nombre_generico_select.label_tag }} {{ medicamento_formset.empty_form.nombre_generico_select }}</p>
-                                <p>{{ medicamento_formset.empty_form.principio_activo.label_tag }} {{ medicamento_formset.empty_form.principio_activo }}</p>
-                                <p>{{ medicamento_formset.empty_form.concentracion.label_tag }} {{ medicamento_formset.empty_form.concentracion }}</p>
-                                <p>{{ medicamento_formset.empty_form.forma_farmaceutica.label_tag }} {{ medicamento_formset.empty_form.forma_farmaceutica }}</p>
-
-                                <p>{{ medicamento_formset.empty_form.dosis.label_tag }} {{ medicamento_formset.empty_form.dosis }}</p>
-                                <p>{{ medicamento_formset.empty_form.duracion_tratamiento.label_tag }} {{ medicamento_formset.empty_form.duracion_tratamiento }}</p>
-                                <p>{{ medicamento_formset.empty_form.frecuencia.label_tag }} {{ medicamento_formset.empty_form.frecuencia }}</p>
-                                <p>{{ medicamento_formset.empty_form.cantidad.label_tag }} {{ medicamento_formset.empty_form.cantidad }}</p>
-                                <p>{{ medicamento_formset.empty_form.indicaciones.label_tag }} {{ medicamento_formset.empty_form.indicaciones }}</p>
-                                <div style="display: none;">{{ medicamento_formset.empty_form.DELETE }}</div>
+                                <div class="col-md-8">
+                                    {{ medicamento_formset.forms.0.nombre_paciente.label_tag }}
+                                    {{ medicamento_formset.forms.0.nombre_paciente }}
+                                </div>
                             </div>
-                        </div>
+                            
+                            <hr>
+                            <h3>Detalles del Medicamento</h3>
+                            
+                            {{ medicamento_formset.management_form }}
+                            <div id="medicamentos-container">
+                                {% for form in medicamento_formset %}
+                                    <div class="medicamento-form border p-3 mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h4 class="form-title mb-0">Medicamento #{{ forloop.counter }}</h4>
+                                        </div>
+                                        {# Mostrar errores de este formulario específico #}
+                                        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+                                        {% for field in form %}{% if field.errors %}<div class="alert alert-warning p-2 mt-1">{{ field.label }}: {{ field.errors|striptags }}</div>{% endif %}{% endfor %}
 
-                        <div class="mt-2">
-                            <button type="button" id="add-medicamento-btn" class="btn btn-secondary">Añadir Otro Medicamento</button>
-                            <button type="button" id="remove-medicamento-btn" class="btn btn-outline-danger">Eliminar Último Medicamento</button>
-                        </div>
+                                        {{ form.id_medicamento }} {# Campo oculto para el ID del medicamento #}
+                                        {{ form.id_paciente }} {# Campo de paciente oculto (ya es hidden por el form) #}
+                                        <p>{{ form.codigo_medicamento_select.label_tag }} {{ form.codigo_medicamento_select }}</p>
+                                        <p>{{ form.nombre_generico_select.label_tag }} {{ form.nombre_generico_select }}</p>
+                                        <p>{{ form.principio_activo.label_tag }} {{ form.principio_activo }}</p>
+                                        <p>{{ form.concentracion.label_tag }} {{ form.concentracion }}</p>
+                                        <p>{{ form.forma_farmaceutica.label_tag }} {{ form.forma_farmaceutica }}</p>
 
-                        <div class="d-flex justify-content-end mt-4">
-                            <a href="{% url 'prof_salud:omed_prof_salud' %}" class="btn btn-secondary me-2">Cancelar</a>
-                            <button type="submit" class="btn btn-success">Guardar Orden Medicamento</button>
-                        </div>
-                    </form>
+                                        <p>{{ form.dosis.label_tag }} {{ form.dosis }}</p>
+                                        <p>{{ form.duracion_tratamiento.label_tag }} {{ form.duracion_tratamiento }}</p>
+                                        <p>{{ form.frecuencia.label_tag }} {{ form.frecuencia }}</p>
+                                        <p>{{ form.cantidad.label_tag }} {{ form.cantidad }}</p>
+                                        <p>{{ form.indicaciones.label_tag }} {{ form.indicaciones }}</p>
+                                        <div style="display: none;">{{ form.DELETE }}</div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <div id="empty-form-template" style="display: none;">
+                                <div class="medicamento-form border p-3 mb-3">
+                                    <h5 class="form-title">Medicamento #__prefix__</h5>
+                                    {{ medicamento_formset.empty_form.id_medicamento }}
+                                    {{ medicamento_formset.empty_form.id_paciente }}
+                                    <p>{{ medicamento_formset.empty_form.codigo_medicamento_select.label_tag }} {{ medicamento_formset.empty_form.codigo_medicamento_select }}</p>
+                                    <p>{{ medicamento_formset.empty_form.nombre_generico_select.label_tag }} {{ medicamento_formset.empty_form.nombre_generico_select }}</p>
+                                    <p>{{ medicamento_formset.empty_form.principio_activo.label_tag }} {{ medicamento_formset.empty_form.principio_activo }}</p>
+                                    <p>{{ medicamento_formset.empty_form.concentracion.label_tag }} {{ medicamento_formset.empty_form.concentracion }}</p>
+                                    <p>{{ medicamento_formset.empty_form.forma_farmaceutica.label_tag }} {{ medicamento_formset.empty_form.forma_farmaceutica }}</p>
+
+                                    <p>{{ medicamento_formset.empty_form.dosis.label_tag }} {{ medicamento_formset.empty_form.dosis }}</p>
+                                    <p>{{ medicamento_formset.empty_form.duracion_tratamiento.label_tag }} {{ medicamento_formset.empty_form.duracion_tratamiento }}</p>
+                                    <p>{{ medicamento_formset.empty_form.frecuencia.label_tag }} {{ medicamento_formset.empty_form.frecuencia }}</p>
+                                    <p>{{ medicamento_formset.empty_form.cantidad.label_tag }} {{ medicamento_formset.empty_form.cantidad }}</p>
+                                    <p>{{ medicamento_formset.empty_form.indicaciones.label_tag }} {{ medicamento_formset.empty_form.indicaciones }}</p>
+                                    <div style="display: none;">{{ medicamento_formset.empty_form.DELETE }}</div>
+                                </div>
+                            </div>
+
+                            <div class="mt-2">
+                                <button type="button" id="add-medicamento-btn" class="btn btn-secondary">Añadir Otro Medicamento</button>
+                                <button type="button" id="remove-medicamento-btn" class="btn btn-outline-danger">Eliminar Último Medicamento</button>
+                            </div>
+
+                            <div class="d-flex justify-content-end mt-4">
+                                <a href="{% url 'prof_salud:omed_prof_salud' %}" class="btn btn-secondary me-2">Cancelar</a>
+                                <button type="submit" class="btn btn-primary">Guardar Orden Medicamento</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-{% block scripts %}
+{% block script %}
 {{ block.super }}
 <script>
 
 document.addEventListener('DOMContentLoaded', function() {
+    // --- Lógica para buscar paciente por documento ---
+    const docInput = document.getElementById('id_medicamentos-0-numero_documento_paciente');
+    const nombreInput = document.getElementById('id_medicamentos-0-nombre_paciente');
+
+    docInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Evita que el formulario se envíe
+            const numeroDocumento = docInput.value.trim();
+            if (numeroDocumento === '') {
+                return;
+            }
+
+            // URL de nuestra vista AJAX
+            const url = `{% url 'prof_salud:buscar_paciente_por_documento' %}?numero_documento=${numeroDocumento}`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Paciente no encontrado');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    nombreInput.value = data.nombre_completo;
+                    const patientId = data.id_paciente;
+
+                    // Sincronizar el ID del paciente en todos los formularios del formset
+                    document.querySelectorAll('input[id$="-id_paciente"]').forEach(hiddenInput => {
+                        hiddenInput.value = patientId;
+                    });
+                    docInput.classList.remove('is-invalid');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    nombreInput.value = 'Paciente no encontrado.';
+                    docInput.classList.add('is-invalid');
+                    // Limpiar el ID en todos los formularios
+                    document.querySelectorAll('input[id$="-id_paciente"]').forEach(hiddenInput => hiddenInput.value = '');
+                });
+        }
+    });
+
     const medicamentosData = JSON.parse('{{ medicamentos_json|escapejs }}');
     const medicamentosContainer = document.getElementById('medicamentos-container');
     const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
@@ -114,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const addMedicamentoBtn = document.getElementById('add-medicamento-btn');
     const removeMedicamentoBtn = document.getElementById('remove-medicamento-btn');
 
-    // Function to update medication fields based on selected ID
+    // fucion para seleccionar medicamento ID
     function actualizarCamposMedicamento(selectElement) {
         // Extract the form prefix (e.g., 'medicamentos-0', 'medicamentos-1')
         const formPrefixMatch = selectElement.id.match(/id_(medicamentos-\d+)-/);
@@ -125,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const formPrefix = formPrefixMatch[1];
         const selectedId = selectElement.value;
 
-        // Get references to all fields within the current form
+        // Get referencias al formulario
         const hiddenIdInput = document.getElementById(`id_${formPrefix}-id_medicamento`);
         const codigoMSelect = document.getElementById(`id_${formPrefix}-codigo_medicamento_select`);
         const nombreGSelect = document.getElementById(`id_${formPrefix}-nombre_generico_select`);
@@ -163,17 +216,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }   
 
-    // Function to attach listeners to select elements within a given form element
+    // Function seleccionar medicamento ID para un formulario específico
     function attachListenersToForm(formElement) {
         const selects = formElement.querySelectorAll('select[id$="-codigo_medicamento_select"], select[id$="-nombre_generico_select"]');
         selects.forEach(select => {
-            // Prevent attaching multiple listeners
+            // Prevenir múltiples listeners
             if (!select.dataset.listenerAttached) {
                 select.addEventListener('change', function() {
                     actualizarCamposMedicamento(this);
                 });
                 select.dataset.listenerAttached = 'true';
-                // Initial call if the form already has a value (e.g., on page load for existing forms)
+                // iniciarlizar campos si ya hay un valor seleccionado
                 if (select.value) {
                     actualizarCamposMedicamento(select);
                 }
@@ -216,5 +269,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-{% endblock scripts %}
+{% endblock script %}
 {% endblock content %}
