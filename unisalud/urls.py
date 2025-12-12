@@ -27,8 +27,5 @@ urlpatterns = [
     path('usuario/', include('usuario.urls')),
     path('profesionalS/', include('prof_salud.urls', namespace='prof_salud')),
     path('administrativo/', include('administrativo.urls')),
+    path('laboratorio/', include('rLaboratorio.urls', namespace='rLaboratorio')),
 ]
-
-
-
-
