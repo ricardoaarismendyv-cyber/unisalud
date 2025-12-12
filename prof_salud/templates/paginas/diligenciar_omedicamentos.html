@@ -35,11 +35,11 @@
                             <!-- Nuevos campos para búsqueda de paciente -->
                             <div class="row mb-3">
                                 <div class="col-md-4">
-                                    {{ medicamento_formset.forms.0.numero_documento_paciente.label_tag }}
+                                    <label for="{{ medicamento_formset.forms.0.numero_documento_paciente.id_for_label }}" class="form-label fw-bold">{{ medicamento_formset.forms.0.numero_documento_paciente.label }}</label>
                                     {{ medicamento_formset.forms.0.numero_documento_paciente }}
                                 </div>
                                 <div class="col-md-8">
-                                    {{ medicamento_formset.forms.0.nombre_paciente.label_tag }}
+                                    <label for="{{ medicamento_formset.forms.0.nombre_paciente.id_for_label }}" class="form-label fw-bold">{{ medicamento_formset.forms.0.nombre_paciente.label }}</label>
                                     {{ medicamento_formset.forms.0.nombre_paciente }}
                                 </div>
                             </div>

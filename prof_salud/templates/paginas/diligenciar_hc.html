@@ -30,11 +30,11 @@
                             {# Renderizamos los campos de paciente personalizados primero #}
                             <div class="row mb-3">
                                 <div class="col-md-4">
-                                    {{ form.numero_documento_paciente.label_tag }}
+                                    <label for="{{ form.numero_documento_paciente.id_for_label }}" class="form-label fw-bold">{{ form.numero_documento_paciente.label }}</label>
                                     {{ form.numero_documento_paciente }}
                                 </div>
                                 <div class="col-md-8">
-                                    {{ form.nombre_paciente.label_tag }}
+                                    <label for="{{ form.nombre_paciente.id_for_label }}" class="form-label fw-bold">{{ form.nombre_paciente.label }}</label>
                                     {{ form.nombre_paciente }}
                                 </div>
                             </div>
@@ -49,7 +49,7 @@
 
                             <hr>
                             <h3>Diagnósticos del Paciente</h3>
-                            
+                                                        
                             {{ diagnostico_formset.management_form }}
 
                             <div id="diagnosticos-container">
