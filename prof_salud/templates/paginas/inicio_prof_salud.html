@@ -30,8 +30,7 @@
                     <label for="roleSelector" class="form-label">Roles disponibles</label>
                     <select
                         class="form-select form-select-lg"
-                        id="roleSelector"
-                    >
+                        id="roleSelector">
                         {% if 'paciente' in request.session.roles %}
                             <option value="{% url 'inicio-usuario' %}">Paciente</option>
                         {% endif %}
@@ -108,7 +107,7 @@
             <div class="col-lg-4 col-md-12">
                 <div class="visual-section">
                     <div class="image-container mb-4">
-                        <img src="{% static 'img/doctor.png' %}" alt="Profesional médico" class="img-fluid rounded shadow-lg">
+                        <img src="{% static 'img/profsalud.jpg' %}" alt="Profesional médico" class="img-fluid rounded shadow-lg">
                     </div>
                     <div class="image-container">
                         <img src="{% static 'img/infografíaunisalud.png' %}" alt="Infografía UniSalud" class="img-fluid rounded shadow-lg">
