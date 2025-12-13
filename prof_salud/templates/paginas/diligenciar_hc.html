@@ -58,6 +58,7 @@
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <h4 class="form-title mb-0">Diagnóstico #{{ forloop.counter }}</h4>
                                         </div>
+
                                         {{ form.id_enfermedad }} {# Campo oculto #}
                                         <p>{{ form.codigo_cie10_select.label_tag }} {{ form.codigo_cie10_select }}</p>
                                         <p>{{ form.nombre_enfermedad_select.label_tag }} {{ form.nombre_enfermedad_select }}</p>
@@ -86,7 +87,7 @@
 
                             <div class="mt-2">
                                 <button type="button" id="add-diagnostico-btn" class="btn btn-secondary">Añadir Otro Diagnóstico</button>
-                                <button type="button" id="remove-diagnostico-btn" class="btn btn-outline-danger">Eliminar Último</button>
+                                <button type="button" id="remove-diagnostico-btn" class="btn btn-danger btn-sm delete-diagnostico-btn">Eliminar</button>
                             </div>
                             <hr>
                             <h3>Antecedentes del Paciente</h3>
@@ -118,7 +119,7 @@
                             </div>
                             <div class="mt-2">
                                 <button type="button" id="add-antecedente-btn" class="btn btn-secondary">Añadir Otro Antecedente</button>
-                                <button type="button" id="remove-antecedente-btn" class="btn btn-outline-danger">Eliminar Último</button>
+                                <button type="button" class="btn btn-danger btn-sm delete-antecedente-btn">Eliminar</button>
                             </div>
                             
                             <div class="d-flex justify-content-end mt-4">
@@ -171,116 +172,161 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- Lógica para añadir y eliminar formularios de Diagnóstico ---
-    const addDiagnosticoBtn = document.getElementById('add-diagnostico-btn');
-    const diagnosticosContainer = document.getElementById('diagnosticos-container');
-    const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
-    const totalFormsInput = document.querySelector('#id_diagnosticos-TOTAL_FORMS');
+//   FORMSET: DIAGNÓSTICOS
 
-    addDiagnosticoBtn.addEventListener('click', function() {
-        let formNum = parseInt(totalFormsInput.value);
-        let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formNum);
-        
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = newFormHtml;
-        
-        tempDiv.querySelector('.form-title').textContent = `Diagnóstico #${formNum + 1}`;
-        
-        // Añadir botón de eliminar al nuevo formulario
-        const deleteBtn = document.createElement('button');
-        deleteBtn.type = 'button';
-        deleteBtn.className = 'btn btn-danger btn-sm float-end delete-diagnostico-btn';
-        deleteBtn.textContent = 'Eliminar';
-        tempDiv.querySelector('.diagnostico-form').insertBefore(deleteBtn, tempDiv.querySelector('.diagnostico-form').firstChild.nextSibling);
+// Elementos base
+const addDiagnosticoBtn = document.getElementById('add-diagnostico-btn');
+const diagnosticosContainer = document.getElementById('diagnosticos-container');
+const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
+const totalFormsInput = document.querySelector('#id_diagnosticos-TOTAL_FORMS');
 
-        diagnosticosContainer.append(tempDiv.firstElementChild);
-        totalFormsInput.value = formNum + 1;
-        
-        // Volver a inicializar los listeners para los botones de eliminar y los selects
-        inicializarListenersDiagnostico();
-    });
-
-    // --- Lógica para eliminar formularios de Diagnóstico ---
-    diagnosticosContainer.addEventListener('click', function(e) {
-        if (e.target && e.target.classList.contains('delete-diagnostico-btn')) {
-            const formToDelete = e.target.closest('.diagnostico-form');
-            formToDelete.style.display = 'none'; // Ocultar el formulario
-            formToDelete.querySelector('input[id$="-DELETE"]').checked = true; // Marcar para eliminar
+// Función para renumerar títulos
+function renumerarDiagnosticos() {
+    const forms = diagnosticosContainer.querySelectorAll('.diagnostico-form');
+    forms.forEach((form, index) => {
+        const title = form.querySelector('.form-title');
+        if (title) {
+            title.textContent = `Diagnóstico #${index + 1}`;
         }
     });
+}
 
-    // --- Lógica para eliminar el último formulario de Diagnóstico ---
-    const removeDiagnosticoBtn = document.getElementById('remove-diagnostico-btn');
-    removeDiagnosticoBtn.addEventListener('click', function() {
-        const allDiagnosticoForms = diagnosticosContainer.querySelectorAll('.diagnostico-form');
-        // Solo eliminamos si hay más de un formulario, para no borrar el único que hay
-        if (allDiagnosticoForms.length > 1) {
-            const lastForm = allDiagnosticoForms[allDiagnosticoForms.length - 1];
-            const deleteInput = lastForm.querySelector('input[id$="-DELETE"]');
-            if (deleteInput && deleteInput.checked) {
-                // Si ya está marcado para borrar (está oculto), no hacemos nada.
-            } else {
-                lastForm.remove(); // Elimina el elemento del DOM
-            }
+// Añadir diagnóstico
+addDiagnosticoBtn.addEventListener('click', function () {
+    let formNum = parseInt(totalFormsInput.value);
+    let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formNum);
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = newFormHtml;
+
+    // Renombrar título
+    tempDiv.querySelector('.form-title').textContent = `Diagnóstico #${formNum + 1}`;
+
+    // Crear botón eliminar
+    const deleteBtn = document.createElement('button');
+    deleteBtn.type = 'button';
+    deleteBtn.className = 'btn btn-danger btn-sm delete-diagnostico-btn float-end';
+    deleteBtn.textContent = 'Eliminar';
+
+    // Insertar botón
+    const formDiv = tempDiv.querySelector('.diagnostico-form');
+    const title = formDiv.querySelector('.form-title');
+    title.insertAdjacentElement('afterend', deleteBtn);
+
+    // Agregar al contenedor
+    diagnosticosContainer.append(tempDiv.firstElementChild);
+
+    // Actualizar TOTAL_FORMS
+    totalFormsInput.value = formNum + 1;
+
+    // Renumerar
+    renumerarDiagnosticos();
+});
+
+// Eliminar diagnóstico individual
+diagnosticosContainer.addEventListener('click', function (e) {
+    if (e.target && e.target.classList.contains('delete-diagnostico-btn')) {
+        const formToDelete = e.target.closest('.diagnostico-form');
+        formToDelete.style.display = 'none';
+        formToDelete.querySelector('input[id$="-DELETE"]').checked = true;
+        renumerarDiagnosticos();
+    }
+});
+
+// Eliminar último diagnóstico
+const removeDiagnosticoBtn = document.getElementById('remove-diagnostico-btn');
+removeDiagnosticoBtn.addEventListener('click', function () {
+    const forms = diagnosticosContainer.querySelectorAll('.diagnostico-form');
+
+    if (forms.length > 1) {
+        const lastForm = forms[forms.length - 1];
+        const deleteInput = lastForm.querySelector('input[id$="-DELETE"]');
+
+        // Marcar para eliminar
+        deleteInput.checked = true;
+        lastForm.style.display = 'none';
+
+        // Renumerar
+        renumerarDiagnosticos();
+    }
+});
+
+//FORMSET: ANTECEDENTES
+
+const addAntecedenteBtn = document.getElementById('add-antecedente-btn');
+const antecedenteFormsContainer = document.getElementById('antecedente-forms-container');
+const emptyAntecedenteTemplate = document.getElementById('empty-antecedente-form-template').innerHTML;
+const totalAntecedenteInput = document.querySelector('#id_antecedentes-TOTAL_FORMS');
+
+// Renumerar antecedentes
+function renumerarAntecedentes() {
+    const forms = antecedenteFormsContainer.querySelectorAll('.antecedente-form');
+    forms.forEach((form, index) => {
+        const title = form.querySelector('.form-title');
+        if (title) {
+            title.textContent = `Antecedente #${index + 1}`;
         }
     });
-    // --- Lógica para añadir formularios de Antecedentes ---
-    const addAntecedenteBtn = document.getElementById('add-antecedente-btn');
-    const antecedenteFormsContainer = document.getElementById('antecedente-forms-container');
-    const emptyAntecedenteTemplate = document.getElementById('empty-antecedente-form-template').innerHTML;
-    const totalAntecedenteInput = document.querySelector('#id_antecedentes-TOTAL_FORMS');
+}
 
-    addAntecedenteBtn.addEventListener('click', function() {
-        let formNum = parseInt(totalAntecedenteInput.value);
-        let newFormHtml = emptyAntecedenteTemplate.replace(/__prefix__/g, formNum);
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = newFormHtml;
-        tempDiv.querySelector('.form-title').textContent = `Antecedente #${formNum + 1}`;
-        
-        // Crear la estructura de título y botón para el nuevo formulario de antecedente
-        const newTitleContainer = document.createElement('div');
-        newTitleContainer.className = 'd-flex justify-content-between align-items-center mb-3';
+// Añadir antecedente
+addAntecedenteBtn.addEventListener('click', function () {
+    let formNum = parseInt(totalAntecedenteInput.value);
+    let newFormHtml = emptyAntecedenteTemplate.replace(/__prefix__/g, formNum);
 
-        const newTitle = tempDiv.querySelector('.form-title');
-        newTitle.classList.add('mb-0');
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = newFormHtml;
 
-        const newDeleteBtn = document.createElement('button');
-        newDeleteBtn.type = 'button';
-        newDeleteBtn.className = 'btn btn-danger btn-sm delete-antecedente-btn';
-        newDeleteBtn.textContent = 'Eliminar';
+    // Crear contenedor de título + botón
+    const titleContainer = document.createElement('div');
+    titleContainer.className = 'd-flex justify-content-between align-items-center mb-3';
 
-        newTitleContainer.append(newTitle, newDeleteBtn);
-        tempDiv.querySelector('.antecedente-form').prepend(newTitleContainer);
+    const title = tempDiv.querySelector('.form-title');
+    title.classList.add('mb-0');
+    title.textContent = `Antecedente #${formNum + 1}`;
 
-        antecedenteFormsContainer.append(tempDiv.firstElementChild);
-        totalAntecedenteInput.value = formNum + 1;
-        
-        // Volver a inicializar los listeners para los botones de eliminar de antecedentes
-        inicializarListenersAntecedente();
-    });
+    const deleteBtn = document.createElement('button');
+    deleteBtn.type = 'button';
+    deleteBtn.className = 'btn btn-danger btn-sm delete-antecedente-btn';
+    deleteBtn.textContent = 'Eliminar';
 
-    // --- Lógica para eliminar formularios de Antecedentes ---
-    antecedenteFormsContainer.addEventListener('click', function(e) {
-        if (e.target && e.target.classList.contains('delete-antecedente-btn')) {
-            const formToDelete = e.target.closest('.antecedente-form');
-            formToDelete.style.display = 'none'; // Ocultar el formulario
-            formToDelete.querySelector('input[id$="-DELETE"]').checked = true; // Marcar para eliminar
-        }
-    });
+    titleContainer.append(title, deleteBtn);
 
-    // --- Lógica para eliminar el último formulario de Antecedente ---
-    const removeAntecedenteBtn = document.getElementById('remove-antecedente-btn');
-    removeAntecedenteBtn.addEventListener('click', function() {
-        const allAntecedenteForms = antecedenteFormsContainer.querySelectorAll('.antecedente-form');
-        let formNum = parseInt(totalAntecedenteInput.value);
-        // Solo eliminamos si hay más de un formulario
-        if (allAntecedenteForms.length > 1) {
-            const lastForm = allAntecedenteForms[allAntecedenteForms.length - 1];
-            lastForm.remove(); // Elimina el elemento del DOM
-            totalAntecedenteInput.value = formNum - 1; // Decrementa el contador
-        }
-    });
+    const formDiv = tempDiv.querySelector('.antecedente-form');
+    formDiv.prepend(titleContainer);
 
+    antecedenteFormsContainer.append(tempDiv.firstElementChild);
+
+    totalAntecedenteInput.value = formNum + 1;
+
+    renumerarAntecedentes();
+});
+
+// Eliminar antecedente individual
+antecedenteFormsContainer.addEventListener('click', function (e) {
+    if (e.target && e.target.classList.contains('delete-antecedente-btn')) {
+        const formToDelete = e.target.closest('.antecedente-form');
+        formToDelete.style.display = 'none';
+        formToDelete.querySelector('input[id$="-DELETE"]').checked = true;
+        renumerarAntecedentes();
+    }
+});
+
+// Eliminar último antecedente
+const removeAntecedenteBtn = document.getElementById('remove-antecedente-btn');
+removeAntecedenteBtn.addEventListener('click', function () {
+    const forms = antecedenteFormsContainer.querySelectorAll('.antecedente-form');
+
+    if (forms.length > 1) {
+        const lastForm = forms[forms.length - 1];
+        const deleteInput = lastForm.querySelector('input[id$="-DELETE"]');
+
+        deleteInput.checked = true;
+        lastForm.style.display = 'none';
+
+        renumerarAntecedentes();
+    }
+});
 
     // --- Lógica para autocompletar campos de diagnóstico ---
     // Obtenemos los datos de las enfermedades desde la vista de Django
