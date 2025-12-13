@@ -141,7 +141,7 @@ class DiagnosticoPacienteForm(forms.Form):
             self.add_error('id_enfermedad', 'Este campo es obligatorio si se especifica un tipo de diagnóstico.')
         return cleaned_data
 
-DiagnosticoFormSet = formset_factory(DiagnosticoPacienteForm, extra=1, can_delete=True)
+DiagnosticoFormSet = formset_factory(DiagnosticoPacienteForm, extra=0, can_delete=True)
 
 class AntecedenteForm(forms.ModelForm):
     """Formulario para un único antecedente."""
@@ -165,7 +165,7 @@ class AntecedenteForm(forms.ModelForm):
         self.fields['severidad'].empty_label = "Seleccione una severidad"
         self.fields['estado_antecedente'].empty_label = "Seleccione un estado"
 
-AntecedenteFormSet = formset_factory(AntecedenteForm, extra=1, can_delete=True)
+AntecedenteFormSet = formset_factory(AntecedenteForm, extra=0, can_delete=True)
 
 class OrdenMedicaForm(forms.ModelForm):
     # Campo para seleccionar un paciente
@@ -265,7 +265,7 @@ class TipoOrdenForm(forms.Form):
             self.add_error(None, 'Debe seleccionar un servicio válido usando el autocompletado.')
         return cleaned_data
 
-serviciosFormSet = formset_factory(TipoOrdenForm, extra=1, can_delete=True) 
+serviciosFormSet = formset_factory(TipoOrdenForm, extra=0, can_delete=True) 
 
 class OrdenMedicamentoForm(forms.ModelForm):
     # Campo para seleccionar un paciente
@@ -361,4 +361,4 @@ class OrdenMedicamentoForm(forms.ModelForm):
         return cleaned_data
 
 
-MedicamentoFormSet = formset_factory(OrdenMedicamentoForm, extra=1, can_delete=True)
+MedicamentoFormSet = formset_factory(OrdenMedicamentoForm, extra=0, can_delete=True)
