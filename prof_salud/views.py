@@ -208,8 +208,8 @@ def diligenciar_hc(request):
                 messages.error(request, f'Ocurrió un error al guardar la historia clínica: {e}')
     else:
         consulta_form = ConsultaForm()
-        diagnostico_formset = DiagnosticoFormSet(prefix='diagnosticos')
-        antecedente_formset = AntecedenteFormSet(prefix='antecedentes')
+        diagnostico_formset = DiagnosticoFormSet(prefix='diagnosticos', initial=[{}]) # Inicia con un form vacío
+        antecedente_formset = AntecedenteFormSet(prefix='antecedentes', initial=[{}]) # Inicia con un form vacío
 
     # Preparar datos de enfermedades para JavaScript
     enfermedades_data = {
