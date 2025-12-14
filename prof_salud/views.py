@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.conf import settings #para QR funcione
 from django.contrib import messages
 from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, DiagnosticoPaciente, AntecedentesPaciente, Enfermedades, Consulta, OrdenMedica, Servicios, EstadoOrden, TipoOrden, Medicamentos, Pacientes, ResultadosLaboratorio
 from login.decorators import role_required
@@ -325,9 +326,8 @@ def generar_hc_pdf(request, consulta_id):
         antecedentes = AntecedentesPaciente.objects.filter(id_paciente=consulta.id_paciente)
 
         # 1. Construir la URL de verificación para el QR
-        verification_url = request.build_absolute_uri(
-            reverse('prof_salud:ver_hc_pdf', args=[consulta.id_consulta])
-        )
+        relative_url = reverse('prof_salud:ver_hc_pdf', args=[consulta.id_consulta])
+        verification_url = f"{settings.BASE_DOMAIN}{relative_url}"
 
         # 2. Generar la imagen del QR en memoria
         qr_img = qrcode.make(verification_url, box_size=6)
@@ -463,10 +463,9 @@ def generar_omedica_pdf(request, orden_id):
             id_servicio__isnull=False
         ).select_related('id_servicio') # Optimiza la consulta para obtener los detalles del servicio
 
-        # 1. Construir la URL de verificación para el QR
-        verification_url = request.build_absolute_uri(
-            reverse('prof_salud:ver_omedica_pdf', args=[orden.id_orden])
-        )
+        # 1. Construir la URL de verificación para el QR                
+        relative_url = reverse('prof_salud:ver_omedica_pdf', args=[orden.id_orden])
+        verification_url = f"{settings.BASE_DOMAIN}{relative_url}"
 
         # 2. Generar la imagen del QR en memoria
         qr_img = qrcode.make(verification_url, box_size=6)
@@ -640,9 +639,8 @@ def generar_omedicamentos_pdf(request, orden_id):
         ).select_related('id_medicamento')
 
         # 1. Construir la URL de verificación para el QR
-        verification_url = request.build_absolute_uri(
-            reverse('prof_salud:ver_omedicamentos_pdf', args=[orden.id_orden])
-        )
+        relative_url = reverse('prof_salud:ver_omedicamentos_pdf', args=[orden.id_orden])
+        verification_url = f"{settings.BASE_DOMAIN}{relative_url}"
 
         # 2. Generar la imagen del QR en memoria
         qr_img = qrcode.make(verification_url, box_size=6)

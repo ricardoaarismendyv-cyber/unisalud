@@ -31,8 +31,12 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-!l-yc9h$9on^#lc(v6&e7^divq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,192.168.1.40').split(',')
 
+# Dominio base para construir URLs absolutas (para QR, correos, etc.)
+# En desarrollo, usa la IP de tu máquina en la red local. Ej: 'http://192.168.1.10:8000'
+# En producción, será tu dominio real. Ej: 'https://www.unisalud.com'
+BASE_DOMAIN = os.getenv('BASE_DOMAIN', 'http://192.168.1.40:8000') #WIFI CASA
 # Permitir que las vistas se carguen en iframes del mismo dominio
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
