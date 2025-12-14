@@ -18,6 +18,7 @@ urlpatterns = [
     path('ordenes_medicamentos/', views.omed_prof_salud, name='omed_prof_salud'),
     path('ordenes_medicamentos/diligenciar/', views.diligenciar_omedicamentos, name='diligenciar_omedicamentos'),
     path('buscar-paciente/', views.buscar_paciente_por_documento, name='buscar_paciente_por_documento'),
+    path('buscar-enfermedades/', views.buscar_enfermedades_ajax, name='buscar_enfermedades_ajax'),
     path('ordenes_medicamentos/ver-pdf/<int:orden_id>/', views.ver_omedicamentos_pdf, name='ver_omedicamentos_pdf'),
     path('ordenes_medicamentos/generar-pdf/<int:orden_id>/', views.generar_omedicamentos_pdf, name='generar_omedicamentos_pdf'),  
     path('consultas/', views.consultas_prof_salud, name='consultas_prof_salud'),
