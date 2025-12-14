@@ -24,6 +24,7 @@
             <link rel="stylesheet" href="{% static 'css/plantilla.css' %}">
         {% endblock estilo %}
         <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+    
     </head>
 
     <body id="page-body">
@@ -113,8 +114,44 @@
     <!-- Select2 JS activar el buscador con JavaScript-->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- Carga del script de la plantilla -->
-    <script src="{% static 'js/plantilla.js' %}"></script>
-    <!-- Bloque para scripts específicos de cada página -->
-    {% block script %}{% endblock script %}
+    
+    
+    <!-- Script base de la plantilla (siempre se carga) -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const languageButton = document.getElementById('language-button');
+                const languageMenu = document.getElementById('language-menu');
+
+                if (languageButton && languageMenu) {
+                    languageButton.addEventListener('click', function(event) {
+                        event.stopPropagation(); 
+                        languageMenu.style.display = languageMenu.style.display === 'block' ? 'none' : 'block';
+                    });
+
+                    document.addEventListener('click', function() {
+                        languageMenu.style.display = 'none';
+                    });
+
+                    languageMenu.querySelectorAll('a').forEach(link => {
+                        link.addEventListener('click', function(event) {
+                            event.preventDefault();
+                            languageButton.value = this.textContent;
+                            languageMenu.style.display = 'none';
+                            event.stopPropagation();
+                        });
+                    });
+                }
+            });
+        </script>
+
+        <!-- Bloque para scripts específicos de cada página -->
+        {% block script %}
+        <script>
+                    body.style.fontSize = currentFontSize + 'px';
+        </script>
+        {% endblock script %}
+        
     </body>
 </html>
+
+
