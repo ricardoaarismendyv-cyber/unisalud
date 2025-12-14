@@ -1,0 +1,46 @@
+{% extends "plantillaRl.html" %}
+{% load static %}
+
+{% block title %}Ver Resultado de Laboratorio{% endblock title %}
+
+{% block content %}
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <div class="col-lg-10 col-md-10">
+                <div class="mb-4">
+                    <a class="btn btn-main btn-nav primary mt-5" href="{% url 'rLaboratorio:inicio_laboratorista' %}">Volver
+                    </a>
+                </div>
+
+                <div class="card shadow-lg border-0 rounded-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="text-center font-weight-light my-3">Resultado de Laboratorio para {{ resultado.id_paciente }}</h3>
+                    </div>
+                    <div class="card-body p-4 p-md-5">
+                        {% if resultado.archivo_pdf %}
+                            <div class="mb-4">
+                                <object data="{% url 'rLaboratorio:generar_resultado_pdf_vista' resultado.id_resultado %}" type="application/pdf" width="100%" height="800px">
+                                    <p>Tu navegador no puede mostrar el PDF. Puedes <a href="{{ resultado.archivo_pdf.url }}">descargarlo aquí</a>.</p>
+                                </object>
+                            </div>
+                            <div class="text-center">
+                                <a href="{{ resultado.archivo_pdf.url }}" class="btn btn-danger" download>
+                                    <i class="fas fa-download me-2"></i> Descargar PDF
+                                </a>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning text-center" role="alert">
+                                Este resultado no tiene un archivo PDF asociado.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Incluir Font Awesome para los íconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock content %}

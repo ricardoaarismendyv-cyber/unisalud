@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, DiagnosticoPaciente, AntecedentesPaciente, Enfermedades, Consulta, OrdenMedica, Servicios, EstadoOrden, TipoOrden, Medicamentos, Pacientes
+from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, DiagnosticoPaciente, AntecedentesPaciente, Enfermedades, Consulta, OrdenMedica, Servicios, EstadoOrden, TipoOrden, Medicamentos, Pacientes, ResultadosLaboratorio
 from login.decorators import role_required
 from .forms import ConsultaForm, DiagnosticoFormSet, AntecedenteFormSet, OrdenMedicaForm, serviciosFormSet, OrdenMedicamentoForm, MedicamentoFormSet
 from django.utils import timezone
@@ -128,6 +128,64 @@ def omed_prof_salud(request):
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def consultas_prof_salud(request):
     return render(request, 'paginas/consultas_prof_salud.html') #Vista de Turnos/Agendamiento para el profesional de salud
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+def resultados_lab(request):
+    """
+    Vista de Resultados de Laboratorio para el profesional de salud.
+    Muestra el último resultado de laboratorio del paciente de la última consulta.
+    """
+    ultimo_resultado = None
+    historial_resultados = None
+    try:
+        profesional_id = request.session.get('id_profesional')
+        if profesional_id:
+            profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
+            # Se busca la última consulta atendida por este profesional para obtener el paciente
+            ultima_consulta = Consulta.objects.filter(id_profesional=profesional, estado='Atendido').order_by('-fecha_atencion').first()
+
+            if ultima_consulta:
+                paciente = ultima_consulta.id_paciente
+                # Obtenemos los resultados de laboratorio de ese paciente
+                resultados = ResultadosLaboratorio.objects.filter(id_paciente=paciente).order_by('-fecha_registro')
+                ultimo_resultado = resultados.first()
+                historial_resultados = resultados[:5]
+
+    except ProfesionalSalud.DoesNotExist:
+        messages.error(request, 'No se pudo encontrar el perfil del profesional.')
+    except Exception as e:
+        messages.error(request, f'Ocurrió un error inesperado: {e}')
+
+    return render(request, 'paginas/resultados_lab_prof_salud.html', {
+        'ultimo_resultado': ultimo_resultado,
+        'historial_resultados': historial_resultados
+    })
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+def ver_resultado_lab_pdf(request, resultado_id):
+    """
+    Muestra una página con el PDF del resultado de laboratorio incrustado.
+    """
+    try:
+        resultado = ResultadosLaboratorio.objects.get(id_resultado=resultado_id)
+        return render(request, 'paginas/ver_resultado_lab_pdf.html', {'resultado': resultado})
+    except ResultadosLaboratorio.DoesNotExist:
+        messages.error(request, 'El resultado de laboratorio solicitado no existe.')
+        return redirect('prof_salud:resultados_lab')
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES + ['paciente'])
+@xframe_options_sameorigin
+def generar_resultado_lab_pdf(request, resultado_id):
+    """
+    Genera y sirve el PDF de un resultado de laboratorio.
+    Redirige a la vista del laboratorista que genera el PDF.
+    """
+    # Construimos la URL a la vista que realmente genera el PDF en la app rLaboratorio
+    pdf_url = reverse('rLaboratorio:generar_resultado_pdf_vista', args=[resultado_id])
+    
+    # Redirigimos a esa URL. El navegador cargará el PDF generado por la otra vista.
+    return redirect(pdf_url)
+
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def preguntasfrecuentes_prof_salud(request):

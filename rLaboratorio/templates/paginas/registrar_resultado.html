@@ -9,8 +9,7 @@
         <div class="row justify-content-center p-4">
             <div class="col-lg-10 col-md-10">
                 <div class="mb-4">
-                    <a class="btn btn-outline-primary" href="{% url 'rLaboratorio:inicio_laboratorista' %}">
-                        <i class="fas fa-arrow-left me-6"></i> Volver
+                    <a class="btn btn-main btn-nav primary mt-5" href="{% url 'rLaboratorio:inicio_laboratorista' %}">Volver
                     </a>
                 </div>
 
@@ -19,7 +18,7 @@
                         <h3 class="text-center font-weight-light my-3">Registrar Nuevo Resultado de Laboratorio</h3>
                     </div>
                     <div class="card-body p-4 p-md-5">
-                        <form method="post" novalidate>
+                        <form method="post" enctype="multipart/form-data" novalidate>
                             {% csrf_token %}
 
                             <!-- Campos para búsqueda de paciente -->
@@ -38,35 +37,32 @@
                             <!-- Renderizar campos del formulario con clases de Bootstrap -->
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="{{ form.id_servicio.id_for_label }}" class="form-label fw-bold">{{ form.id_servicio.label }}</label>
-                                    {{ form.id_servicio }}
-                                    {% if form.id_servicio.errors %}<div class="invalid-feedback d-block">{{ form.id_servicio.errors.as_text }}</div>{% endif %}
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.tipo_examen.id_for_label }}" class="form-label fw-bold">{{ form.tipo_examen.label }}</label>
-                                    {{ form.tipo_examen }}
-                                    {% if form.tipo_examen.errors %}<div class="invalid-feedback d-block">{{ form.tipo_examen.errors.as_text }}</div>{% endif %}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.fecha_solicitud.id_for_label }}" class="form-label fw-bold">{{ form.fecha_solicitud.label }}</p>
+                                    <label for="{{ form.fecha_solicitud.id_for_label }}" class="form-label fw-bold">{{ form.fecha_solicitud.label }}</label>
                                     {{ form.fecha_solicitud }}
                                     {% if form.fecha_solicitud.errors %}<div class="invalid-feedback d-block">{{ form.fecha_solicitud.errors.as_text }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.fecha_registro_resultado.id_for_label }}" class="form-label fw-bold">{{ form.fecha_registro_resultado.label }}</label>
+                                    {{ form.fecha_registro_resultado }}
+                                    {% if form.fecha_registro_resultado.errors %}<div class="invalid-feedback d-block">{{ form.fecha_registro_resultado.errors.as_text }}</div>{% endif %}
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="{{ form.resultado.id_for_label }}" class="form-label fw-bold">{{ form.resultado.label }}</label>
-                                {{ form.resultado }}
-                                {% if form.resultado.errors %}<div class="invalid-feedback d-block">{{ form.resultado.errors.as_text }}</div>{% endif %}
+                                <label for="{{ form.archivo_pdf.id_for_label }}" class="form-label fw-bold">{{ form.archivo_pdf.label }}</label>
+                                {{ form.archivo_pdf }}
+                                {% if form.instance.archivo_pdf %}
+                                    <p class="mt-2">
+                                        Archivo actual: <a href="{{ form.instance.archivo_pdf.url }}" target="_blank">{{ form.instance.archivo_pdf.name }}</a>
+                                    </p>
+                                {% endif %}
+                                {% if form.archivo_pdf.errors %}<div class="invalid-feedback d-block">{{ form.archivo_pdf.errors.as_text }}</div>{% endif %}
                             </div>
 
                             <div class="mb-4">
-                                <label for="{{ form.observaciones.id_for_label }}" class="form-label fw-bold">{{ form.observaciones.label }}</label>
-                                {{ form.observaciones }}
-                                {% if form.observaciones.errors %}<div class="invalid-feedback d-block">{{ form.observaciones.errors.as_text }}</div>{% endif %}
+                                <label for="{{ form.observaciones_resultados.id_for_label }}" class="form-label fw-bold">{{ form.observaciones_resultados.label }}</label>
+                                {{ form.observaciones_resultados }}
+                                {% if form.observaciones_resultados.errors %}<div class="invalid-feedback d-block">{{ form.observaciones_resultados.errors.as_text }}</div>{% endif %}
                             </div>
 
                             <div class="d-grid gap-2 mt-4">

@@ -1,0 +1,27 @@
+{% extends 'plantilla_ps.html' %}
+{% load static %}
+
+{% block title %}Ver Resultado de Laboratorio{% endblock %}
+
+{% block content %}
+<section class="main">
+    <div class="container-fluid">
+        <div class="row p-4 justify-content-center">
+            <div class="row justify-content-center p-4">
+                <div class="col-lg-10 col-md-10">
+                    <a class="btn btn-main btn-nav mt-5" href="{% url 'prof_salud:resultados_lab' %}">Volver</a>
+                    <a class="btn btn-secondary" href="{% url 'prof_salud:generar_resultado_lab_pdf' resultado.id_resultado %}" download="Resultado_{{ resultado.id_paciente.numero_documento }}_{{ resultado.fecha_solicitud|date:'Ymd' }}.pdf">
+                        <i class="fas fa-download"></i> Descargar PDF
+                    </a>
+                </div>
+
+                <h1 class="text-center mb-4">Resultado de Laboratorio #{{ resultado.id_resultado }}</h1>
+
+                <div class="card shadow-sm">
+                    <iframe src="{% url 'prof_salud:generar_resultado_lab_pdf' resultado.id_resultado %}" width="100%" height="800px" style="border: none;" title="Visor de PDF de Resultado de Laboratorio"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
