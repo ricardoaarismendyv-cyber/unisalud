@@ -6,7 +6,7 @@
 {# En esta página, reemplazamos el botón de login por el de logout #}
 <li>
     {# Asumimos que tienes una URL llamada 'logout' para cerrar la sesión #}
-    <button type="button" class="navButton0 login-btn" onclick="window.location.href='#'">
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "logout" %}'">
         <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
     </button>
 </li>

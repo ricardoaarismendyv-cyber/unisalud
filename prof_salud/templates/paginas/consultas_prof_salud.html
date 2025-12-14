@@ -9,7 +9,7 @@
             
 {% block auth_button %}
 <li>
-    <a class="navButton0 login-btn" href="{% url 'login' %}">
+    <a class="navButton0 login-btn" onclick="window.location.href='{% url "logout" %}'">
         <img class="img-button" src="{% static 'img/log-in.svg' %}" alt="Icono login"> 
         Cerrar Sesión
     </a>

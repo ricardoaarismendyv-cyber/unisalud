@@ -17,17 +17,8 @@
                 <!-- Columna principal -->
                 <div class="col-md-8" style="padding: 60px 20px;">
 
-                    <div class="mb-3">
-                        <label class="form-label">Roles a elegir</label>
-                        <select class="form-select form-select-lg" id="roleSelector">
-                            <option value="{% url 'inicio_admin' %}">Administrativo</option>
-                            <option value="{% url 'inicio-usuario' %}">Usuario</option>
-                            <option onclick="window.location.href='{% url 'consultas_prof_salud' profesional.id_profesional %}'">Profesional de salud</option>
-                            <option value="{% url 'inicio-turnero' %}" selected>Turnero</option>
-                        </select>
-                    </div>
-
                     <h1>¡Bienvenido! Turnero</h1>
+
 
 <!-- RECUADRO 1 -->
 <div class="card shadow p-4 mb-4" style="border-radius: 15px; width: 100%;">
@@ -73,30 +64,28 @@
     padding: 20px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 ">
-    <h4 class="fw-bold text-center mb-3">Usuarios Cerrados</h4>
 
-    <table class="table table-hover text-center">
-        <thead>
-            <tr>
-                <th>Usuario</th>
-                <th>Estado</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for user in usuarios_cerrados %}
+    <div class="historial-box2">
+        <h2 class="titulo-turnero2 text-center">Historial de Turnos Cerrados</h2>
+        <table class="table table-striped text-center">
+            <thead>
                 <tr>
-                    <td>{{ user.nombre }}</td>
-                    <td><span class="badge bg-danger">Cerrado</span></td>
+                    <th>Turno</th>
                 </tr>
-            {% empty %}
+            </thead>
+            <tbody>
+                {% for t in historial %}
                 <tr>
-                    <td colspan="2" class="text-secondary">No hay usuarios en estado cerrado</td>
+                    <td>{{ t.letra }}{{ t.numero }}</td>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+                {% empty %}
+                <tr>
+                    <td class="text-muted">Sin historial</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
         </div>
     </section>
     {% endblock content %}

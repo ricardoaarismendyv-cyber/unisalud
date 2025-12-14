@@ -8,12 +8,21 @@ from django.contrib import messages
 def inicio_turnero(request):
     id_prof = request.session.get('id_profesional')
 
+
     profesional = None
     if id_prof:
         profesional = ProfesionalSalud.objects.get(id_profesional=id_prof)
 
+    historial = (
+        Turnos.objects
+        .filter(estado__icontains="cerr")
+        .order_by("-id_turno")[:20]
+    )
+
+
     return render(request, "turnero/inicio_turnos.html", {
-        'profesional': profesional
+        'profesional': profesional,
+        "historial": historial,
     })
 
 
