@@ -168,17 +168,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         addButton.addEventListener('click', function() {
+            // ... dentro del listener del botón de añadir
             let formNum = parseInt(totalFormsInput.value);
-            // Clonar el nodo directamente en lugar de usar innerHTML para evitar errores de parseo.
-            const newForm = document.querySelector(`#${options.emptyTemplateId} .${options.formClass}`).cloneNode(true);
-            // Reemplazar el prefijo en el HTML del nuevo clon.
-            newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, formNum);
+            // 1. Obtener el HTML de la plantilla como texto
+            let newFormHTML = document.getElementById(options.emptyTemplateId).innerHTML;
+            // 2. Reemplazar el prefijo en el texto
+            newFormHTML = newFormHTML.replace(/__prefix__/g, formNum);
 
-            container.appendChild(newForm);
+            // 3. Crear un nuevo elemento div y asignarle el HTML corregido
+            const newForm = document.createElement('div');
+            newForm.innerHTML = newFormHTML;
+            // El primer hijo del div será el .servicio-form que queremos
+            const formToAdd = newForm.firstElementChild; 
+
+            // 4. Añadir el nuevo formulario al contenedor
+            container.appendChild(formToAdd); 
             totalFormsInput.value = formNum + 1;
 
             if (options.afterAdd) {
-                options.afterAdd(newForm);
+                // 5. Llamar a la inicialización en el elemento correcto
+                options.afterAdd(formToAdd); 
             }
             renumerarForms();
         });
