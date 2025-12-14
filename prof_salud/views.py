@@ -178,6 +178,8 @@ def diligenciar_hc(request):
                 nueva_consulta.fecha_programada = timezone.now() # O la fecha de la cita real
                 nueva_consulta.fecha_atencion = timezone.now()
                 nueva_consulta.estado = 'Atendido'
+                # Asignar el paciente (OBLIGATORIO)
+                nueva_consulta.id_paciente = consulta_form.cleaned_data['paciente']
                 nueva_consulta.save()
 
                 # Guardar los diagnósticos del formset
@@ -208,14 +210,14 @@ def diligenciar_hc(request):
                 messages.error(request, f'Ocurrió un error al guardar la historia clínica: {e}')
     else:
         consulta_form = ConsultaForm()
-        diagnostico_formset = DiagnosticoFormSet(prefix='diagnosticos', initial=[{}]) # Inicia con un form vacío
-        antecedente_formset = AntecedenteFormSet(prefix='antecedentes', initial=[{}]) # Inicia con un form vacío
+        diagnostico_formset = DiagnosticoFormSet(prefix='diagnosticos')
+        antecedente_formset = AntecedenteFormSet(prefix='antecedentes')
 
     # Preparar datos de enfermedades para JavaScript
     enfermedades_data = {
         e.id_enfermedad: {
-            'categoria': e.categoria_grupom,
-            'grupo': e.grupo_mortalidad
+            'categoria_grupom': e.categoria_grupom,
+            'grupo_mortalidad': e.grupo_mortalidad
         } for e in Enfermedades.objects.all()
     }
     enfermedades_json = json.dumps(enfermedades_data)
@@ -544,6 +546,25 @@ def buscar_paciente_por_documento(request):
         return JsonResponse(data)
     except Pacientes.DoesNotExist:
         return JsonResponse({'error': 'Paciente no encontrado.'}, status=404)
+
+def buscar_enfermedades_ajax(request):
+    search_term = request.GET.get('term', '')
+    # Buscamos enfermedades que contengan el término de búsqueda en el código o en el nombre
+    enfermedades = Enfermedades.objects.filter(
+        Q(codigo_cie10__icontains=search_term) | Q(nombre_enfermedad__icontains=search_term)
+    ) #sin limite
+
+    results = []
+    for enfermedad in enfermedades:
+        results.append({
+            'id': enfermedad.id_enfermedad, # ID para el valor del select
+            'text': f"{enfermedad.codigo_cie10} - {enfermedad.nombre_enfermedad}", # Texto a mostrar
+            # Datos adicionales que usaremos en JavaScript
+            'categoria_grupom': enfermedad.categoria_grupom,
+            'grupo_mortalidad': enfermedad.grupo_mortalidad
+        })
+
+    return JsonResponse({'results': results})
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES + ['paciente'])
 @xframe_options_sameorigin # Permite que esta vista se cargue en un iframe del mismo sitio.
