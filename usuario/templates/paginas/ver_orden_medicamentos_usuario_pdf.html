@@ -20,13 +20,12 @@
     <div class="container-fluid">
         <div class="row justify-content-center p-4">
             <div class="col-lg-10 col-md-10">
-                <a class="btn btn-main btn-nav"href="{% url 'historia-clinica-usuario' %}">Volver</a>
-                <a class="btn btn-main btn-nav" href="{% url 'prof_salud' %}">Volver a Orden Medicamentos</a>
-                <a class="btn btn-main btn-nav" href="{% url 'prof_salud:generar_omedicamentos_pdf' orden.id_orden %}"download="OMed_{{ orden.id_paciente.numero_documento }}_{{ orden.fecha_emision|date:'Ymd' }}.pdf">Descargar PDF Orden de Medicamentos</a>
+                <a class="btn btn-main btn-nav"href="{% url 'omeusuario' %}">Volver</a>
+                <a class="btn btn-main btn-nav" href="{{ pdf_url }}"download>Descargar PDF Orden de Medicamentos</a>
 
                 <div class="container border border-dark rounded p-4 my-5 div-main">
                     <h1>Orden de Medicamentos</h1>
-                    <iframe src="{% url 'prof_salud:generar_omedicamentos_pdf' orden.id_orden %}" width="100%" height="800px" style="border: none;" title="Visor de PDF de Orden de Medicamentos"></iframe>
+                    <iframe src="{{ pdf_url }}" width="100%" height="800px" style="border: none;" title="Visor de PDF de Orden de Medicamentos"></iframe>
                 </div>
             </div>
         </div>
