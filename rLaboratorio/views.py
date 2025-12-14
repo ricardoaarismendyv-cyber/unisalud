@@ -74,7 +74,7 @@ def ver_resultado_pdf(request, resultado_id):
         messages.error(request, 'El resultado de laboratorio solicitado no existe.')
         return redirect('rLaboratorio:inicio_laboratorista')
 
-@role_required(allowed_roles=ALLOWED_LAB_ROLES + ALLOWED_PROF_ROLES)
+@role_required(allowed_roles=ALLOWED_LAB_ROLES + ALLOWED_PROF_ROLES + ['paciente'])
 def generar_resultado_pdf_vista(request, resultado_id):
     """
     Sirve el archivo PDF para ser mostrado en un <iframe/> o <object/>.

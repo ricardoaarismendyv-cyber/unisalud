@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from login.decorators import role_required
-from .models import Pacientes, Consulta, OrdenMedica
+from .models import Pacientes, Consulta, OrdenMedica, ResultadosLaboratorio
 from django.urls import reverse
 from django.contrib import messages
 
@@ -53,10 +53,18 @@ def omusuario(request):
     ).order_by('id_lote', '-fecha_emision').distinct('id_lote')
     # La última orden es el primer elemento
     ultima_orden = ordenes.first()
-
+    
+    # Obtenemos también los resultados de laboratorio del paciente
+    historial_resultados = ResultadosLaboratorio.objects.filter(
+        id_paciente_id=paciente_id
+    ).order_by('-fecha_registro_resultado')
+    ultimo_resultado = historial_resultados.first()
+    
     return render(request, 'paginas/orden-medica-usuario.html', {
         'ultima_orden': ultima_orden,
-        'ordenes': ordenes # Pasamos el historial completo a la plantilla
+        'ordenes': ordenes, # Pasamos el historial completo a la plantilla
+        'ultimo_resultado': ultimo_resultado,
+        'historial_resultados': historial_resultados
     })
 
 @role_required(allowed_roles=['paciente'])
