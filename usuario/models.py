@@ -538,10 +538,11 @@ class ResultadosLaboratorio(models.Model):
     id_paciente = models.ForeignKey('Pacientes', models.DO_NOTHING, db_column='id_paciente', db_comment='Referencia a PACIENTES')
     id_laboratorista = models.ForeignKey('ProfesionalSalud', models.DO_NOTHING, db_column='id_laboratorista', blank=True, null=True, db_comment='Referencia al laboratorista-USUARIOS que registro')
     fecha_solicitud = models.DateField(db_comment='Fecha en que se solicito el examen')
-    fecha_resultado = models.DateTimeField(blank=True, null=True, db_comment='Fecha en que se registro el resultado')
+    fecha_registro_resultado = models.DateTimeField(blank=True, null=True, db_comment='Fecha en que se registro el resultado')
     observaciones_resultados = models.TextField(blank=True, null=True, db_comment='Notas adicionales a los resultados laboratorio')
     estado = models.CharField(max_length=10, blank=True, null=True, db_comment='Esta: pendiente, registrado, etc')
     codigo_qr = models.CharField(max_length=255, blank=True, null=True, db_comment='Codigo QR para descarga')
+    archivo_pdf = models.FileField(upload_to='resultados_laboratorio/', blank=True, null=True, db_comment='Archivo PDF con el resultado')
     fecha_registro = models.DateTimeField(blank=True, null=True, db_comment='Fecha de registro')
 
     class Meta:
@@ -549,7 +550,7 @@ class ResultadosLaboratorio(models.Model):
         db_table = 'resultados_laboratorio'
 
     def __str__(self):
-        return f'Resultado de {self.tipo_examen} para {self.id_paciente}'
+        return f'Resultado para {self.id_paciente} del {self.fecha_solicitud}'
 
 
 class Incapacidad(models.Model):
