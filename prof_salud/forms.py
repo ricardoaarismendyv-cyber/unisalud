@@ -12,7 +12,7 @@ class PacienteChoiceField(forms.ModelChoiceField):
 
 class ConsultaForm(forms.ModelForm):
     # El campo 'paciente' del modelo se convierte en un campo oculto.
-    paciente = forms.ModelChoiceField(queryset=Pacientes.objects.all(), widget=forms.HiddenInput(), required=False)
+    paciente = forms.ModelChoiceField(queryset=Pacientes.objects.all(), widget=forms.HiddenInput(), required=True)
     # Añadimos campos no ligados al modelo para la interacción en la plantilla.
     numero_documento_paciente = forms.CharField(label="Documento del Paciente", required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite documento y presione Enter'}))
     nombre_paciente = forms.CharField(label="Nombre del Paciente", required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': True}))
@@ -93,20 +93,22 @@ class DiagnosticoPacienteForm(forms.Form):
     # Campo oculto que guardará el ID de la enfermedad seleccionada.
     id_enfermedad = forms.ModelChoiceField(queryset=Enfermedades.objects.all(), widget=forms.HiddenInput(), required=False)
 
+    # Campo para buscar por código CIE-10
     codigo_cie10_select = CodigoCIE10ChoiceField(
         queryset=Enfermedades.objects.all(),
         label="Código CIE-10",
         widget=forms.Select(attrs={'class': 'form-control'}),
-        empty_label="Seleccione un código",
         required=False
     )
+    
+    # Campo para buscar por nombre de enfermedad
     nombre_enfermedad_select = NombreEnfermedadChoiceField(
         queryset=Enfermedades.objects.all(),
         label="Nombre Enfermedad",
         widget=forms.Select(attrs={'class': 'form-control'}),
-        empty_label="Seleccione una enfermedad",
         required=False
     )
+
     tipo_diagnostico = forms.ChoiceField(
         choices=[('', 'Seleccione un tipo'), ('Principal', 'Principal'), ('Presuntivo', 'Presuntivo'), ('Secundario', 'Secundario')],
         label="Tipo de Diagnóstico",
@@ -141,7 +143,7 @@ class DiagnosticoPacienteForm(forms.Form):
             self.add_error('id_enfermedad', 'Este campo es obligatorio si se especifica un tipo de diagnóstico.')
         return cleaned_data
 
-DiagnosticoFormSet = formset_factory(DiagnosticoPacienteForm, extra=0, can_delete=True)
+DiagnosticoFormSet = formset_factory(DiagnosticoPacienteForm, extra=1, can_delete=True)
 
 class AntecedenteForm(forms.ModelForm):
     """Formulario para un único antecedente."""
@@ -165,7 +167,7 @@ class AntecedenteForm(forms.ModelForm):
         self.fields['severidad'].empty_label = "Seleccione una severidad"
         self.fields['estado_antecedente'].empty_label = "Seleccione un estado"
 
-AntecedenteFormSet = formset_factory(AntecedenteForm, extra=0, can_delete=True)
+AntecedenteFormSet = formset_factory(AntecedenteForm, extra=1, can_delete=True)
 
 class OrdenMedicaForm(forms.ModelForm):
     # Campo para seleccionar un paciente
@@ -265,19 +267,25 @@ class TipoOrdenForm(forms.Form):
             self.add_error(None, 'Debe seleccionar un servicio válido usando el autocompletado.')
         return cleaned_data
 
-serviciosFormSet = formset_factory(TipoOrdenForm, extra=0, can_delete=True) 
+serviciosFormSet = formset_factory(TipoOrdenForm, extra=1, can_delete=True) 
+
 
 class OrdenMedicamentoForm(forms.ModelForm):
-    # Campo para seleccionar un paciente
-    # Este campo ahora será un campo oculto que llenaremos con JavaScript.
-    id_paciente = forms.IntegerField(widget=forms.HiddenInput(), required=True)
-    # Añadimos campos no ligados al modelo para la interacción en la plantilla.
-    numero_documento_paciente = forms.CharField(label="Documento del Paciente", required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    nombre_paciente = forms.CharField(label="Nombre del Paciente", required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': True}))
-
     """
     Formulario específico para crear órdenes de medicamentos con autocompletado.
     """
+    # Campo para seleccionar un paciente
+    # Este campo ahora será un campo oculto que llenaremos con JavaScript.
+    id_paciente = forms.ModelChoiceField(
+        queryset=Pacientes.objects.all(),
+        widget=forms.HiddenInput(),
+        required=True,
+        label="" # No necesita label al ser oculto
+    )
+    # Añadimos campos no ligados al modelo para la interacción en la plantilla.
+    numero_documento_paciente = forms.CharField(label="Documento del Paciente", required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite documento y presione Enter'}))
+    nombre_paciente = forms.CharField(label="Nombre del Paciente", required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': True}))
+
     # Campo oculto que guardará el ID del medicamento seleccionado. Renombrado para claridad.
     id_medicamento = forms.ModelChoiceField(
         queryset=Medicamentos.objects.all(), 
@@ -361,4 +369,4 @@ class OrdenMedicamentoForm(forms.ModelForm):
         return cleaned_data
 
 
-MedicamentoFormSet = formset_factory(OrdenMedicamentoForm, extra=0, can_delete=True)
+MedicamentoFormSet = formset_factory(OrdenMedicamentoForm, extra=1, can_delete=True)
