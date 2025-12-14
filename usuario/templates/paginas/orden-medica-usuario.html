@@ -8,9 +8,7 @@
 {% endblock estilo %}
 
 {% block auth_button %}
-{# En esta página, reemplazamos el botón de login por el de logout #}
 <li>
-    {# Asumimos que tienes una URL llamada 'logout' para cerrar la sesión #}
     <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio-usuario" %}'">
         <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
     </button>
@@ -57,11 +55,14 @@
                                 <ul class="list-group list-group-flush itemList">
                                     {% for orden in ordenes %}
                                         <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                                            <a href="{% url 'ver_orden_medica_usuario_pdf' orden.id_orden %}" target="_blank">
-                                                Orden Médica del {{ orden.fecha_emision|date:"d/m/Y" }} (Lote: {{ orden.id_lote|slice:":8" }}...)
-                                            </a>
+                                            <div class="me-3 d-flex flex-column">
+                                                <a href="{% url 'ver_orden_medica_usuario_pdf' orden.id_orden %}" target="_blank"title="Ver orden médica del {{ orden.fecha_emision|date:'d/m/Y' }}"><strong>Orden Médica</strong> — {{ orden.fecha_emision|date:"d/m/Y" }}</a>
+                                                <small class="text-muted">Profesional: {{ orden.id_profesional.nombre1 }} {{ orden.id_profesional.nombre2 }} {{ orden.id_profesional.apellido1 }} {{ orden.id_profesional.apellido2 }}<br>Especialidad: {{ orden.id_profesional.id_especialidad.nombre_especialidad }}</small>
+                                            </div>
                                             <div class="text-nowrap">
                                                 <span class="badge bg-primary rounded-pill">{{ orden.fecha_emision|date:"d/m/Y H:i" }}</span>
+                                                <span class="badge bg-secondary rounded-pill">{{ orden.id_profesional.get_full_name|truncatechars:12 }}</span>
+                                                <span class="badge bg-success rounded-pill">{{ orden.id_especialidad.nombre_especialidad|truncatechars:15 }}</span>{{ orden.id_especialidad.nombre_especialidad|truncatechars:15 }}</span>
                                             </div>
                                         </li>
                                     {% empty %}
@@ -73,11 +74,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <section class="main">
-        <div class="container-fluid">
-            <div class="row justify-content-center">
+        <div class="row justify-content-center">
                 <div class="col-lg-10 col-md-10">
                     <div class="container border border-dark rounded p-4 my-5 div-main">
                         <!-- Contenido resultados de laboratorio -->

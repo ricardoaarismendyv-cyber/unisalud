@@ -16,13 +16,13 @@
 {% endblock auth_button %}
 
 {% block content %}
+
 <section class="main">
     <div class="container-fluid">
         <div class="row justify-content-center p-4">
             <div class="col-lg-10 col-md-10">
                 <div>
                     <a class="btn btn-main btn-nav" href='{% url "inicio-usuario" %}'>Volver</a>
-                </div>
                     <select name="filtrarhc" id="" class="btn btn-main btn-nav">
                         <option disabled selected value="">Filtrar por</option>
                         <option value="fecha">Recientes a antiguas</option>
@@ -30,57 +30,54 @@
                     </select>                    
                 </div>
             </div>
-            <div class="row justify-content-center">
-    <div class="col-lg-10 col-md-10">
-        <div class="container border border-dark rounded p-4 my-5 div-main">
-
-            {% if consulta %}
-                <h2>Ver Historia clínica más reciente #{{ consulta.id_consulta }}</h2>
-                <p>Aquí puede visualizar su historia clínica más reciente</p>
-
-                <iframe src="{% url 'prof_salud:generar_hc_pdf' consulta.id_consulta %}"
-                        width="100%" height="800px"
-                        style="border: none;"
-                        title="Visor de PDF de Historia Clínica">
-                </iframe>
-
-                <a class="btn btn-outline-primary"
-                   href="{% url 'prof_salud:generar_hc_pdf' consulta.id_consulta %}"
-                   download="HC_{{ consulta.id_paciente.numero_documento }}_{{ consulta.fecha_atencion|date:'Ymd' }}.pdf">
-                    Descargar PDF Historia Clínica
-                </a>
-
-            {% else %}
-                <h3>No hay historia clínica registrada.</h3>
-                <p>Cuando tenga una consulta médica, podrá visualizarla aquí.</p>
-            {% endif %}
-
-        </div>
-
-        <!-- Historial completo -->
-        <div class="collapse mt-3" id="RegistroClinicoCompleto">
-            <div class="card card-body div-main">
-                <h5 class="card-title">Registro del Historial Clínico</h5>
-                <p>A continuación se muestra un listado de historias clínicas del paciente.</p>
-
-                <ul class="list-group list-group-flush itemList">
-                    {% for hc in historial_paciente %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                            <a href="{% url 'prof_salud:generar_hc_pdf' hc.id_consulta %}" target="_blank">
-                                Historia Clínica del {{ hc.fecha_atencion|date:"d/m/Y" }}
-                            </a>
-                            <div class="text-nowrap">
-                                <span class="badge bg-primary rounded-pill">
-                                    {{ hc.fecha_atencion|date:"d/m/Y H:i" }}
-                                </span>
+            <div class="col-lg-10 col-md-10">
+                {% if ultima_consulta %}
+                    <div class="container border border-dark rounded p-4 my-5 div-main">
+                        <h2>Ver Historia clínica más reciente #{{ ultima_consulta.id_consulta }}</h2>
+                        <p>Aquí puede visualizar su historia clínica más reciente</p>
+                        <iframe src="{% url 'prof_salud:generar_hc_pdf' ultima_consulta.id_consulta %}" width="100%" height="800px" style="border: none;" title="Visor de PDF de Historia Clínica"></iframe>
+                        <a class="btn btn-outline-primary" href="{% url 'prof_salud:generar_hc_pdf' ultima_consulta.id_consulta %}" download="HC_{{ ultima_consulta.id_paciente.numero_documento }}_{{ ultima_consulta.fecha_atencion|date:'Ymd' }}.pdf">Descargar PDF Historia Clínica</a>
+                    </div>
+                {% else %}
+                    <div class="container border border-dark rounded p-4 my-5 div-main">
+                        <h1>Historia Clínica</h1>
+                        <p>Aún no tiene historias clínicas registradas.</p>
+                    </div>
+                {% endif %}
+                        <!-- Contenido colapsable con el historial -->
+                        <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#historialHc" aria-expanded="false" aria-controls="historialHc">
+                            Ver historial de historias clínicas
+                        </button>
+                        <div class="collapse mt-3" id="historialHc">
+                            <div class="card card-body div-main">
+                                <h5 class="card-title">Registro del Historial Clínico</h5>
+                                <p>A continuación se muestra un listado de historias clínicas del paciente.</p>
+                                <ul class="list-group list-group-flush itemList">
+                                    {% for consulta in historial %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                            <div class="me-3 d-flex flex-column">
+                                                <a href="{% url 'ver_hc_usuario_pdf' consulta.id_consulta %}" target="_blank" title="Ver historia clínica del {{ consulta.fecha_atencion|date:'d/m/Y' }}">
+                                                    <strong>Historia Clínica</strong> — {{ consulta.fecha_atencion|date:"d/m/Y" }}
+                                                </a>
+                                                <small class="text-muted">
+                                                    Profesional: {{ consulta.id_profesional.nombre1 }} {{ consulta.id_profesional.apellido1 }}<br>
+                                                    Especialidad: {{ consulta.id_profesional.id_especialidad.nombre_especialidad }}
+                                                </small>
+                                            </div>
+                                            <div class="text-nowrap">
+                                                <span class="badge bg-primary rounded-pill">{{ consulta.fecha_atencion|date:"d/m/Y H:i" }}</span>
+                                            </div>
+                                        </li>
+                                    {% empty %}
+                                        <li class="list-group-item div-main">No hay historial clínico para mostrar.</li>
+                                    {% endfor %}
+                                </ul>
                             </div>
-                        </li>
-                    {% empty %}
-                        <li class="list-group-item div-main">No hay historial clínico para mostrar.</li>
-                    {% endfor %}
-                </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock content %}
