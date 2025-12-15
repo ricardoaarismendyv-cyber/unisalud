@@ -73,8 +73,8 @@ main.dark-mode{
 }
 
 /* css de inicio */
-.main {
-    margin-top: 40px;
+main {
+    margin-top: 30px;
     margin-bottom: 40px;
 }
 
@@ -91,7 +91,7 @@ main.dark-mode{
 }
 
 .div-main {
-    background-color: var(--white);
+    background-color:#7da9f5;
     transition: all 0.3s ease;
     padding: 2rem;
     border-radius: 16px;
@@ -278,6 +278,8 @@ h1, h2, h3, h4, h5, h6 {
     width: 100%;
     z-index: 1030;
     background: var(--white);
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .mainNav {
@@ -412,7 +414,7 @@ h1, h2, h3, h4, h5, h6 {
 
 
 .dark-mode .footer-nav{
-    background: linear-gradient(135deg, #0d1117, #1e3a8a);
+    background: linear-gradient(135deg, #0d1117, dark-mode);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -477,7 +479,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .sidebar h2 {
     padding: 8px 8px 8px 32px;
-    color: var(--text-dark);
+    color: var(--text-black);
     text-align: left;
     font-weight: 600;
 }
@@ -534,6 +536,25 @@ body.high-contrast {
     color: #fff !important;
 }
 
+body.high-contrast .highlighted-text {
+    color: #ffff00 ;
+    font-weight: 700 !important;
+    font-size: 1.1rem;
+    background: rgb(234, 40, 40) ;
+    padding: 16px 20px;
+    border-left:red;
+    margin: 0px;
+}
+
+body.high-contrast .accordion-body {
+    background-color: rgb(234, 40, 40);
+    color:#ffff00;
+    padding: 20px 25px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    line-height: 1.6;
+    font-size: 15px;
+}
 body.high-contrast header.mainHeader,
 body.high-contrast .mainNav,
 body.high-contrast footer,
@@ -542,7 +563,7 @@ body.high-contrast main,
 body.high-contrast .sidebar {
     background-image: none !important;
     background-color: black!important;
-    color: #fff !important;
+    color: #ffffff !important;
     border-color: #fff !important;
 }
 
@@ -551,8 +572,8 @@ body.high-contrast .navButton0,
 body.high-contrast .foot-button,
 body.high-contrast .sidebar-button {
     background-image: none !important;
-    background-color: #222 !important;
-    color: #fff !important;
+    background-color: rgb(234, 40, 40) !important;
+    color: #ffff00 !important;
     border: 1px solid #fff !important;
 }
 
@@ -567,7 +588,7 @@ body.high-contrast .div-main {
     background-image: none;
     background-color: #000 !important;
     color: #fff !important;
-    border-color: #fff !important;
+    border-color: #5f1414 !important;
 }
 
 body.high-contrast h1 {
@@ -587,14 +608,57 @@ body.dyslexia-font {
         flex-direction: column;
         gap: 10px;
     }
-    
+
     .footer-menu {
         flex-direction: column;
         gap: 10px;
     }
-    
+
     .mainNav {
         height: auto;
         padding: 15px 20px;
     }
+}
+
+/* Fuente para dislexia */
+.dyslexia {
+    font-family: "OpenDyslexic", Arial, sans-serif !important;
+}
+
+/* Modo alto contraste */
+.high-contrast {
+    background-color: #000 !important;
+    color: #fff !important;
+}
+
+.high-contrast button {
+    background-color: rgb(234, 40, 40) !important;
+    color: #000 !important;
+    border: 2px solid #000 !important;
+}
+
+/* 1. Estilos para los iconos del encabezado en modo Alto Contraste activando el modo oscuro */
+body.high-contrast #theme-toggle-img,
+body.high-contrast #moon-icon,
+body.high-contrast #accessibility-icon {
+    filter: brightness(0) invert(1) !important; 
+}
+
+/*ESTILOS PARA EL MODO DALTONISMO (CORRECCIÓN DE LAYOUT Y ESTABILIDAD)  */
+body.color-blind-mode {
+    filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='deuteranopia'><feColorMatrix type='matrix' values='0.33 0.67 0 0 0  0.33 0.67 0 0 0  0 0 1 0 0  0 0 0 1 0'/></filter></svg>#deuteranopia") !important;
+    
+    /* SEGURIDAD DE LAYOUT: Estas líneas previenen los problemas de posición */
+    transform: none !important; 
+    perspective: none !important;
+    position: static !important; 
+
+    /* Otras reglas de seguridad */
+    opacity: 1 !important;
+    background-color: initial !important; 
+}
+
+body.color-blind-mode .mainHeader,
+body.color-blind-mode .footer-bar {
+    position: static !important;
 }
