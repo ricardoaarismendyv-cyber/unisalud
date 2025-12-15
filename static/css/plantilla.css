@@ -479,7 +479,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .sidebar h2 {
     padding: 8px 8px 8px 32px;
-    color: var(--text-black);
+    color:var(--text-white);
+    text-align: left;
+    font-weight: 600;
+}
+.dark-mode-sidebar h2 {
+    padding: 8px 8px 8px 32px;
+    color:black;
     text-align: left;
     font-weight: 600;
 }
