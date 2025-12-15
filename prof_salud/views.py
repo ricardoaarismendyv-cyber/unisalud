@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
+from django.conf import settings #para QR funcione
 from django.contrib import messages
-from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, DiagnosticoPaciente, AntecedentesPaciente, Enfermedades, Consulta, OrdenMedica, Servicios, EstadoOrden, TipoOrden, Medicamentos
+from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, DiagnosticoPaciente, AntecedentesPaciente, Enfermedades, Consulta, OrdenMedica, Servicios, EstadoOrden, TipoOrden, Medicamentos, Pacientes, ResultadosLaboratorio
 from login.decorators import role_required
 from .forms import ConsultaForm, DiagnosticoFormSet, AntecedenteFormSet, OrdenMedicaForm, serviciosFormSet, OrdenMedicamentoForm, MedicamentoFormSet
 from django.utils import timezone
@@ -8,8 +9,14 @@ import json
 from django.http import HttpResponse
 from django.template.loader import get_template #obtener o descargar una plantilla de diseño web
 from xhtml2pdf import pisa #conversión real que realiza el trabajo de transformar el contenido HTML y CSS en el formato PDF.
+import qrcode # Para generar códigos QR
+import uuid # Para generar el id_lote
 from io import BytesIO #generar un archivo (como un PDF o una imagen) y enviarlo inmediatamente a un usuario a través de una API web, sin tocar el sistema de archivos del servidor.
+from django.urls import reverse # <--- AÑADIR ESTA LÍNEA
 from django.core.serializers.json import DjangoJSONEncoder
+import base64
+from django.http import JsonResponse
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 ALLOWED_PROF_ROLES = ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']
 
@@ -21,7 +28,9 @@ def inicio_prof_salud(request):
                 if not profesional_id:
                         messages.error(request, 'No se encontró un perfil de profesional de salud en su sesión.')
                         return redirect('login')
-                request.session['active_role'] = 'profesional_salud' # <--- AÑADIR ESTA LÍNEA
+                #  asegura que el rol activo se mantenga consistente a lo largo de la sesión del usuario, especialmente cuando navega entre diferentes perfiles si tiene más de uno.
+                if 'active_role' not in request.session:
+                        request.session['active_role'] = 'profesional_salud'
                 profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
                 return render(request, 'paginas/inicio_prof_salud.html', {'profesional': profesional, 'roles': request.session.get('roles', [])})
         except ProfesionalSalud.DoesNotExist:
@@ -40,7 +49,7 @@ def hc_prof_salud(request):
         profesional_id = request.session.get('id_profesional')
         if profesional_id:
             profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
-            # Buscamos la última consulta atendida por este profesional
+            # Se busca la última consulta atendida por este profesional
             ultima_consulta = Consulta.objects.filter(id_profesional=profesional, estado='Atendido').order_by('-fecha_atencion').first()
 
             # Si encontramos una última consulta, buscamos el historial de ese paciente
@@ -58,15 +67,126 @@ def hc_prof_salud(request):
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def om_prof_salud(request):
-    return render(request, 'paginas/om_prof_salud.html') #Vista de Orden Médica para el profesional de salud
+    """
+    Vista de Orden Médica para el profesional de salud.
+    Muestra la última orden médica registrada por el profesional.
+    """
+    ultima_orden_medica = None
+    historial_ordenes_medicas = None
+    try:
+        profesional_id = request.session.get('id_profesional')
+        if profesional_id:
+            profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
+            # Se busca la última OrdenMedica atendida por este profesional
+            ultima_orden_medica = OrdenMedica.objects.filter(id_profesional=profesional).order_by('-fecha_emision').first()
+
+            # Si encontramos una última orden médica, buscamos el historial de ese paciente
+            if ultima_orden_medica:
+                paciente = ultima_orden_medica.id_paciente
+                # Obtenemos las últimas órdenes médicas de ese paciente, ordenadas por fecha
+                historial_ordenes_medicas = OrdenMedica.objects.filter(id_paciente=paciente).order_by('-fecha_emision')[:5] # Puedes ajustar el límite
+
+    except ProfesionalSalud.DoesNotExist:
+        messages.error(request, 'No se pudo encontrar el perfil del profesional.')
+    except Exception as e:
+        messages.error(request, f'Ocurrió un error inesperado: {e}')
+
+    return render(request, 'paginas/om_prof_salud.html', {'ultima_orden_medica': ultima_orden_medica, 'historial_ordenes_medicas': historial_ordenes_medicas})
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def omed_prof_salud(request):
-    return render(request, 'paginas/omed_prof_salud.html') #Vista de Orden de Medicamentos para el profesional de salud.
+    """
+    Vista de Órdenes de Medicamentos para el profesional de salud.
+    Muestra la última orden de medicamentos registrada por el profesional y el historial del paciente.
+    """
+    ultima_orden_medicamentos = None
+    historial_ordenes_medicamentos = None
+    try:
+        profesional_id = request.session.get('id_profesional')
+        if profesional_id:
+            profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
+            # Buscamos la última OrdenMedicamentos atendida por este profesional
+            ultima_orden_medicamentos = OrdenMedica.objects.filter(
+                id_profesional=profesional, 
+                id_medicamento__isnull=False
+            ).order_by('-fecha_emision').first()
+
+            # Si encontramos una última orden médicamentos, buscamos el historial de ese paciente
+            if ultima_orden_medicamentos:
+                paciente = ultima_orden_medicamentos.id_paciente
+                # Obtenemos las últimas 5 órdenes de medicamentos de ese paciente.
+                historial_ordenes_medicamentos = OrdenMedica.objects.filter(
+                    id_paciente=paciente, id_medicamento__isnull=False
+                ).order_by('-fecha_emision')[:5]
+
+    except ProfesionalSalud.DoesNotExist:
+        messages.error(request, 'No se pudo encontrar el perfil del profesional.')
+    except Exception as e:
+        messages.error(request, f'Ocurrió un error inesperado: {e}')
+
+    return render(request, 'paginas/omed_prof_salud.html', {'ultima_orden_medicamentos': ultima_orden_medicamentos, 'historial_ordenes_medicamentos': historial_ordenes_medicamentos})
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def consultas_prof_salud(request):
     return render(request, 'paginas/consultas_prof_salud.html') #Vista de Turnos/Agendamiento para el profesional de salud
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+def resultados_lab(request):
+    """
+    Vista de Resultados de Laboratorio para el profesional de salud.
+    Muestra el último resultado de laboratorio del paciente de la última consulta.
+    """
+    ultimo_resultado = None
+    historial_resultados = None
+    try:
+        profesional_id = request.session.get('id_profesional')
+        if profesional_id:
+            profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
+            # Se busca la última consulta atendida por este profesional para obtener el paciente
+            ultima_consulta = Consulta.objects.filter(id_profesional=profesional, estado='Atendido').order_by('-fecha_atencion').first()
+
+            if ultima_consulta:
+                paciente = ultima_consulta.id_paciente
+                # Obtenemos los resultados de laboratorio de ese paciente
+                resultados = ResultadosLaboratorio.objects.filter(id_paciente=paciente).order_by('-fecha_registro')
+                ultimo_resultado = resultados.first()
+                historial_resultados = resultados[:5]
+
+    except ProfesionalSalud.DoesNotExist:
+        messages.error(request, 'No se pudo encontrar el perfil del profesional.')
+    except Exception as e:
+        messages.error(request, f'Ocurrió un error inesperado: {e}')
+
+    return render(request, 'paginas/resultados_lab_prof_salud.html', {
+        'ultimo_resultado': ultimo_resultado,
+        'historial_resultados': historial_resultados
+    })
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+def ver_resultado_lab_pdf(request, resultado_id):
+    """
+    Muestra una página con el PDF del resultado de laboratorio incrustado.
+    """
+    try:
+        resultado = ResultadosLaboratorio.objects.get(id_resultado=resultado_id)
+        return render(request, 'paginas/ver_resultado_lab_pdf.html', {'resultado': resultado})
+    except ResultadosLaboratorio.DoesNotExist:
+        messages.error(request, 'El resultado de laboratorio solicitado no existe.')
+        return redirect('prof_salud:resultados_lab')
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES + ['paciente'])
+@xframe_options_sameorigin
+def generar_resultado_lab_pdf(request, resultado_id):
+    """
+    Genera y sirve el PDF de un resultado de laboratorio.
+    Redirige a la vista del laboratorista que genera el PDF.
+    """
+    # Construimos la URL a la vista que realmente genera el PDF en la app rLaboratorio
+    pdf_url = reverse('rLaboratorio:generar_resultado_pdf_vista', args=[resultado_id])
+    
+    # Redirigimos a esa URL. El navegador cargará el PDF generado por la otra vista.
+    return redirect(pdf_url)
+
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def preguntasfrecuentes_prof_salud(request):
@@ -117,8 +237,8 @@ def diligenciar_hc(request):
                 nueva_consulta.fecha_programada = timezone.now() # O la fecha de la cita real
                 nueva_consulta.fecha_atencion = timezone.now()
                 nueva_consulta.estado = 'Atendido'
-                paciente_obj = nueva_consulta.id_paciente # El paciente ya está asignado al guardar el form
-                nueva_consulta.id_paciente = paciente_obj
+                # Asignar el paciente (OBLIGATORIO)
+                nueva_consulta.id_paciente = consulta_form.cleaned_data['paciente']
                 nueva_consulta.save()
 
                 # Guardar los diagnósticos del formset
@@ -139,12 +259,12 @@ def diligenciar_hc(request):
                 for form in antecedente_formset:
                     if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
                         antecedente = form.save(commit=False)
-                        antecedente.id_paciente = paciente_obj
+                        antecedente.id_paciente = nueva_consulta.id_paciente # Usamos el paciente de la consulta
                         antecedente.fecha_registro = timezone.now().date() # Extraer solo la fecha
                         antecedente.save()
 
                 messages.success(request, f'Historia clínica para el paciente {nueva_consulta.id_paciente} guardada con éxito.')
-                return redirect('ver_hc_pdf', consulta_id=nueva_consulta.id_consulta)
+                return redirect('prof_salud:ver_hc_pdf', consulta_id=nueva_consulta.id_consulta)
             except Exception as e:
                 messages.error(request, f'Ocurrió un error al guardar la historia clínica: {e}')
     else:
@@ -155,8 +275,8 @@ def diligenciar_hc(request):
     # Preparar datos de enfermedades para JavaScript
     enfermedades_data = {
         e.id_enfermedad: {
-            'categoria': e.categoria_grupom,
-            'grupo': e.grupo_mortalidad
+            'categoria_grupom': e.categoria_grupom,
+            'grupo_mortalidad': e.grupo_mortalidad
         } for e in Enfermedades.objects.all()
     }
     enfermedades_json = json.dumps(enfermedades_data)
@@ -194,7 +314,8 @@ def ver_hc_pdf(request, consulta_id):
         messages.error(request, 'La consulta solicitada no existe.')
         return redirect('hc_prof_salud')
 
-@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+@role_required(allowed_roles=ALLOWED_PROF_ROLES + ['paciente'])
+@xframe_options_sameorigin # Permite que esta vista se cargue en un iframe del mismo sitio.
 def generar_hc_pdf(request, consulta_id):
     """
     Genera un PDF para una consulta de historia clínica específica.
@@ -204,26 +325,40 @@ def generar_hc_pdf(request, consulta_id):
         diagnosticos = DiagnosticoPaciente.objects.filter(id_consulta=consulta)
         antecedentes = AntecedentesPaciente.objects.filter(id_paciente=consulta.id_paciente)
 
+        # 1. Construir la URL de verificación para el QR
+        relative_url = reverse('prof_salud:ver_hc_pdf', args=[consulta.id_consulta])
+        verification_url = f"{settings.BASE_DOMAIN}{relative_url}"
+
+        # 2. Generar la imagen del QR en memoria
+        qr_img = qrcode.make(verification_url, box_size=6)
+        qr_buffer = BytesIO()
+        qr_img.save(qr_buffer, format='PNG')
+        qr_b64 = base64.b64encode(qr_buffer.getvalue()).decode('utf-8')
+        qr_code_data_uri = f'data:image/png;base64,{qr_b64}'
+
         context = {
             'consulta': consulta,
             'diagnosticos': diagnosticos,
             'antecedentes': antecedentes,
+            'qr_code': qr_code_data_uri, # Pasar la imagen como Data URI
         }
         pdf = render_to_pdf('pdf/hc_pdf_template.html', context)
 
         if pdf:
             # Creamos la respuesta HTTP con los bytes del PDF
             response = HttpResponse(pdf, content_type='application/pdf')
-            # Esta cabecera le indica al navegador que muestre el archivo en línea
-            response['Content-Disposition'] = f'inline; filename="hc_{consulta.id_consulta}.pdf"'
+            # La cabecera 'inline' sugiere al navegador mostrar el PDF en línea.
+            # El navegador del usuario decide si lo muestra o lo descarga
+            filename = f"hc_{consulta.id_paciente.numero_documento}_{consulta.fecha_atencion.strftime('%Y%m%d')}.pdf"
+            response['Content-Disposition'] = f'inline; filename="{filename}"'
             return response
         
         messages.error(request, 'No se pudo generar el PDF.')
-        return redirect('hc_prof_salud')
+        return redirect('prof_salud:hc_prof_salud')
 
     except Consulta.DoesNotExist:
         messages.error(request, 'La consulta solicitada no existe.')
-        return redirect('hc_prof_salud')
+        return redirect('prof_salud:hc_prof_salud')
 
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def diligenciar_omedica(request):
@@ -244,6 +379,9 @@ def diligenciar_omedica(request):
                 orden_base = orden_medica_form.cleaned_data
                 estado_pendiente = EstadoOrden.objects.get(nombre_estado_orden='Pendiente')
                 orden_creada_id = None # Variable para guardar el ID de la última orden creada
+                # Generamos un ID de lote único para esta transacción.
+                lote_id = uuid.uuid4()
+                fecha_emision_batch = timezone.now()
 
                 # Guardar los servicios del formset
                 for servicio_form in servicios_formset:
@@ -262,14 +400,15 @@ def diligenciar_omedica(request):
                             id_servicio=servicios_obj,
                             indicaciones=servicio_form.cleaned_data.get('indicaciones', ''),
                             id_estado_orden=estado_pendiente,
-                            fecha_emision=timezone.now(), 
+                            id_lote=lote_id, # Asignamos el ID de lote.
+                            fecha_emision=fecha_emision_batch, 
                         )
                         orden_creada_id = nueva_orden.id_orden # Actualizamos el ID con la última orden
 
                 if orden_creada_id:
                     messages.success(request, f'Orden(es) Médica(s) para el paciente {orden_base.get("id_paciente")} guardada(s) con éxito.')
                     # Redirigir a la vista PDF de la última orden creada
-                    return redirect('ver_omedica_pdf', orden_id=orden_creada_id)
+                    return redirect('prof_salud:ver_omedica_pdf', orden_id=orden_creada_id)
                 else:
                     # Si el bucle termina y no se creó ninguna orden
                     messages.warning(request, 'No se añadió ningún servicio, por lo que no se guardó ninguna orden.')
@@ -303,43 +442,49 @@ def ver_omedica_pdf(request, orden_id):
     Muestra una página con el PDF de la Orden Médica incrustado y opciones para descargar o volver.
     """
     try:
-        # Verificamos que la orden exista para evitar errores
         orden = OrdenMedica.objects.get(id_orden=orden_id)
         return render(request, 'paginas/ver_omedica_pdf.html', {'orden': orden})
     except OrdenMedica.DoesNotExist:
         messages.error(request, 'La orden médica solicitada no existe.')
         return redirect('om_prof_salud')
 
-@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+@role_required(allowed_roles=ALLOWED_PROF_ROLES + ['paciente'])
+@xframe_options_sameorigin # Permite que esta vista se cargue en un iframe del mismo sitio.
 def generar_omedica_pdf(request, orden_id):
     """
     Genera un PDF para una orden médica específica.
     """
     try:
         orden = OrdenMedica.objects.get(id_orden=orden_id)
-        
-        # Para mostrar todos los servicios de una "orden lógica" (una única submission),
-        # asumimos que comparten el mismo paciente, profesional, centro, tipo de orden
-        # y la misma fecha de emisión (o una muy cercana).
-        # Es crucial que en diligenciar_omedica se use un único timezone.now() para todas las órdenes de un batch.
+
+        # Usamos el id_lote para agrupar todos los servicios de la misma orden.
         servicios_solicitados = OrdenMedica.objects.filter(
-            id_paciente=orden.id_paciente,
-            id_profesional=orden.id_profesional,
-            id_centro_medico=orden.id_centro_medico,
-            id_tipo_orden=orden.id_tipo_orden,
-            fecha_emision=orden.fecha_emision, # Asumimos que todas las órdenes del batch tienen la misma fecha_emision
-            id_servicio__isnull=False # Solo queremos las órdenes que son de tipo servicio
+            id_lote=orden.id_lote,
+            id_servicio__isnull=False
         ).select_related('id_servicio') # Optimiza la consulta para obtener los detalles del servicio
+
+        # 1. Construir la URL de verificación para el QR                
+        relative_url = reverse('prof_salud:ver_omedica_pdf', args=[orden.id_orden])
+        verification_url = f"{settings.BASE_DOMAIN}{relative_url}"
+
+        # 2. Generar la imagen del QR en memoria
+        qr_img = qrcode.make(verification_url, box_size=6)
+        qr_buffer = BytesIO()
+        qr_img.save(qr_buffer, format='PNG')
+        qr_b64 = base64.b64encode(qr_buffer.getvalue()).decode('utf-8')
+        qr_code_data_uri = f'data:image/png;base64,{qr_b64}'
 
         context = {
             'orden': orden,
             'servicios': servicios_solicitados,
+            'qr_code': qr_code_data_uri,
         }
         pdf = render_to_pdf('pdf/omedica_pdf_template.html', context)
 
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition'] = f'inline; filename="orden_medica_{orden.id_orden}.pdf"'
+            filename = f"OM_{orden.id_paciente.numero_documento}_{orden.fecha_emision.strftime('%Y%m%d')}.pdf"
+            response['Content-Disposition'] = f'inline; filename="{filename}"'
             return response
         
         messages.error(request, 'No se pudo generar el PDF de la orden médica.')
@@ -364,34 +509,50 @@ def diligenciar_omedicamentos(request):
         if medicamento_formset.is_valid():
             try:
                 orden_creada_id = None
+                lote_id = uuid.uuid4() # Generamos un ID de lote único.
+                fecha_emision_batch = timezone.now()
+                paciente = None # Inicializamos la variable paciente
+
                 for form in medicamento_formset:
                     if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
                         nueva_orden = form.save(commit=False)
-                        # El método clean del formulario ya ha puesto el medicamento en cleaned_data
                         medicamento_seleccionado = form.cleaned_data.get('id_medicamento')
-                        if not medicamento_seleccionado:
-                            messages.error(request, 'Debe seleccionar un medicamento válido.')
-                            # Volvemos a renderizar el formulario con el error
-                            return render(request, 'paginas/diligenciar_omedicamentos.html', {'medicamento_formset': medicamento_formset, 'medicamentos_json': medicamentos_json})
                         
+                        if not medicamento_seleccionado:
+                            # Si el formulario no tiene medicamento, pero ha cambiado, es un formset vacío o incompleto.
+                            # Lo saltamos para no guardar una orden vacía.
+                            if form.has_changed():
+                                continue
+
+                        # El paciente se toma del primer formulario válido
+                        if not paciente:
+                            paciente = form.cleaned_data.get('id_paciente')
+
+                        # Asignar los datos que no vienen del formulario
                         nueva_orden.id_medicamento = medicamento_seleccionado
+                        nueva_orden.id_lote = lote_id # Asignamos el ID de lote.
 
                         # Asignar los datos que no vienen del formulario
                         nueva_orden.id_profesional = profesional
                         nueva_orden.id_centro_medico = profesional.id_centro_medico
-                        nueva_orden.fecha_emision = timezone.now()
+                        nueva_orden.fecha_emision = fecha_emision_batch
                         # Asignar un estado inicial y tipo de orden
-                        nueva_orden.id_estado_orden = EstadoOrden.objects.get(nombre_estado_orden='Pendiente')
-                        nueva_orden.id_tipo_orden = TipoOrden.objects.get(nombre_tipo='Medicamentos')
+                        nueva_orden.id_estado_orden, _ = EstadoOrden.objects.get_or_create(nombre_estado_orden__iexact='Pendiente', defaults={'nombre_estado_orden': 'Pendiente'})
+                        nueva_orden.id_tipo_orden, _ = TipoOrden.objects.get_or_create(nombre_tipo__iexact='Medicamentos', defaults={'nombre_tipo': 'Medicamentos'})
                         nueva_orden.save()
                         orden_creada_id = nueva_orden.id_orden
 
-                messages.success(request, f'Orden de Medicamentos para el paciente {nueva_orden.id_paciente} guardada con éxito.')
-                return redirect('omed_prof_salud') # Redirigir a la lista de órdenes de medicamentos
-            except Exception as e:
+                if orden_creada_id:
+                    messages.success(request, f'Orden de Medicamentos para el paciente {nueva_orden.id_paciente} guardada con éxito.')
+                    # Redirigir a la vista que muestra el PDF de la última orden creada
+                    return redirect('prof_salud:ver_omedicamentos_pdf', orden_id=orden_creada_id)
+                else:
+                    messages.warning(request, 'No se añadió ningún medicamento, por lo que no se guardó ninguna orden.')
+            except Exception as e: # Captura de otros posibles errores
                 messages.error(request, f'Ocurrió un error al guardar la orden: {e}')
         else:
-             messages.error(request, 'Por favor, corrija los errores en el formulario.')
+            # Si el formset no es válido, los errores se mostrarán en la plantilla.
+            messages.error(request, 'Por favor, corrija los errores en el formulario.')
     else:
         medicamento_formset = MedicamentoFormSet(prefix='medicamentos')
 
@@ -400,15 +561,110 @@ def diligenciar_omedicamentos(request):
         m.id_medicamento: {
             'codigo_medicamento': m.codigo_medicamento,
             'nombre_generico': m.nombre_generico,
-             'principio_activo': m.principio_activo,
+            'principio_activo': m.principio_activo,
             'concentracion': m.concentracion,
             'forma_farmaceutica': m.forma_farmaceutica,
         } for m in Medicamentos.objects.all()
     }
     medicamentos_json = json.dumps(medicamentos_data, cls=DjangoJSONEncoder)
 
-
     return render(request, 'paginas/diligenciar_omedicamentos.html', {
         'medicamento_formset': medicamento_formset,
         'medicamentos_json': medicamentos_json,
     })
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+def ver_omedicamentos_pdf(request, orden_id):
+    """
+    Muestra una página con el PDF de la Orden de Medicamentos incrustado.
+    """
+    try:
+        orden = OrdenMedica.objects.get(id_orden=orden_id)
+        return render(request, 'paginas/ver_omedicamentos_pdf.html', {'orden': orden})
+    except OrdenMedica.DoesNotExist:
+        messages.error(request, 'La orden de medicamentos solicitada no existe.')
+        return redirect('omed_prof_salud')
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES)
+def buscar_paciente_por_documento(request):
+    """
+    Vista para AJAX. Busca un paciente por número de documento.
+    """
+    numero_documento = request.GET.get('numero_documento', None)
+    if not numero_documento:
+        return JsonResponse({'error': 'Número de documento no proporcionado.'}, status=400)
+
+    try:
+        paciente = Pacientes.objects.get(numero_documento=numero_documento)
+        data = {
+            'id_paciente': paciente.id_paciente,
+            'nombre_completo': f'{paciente.nombre1} {paciente.apellido1} {paciente.apellido2}'.strip()
+        }
+        return JsonResponse(data)
+    except Pacientes.DoesNotExist:
+        return JsonResponse({'error': 'Paciente no encontrado.'}, status=404)
+
+def buscar_enfermedades_ajax(request):
+    search_term = request.GET.get('term', '')
+    # Buscamos enfermedades que contengan el término de búsqueda en el código o en el nombre
+    enfermedades = Enfermedades.objects.filter(
+        Q(codigo_cie10__icontains=search_term) | Q(nombre_enfermedad__icontains=search_term)
+    ) #sin limite
+
+    results = []
+    for enfermedad in enfermedades:
+        results.append({
+            'id': enfermedad.id_enfermedad, # ID para el valor del select
+            'text': f"{enfermedad.codigo_cie10} - {enfermedad.nombre_enfermedad}", # Texto a mostrar
+            # Datos adicionales que usaremos en JavaScript
+            'categoria_grupom': enfermedad.categoria_grupom,
+            'grupo_mortalidad': enfermedad.grupo_mortalidad
+        })
+
+    return JsonResponse({'results': results})
+
+@role_required(allowed_roles=ALLOWED_PROF_ROLES + ['paciente'])
+@xframe_options_sameorigin # Permite que esta vista se cargue en un iframe del mismo sitio.
+def generar_omedicamentos_pdf(request, orden_id):
+    """
+    Genera un PDF para una orden de medicamentos específica.
+    """
+    try:
+        orden = OrdenMedica.objects.get(id_orden=orden_id)
+
+        # Usamos el id_lote para agrupar todos los medicamentos de la misma orden.
+        medicamentos_solicitados = OrdenMedica.objects.filter(
+            id_lote=orden.id_lote,
+            id_medicamento__isnull=False # Solo órdenes que son de medicamentos
+        ).select_related('id_medicamento')
+
+        # 1. Construir la URL de verificación para el QR
+        relative_url = reverse('prof_salud:ver_omedicamentos_pdf', args=[orden.id_orden])
+        verification_url = f"{settings.BASE_DOMAIN}{relative_url}"
+
+        # 2. Generar la imagen del QR en memoria
+        qr_img = qrcode.make(verification_url, box_size=6)
+        qr_buffer = BytesIO()
+        qr_img.save(qr_buffer, format='PNG')
+        qr_b64 = base64.b64encode(qr_buffer.getvalue()).decode('utf-8')
+        qr_code_data_uri = f'data:image/png;base64,{qr_b64}'
+
+        context = {
+            'orden': orden,
+            'medicamentos': medicamentos_solicitados,
+            'qr_code': qr_code_data_uri,
+        }
+        pdf = render_to_pdf('pdf/omedicamentos_pdf_template.html', context)
+
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            filename = f"OMed_{orden.id_paciente.numero_documento}_{orden.fecha_emision.strftime('%Y%m%d')}.pdf"
+            response['Content-Disposition'] = f'inline; filename="{filename}"'
+            return response
+        
+        messages.error(request, 'No se pudo generar el PDF de la orden de medicamentos.')
+        return redirect('omed_prof_salud')
+
+    except OrdenMedica.DoesNotExist:
+        messages.error(request, 'La orden de medicamentos solicitada no existe.')
+        return redirect('omed_prof_salud')

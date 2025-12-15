@@ -157,5 +157,16 @@
         {% endif %}
     </div>
 
+    <div style="text-align: right; margin-top: 30px;">
+        <p style="font-size: 9pt; color: #666;">
+        Verifique la autenticidad de este documento escaneando el código QR.
+        </p>
+        {% if qr_code %}
+            <img src="{{ qr_code }}" alt="Código QR" style="width: 100px; height: 100px;">
+        {% endif %}
+    </div>
+    <div class="footer">
+        <p>Firma Profesional: {{ orden.id_profesional.nombre1 }} {{ orden.id_profesional.apellido1 }}</p>
+    </div>
 </body>
 </html>

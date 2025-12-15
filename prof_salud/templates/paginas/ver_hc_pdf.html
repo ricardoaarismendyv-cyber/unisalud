@@ -12,18 +12,12 @@
     <div class="container-fluid">
         <div class="row justify-content-center p-4">
             <div class="col-lg-10 col-md-10">
+                <a class="btn btn-main btn-nav" href="{% url 'prof_salud:hc_prof_salud' %}">Volver a Historia Clínica</a>
+                <a class="btn btn-main btn-nav" href="{% url 'prof_salud:generar_hc_pdf' consulta.id_consulta %}" download="HC_{{ consulta.id_paciente.numero_documento }}_{{ consulta.fecha_atencion|date:'Ymd' }}.pdf">Descargar PDF</a>
+                                
                 <div class="container border border-dark rounded p-4 my-5 div-main">
-                    <h1>Historia Clínica Generada</h1>
-                    <p>La historia clínica se ha guardado y generado correctamente. A continuación puede previsualizar el documento.</p>
-                    
-                    <div class="my-3">
-                        <a href="{% url 'generar_hc_pdf' consulta.id_consulta %}" class="btn btn-primary" download="HC_{{ consulta.id_paciente.numero_documento }}_{{ consulta.fecha_atencion|date:'Ymd' }}.pdf">Descargar Historia Clinica</a>
-                        <a href="{% url 'inicio_prof_salud' %}" class="btn btn-secondary">Volver al Inicio</a>
-                    </div>
-
-                    <object data="{% url 'generar_hc_pdf' consulta.id_consulta %}" type="application/pdf" width="100%" height="600px" class="mt-3">
-                        <p>Si su navegador no puede mostrar el PDF. Por favor, <a href="{% url 'generar_hc_pdf' consulta.id_consulta %}">haga clic aquí para descargarlo</a>.</p>
-                    </object>
+                    <h1>Visualizador de Historia Clínica #{{ consulta.id_consulta }}</h1>
+                    <iframe src="{% url 'prof_salud:generar_hc_pdf' consulta.id_consulta %}" width="100%" height="800px" style="border: none;" title="Visor de PDF de Historia Clínica"></iframe>
                 </div>
             </div>
         </div>

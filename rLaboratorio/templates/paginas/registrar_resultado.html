@@ -1,0 +1,125 @@
+{% extends "plantillaRl.html" %}
+{% load static %}
+
+{% block title %}Registrar Resultado de Laboratorio{% endblock title %}
+
+{% block content %}
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <div class="col-lg-10 col-md-10">
+                <div class="mb-4">
+                    <a class="btn btn-main btn-nav primary mt-5" href="{% url 'rLaboratorio:inicio_laboratorista' %}">Volver
+                    </a>
+                </div>
+
+                <div class="card shadow-lg border-0 rounded-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="text-center font-weight-light my-3">Registrar Nuevo Resultado de Laboratorio</h3>
+                    </div>
+                    <div class="card-body p-4 p-md-5">
+                        <form method="post" enctype="multipart/form-data" novalidate>
+                            {% csrf_token %}
+
+                            <!-- Campos para búsqueda de paciente -->
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="{{ form.numero_documento_paciente.id_for_label }}" class="form-label fw-bold">{{ form.numero_documento_paciente.label }}</label>
+                                    {{ form.numero_documento_paciente }}
+                                </div>
+                                <div class="col-md-8">
+                                    <label for="{{ form.nombre_paciente.id_for_label }}" class="form-label fw-bold">{{ form.nombre_paciente.label }}</label>
+                                    {{ form.nombre_paciente }}
+                                </div>
+                            </div>
+                            {{ form.id_paciente }} {# Campo oculto que se llenará con JS #}
+
+                            <!-- Renderizar campos del formulario con clases de Bootstrap -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.fecha_solicitud.id_for_label }}" class="form-label fw-bold">{{ form.fecha_solicitud.label }}</label>
+                                    {{ form.fecha_solicitud }}
+                                    {% if form.fecha_solicitud.errors %}<div class="invalid-feedback d-block">{{ form.fecha_solicitud.errors.as_text }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.fecha_registro_resultado.id_for_label }}" class="form-label fw-bold">{{ form.fecha_registro_resultado.label }}</label>
+                                    {{ form.fecha_registro_resultado }}
+                                    {% if form.fecha_registro_resultado.errors %}<div class="invalid-feedback d-block">{{ form.fecha_registro_resultado.errors.as_text }}</div>{% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.archivo_pdf.id_for_label }}" class="form-label fw-bold">{{ form.archivo_pdf.label }}</label>
+                                {{ form.archivo_pdf }}
+                                {% if form.instance.archivo_pdf %}
+                                    <p class="mt-2">
+                                        Archivo actual: <a href="{{ form.instance.archivo_pdf.url }}" target="_blank">{{ form.instance.archivo_pdf.name }}</a>
+                                    </p>
+                                {% endif %}
+                                {% if form.archivo_pdf.errors %}<div class="invalid-feedback d-block">{{ form.archivo_pdf.errors.as_text }}</div>{% endif %}
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="{{ form.observaciones_resultados.id_for_label }}" class="form-label fw-bold">{{ form.observaciones_resultados.label }}</label>
+                                {{ form.observaciones_resultados }}
+                                {% if form.observaciones_resultados.errors %}<div class="invalid-feedback d-block">{{ form.observaciones_resultados.errors.as_text }}</div>{% endif %}
+                            </div>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">Guardar Resultado</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Incluir Font Awesome para los íconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% block script %}
+{{ block.super }}
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Lógica para buscar paciente por documento ---
+    const docInput = document.getElementById('id_numero_documento_paciente');
+    const nombreInput = document.getElementById('id_nombre_paciente');
+    const pacienteIdInput = document.getElementById('id_id_paciente');
+
+    docInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Evita que el formulario se envíe
+            const numeroDocumento = docInput.value.trim();
+            if (numeroDocumento === '') {
+                return;
+            }
+
+            // URL de nuestra vista AJAX
+            const url = `{% url 'prof_salud:buscar_paciente_por_documento' %}?numero_documento=${numeroDocumento}`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Paciente no encontrado');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    nombreInput.value = data.nombre_completo;
+                    pacienteIdInput.value = data.id_paciente; // Actualiza el campo oculto
+                    docInput.classList.remove('is-invalid');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    nombreInput.value = 'Paciente no encontrado.';
+                    docInput.classList.add('is-invalid');
+                    pacienteIdInput.value = ''; // Limpia el ID
+                });
+        }
+    });
+});
+</script>
+{% endblock script%}
+{% endblock content %}

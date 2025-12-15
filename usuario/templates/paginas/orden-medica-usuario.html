@@ -8,9 +8,7 @@
 {% endblock estilo %}
 
 {% block auth_button %}
-{# En esta página, reemplazamos el botón de login por el de logout #}
 <li>
-    {# Asumimos que tienes una URL llamada 'logout' para cerrar la sesión #}
     <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio-usuario" %}'">
         <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
     </button>
@@ -22,104 +20,110 @@
 <section class="main">
     <div class="container-fluid">
         <div class="row justify-content-center p-4">
-            <!-- Columna para el contenido principal -->
             <div class="col-lg-10 col-md-10">
                 <div>
                     <a class="btn btn-main btn-nav" href='{% url "inicio-usuario" %}'>Volver</a>
                     <select name="filtrarom" id="" class="btn btn-main btn-nav">
                         <option disabled selected value="">Filtrar por</option>
                         <option value="fecha">Recientes a antiguas</option>
-                        <option value="especialidad">Especialidad</option>
                         <option value="nombreMedico">Nombre del médico</option>
-                        <option value="estadoOrden">Estado de la orden</option> 
                     </select>                    
                 </div>
             </div>
-            <div class="row justify-content-center">
-                <div class="col-lg-10 col-md-10">
+            <div class="col-lg-10 col-md-10">
+                {% if ultima_orden %}
                     <div class="container border border-dark rounded p-4 my-5 div-main">
-                        <h1>Orden médica más reciente</h1>
-                        <p>Aquí puede visualizar su orden médica más reciente, pare ver las demás haga click en el botón "ver historial de ordenes médicas"</p>
-                        <div>
-                        <object data="{% static 'docs/omejemplo.pdf' %}" type="application/pdf" width="100%" height="500px" class="mb-3"></object>
-                            </div>
-                        <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#historialCompleto" aria-expanded="false" aria-controls="historialCompleto">
-                            Ver historial de ordenes médicas
-                        </button>
-                        <a class="btn btn-main btn-nav" href="{% static "docs/omejemplo.pdf" %}">Descargar PDF orden médica reciente</a>   
+                        <h2>Ver Orden Médica más reciente #{{ ultima_orden.id_orden }}</h2>
+                        <p>Aquí puede visualizar su orden médica más reciente</p>
+                        <iframe src="{% url 'prof_salud:generar_omedica_pdf' ultima_orden.id_orden %}" width="100%" height="800px" style="border: none;" title="Visor de PDF de Orden Médica"></iframe>
+                        <a class="btn btn-outline-primary" href="{% url 'prof_salud:generar_omedica_pdf' ultima_orden.id_orden %}" download="OM_{{ ultima_orden.id_paciente.numero_documento }}_{{ ultima_orden.fecha_emision|date:'Ymd' }}.pdf">Descargar PDF Orden Médica</a>
+                    </div>
+                {% else %}
+                    <div class="container border border-dark rounded p-4 my-5 div-main">
+                        <h1>Órdenes Médicas</h1>
+                        <p>Aún no tiene órdenes médicas de servicios registradas.</p>
+                    </div>
+                {% endif %}
                         <!-- Contenido colapsable con el historial -->
-                        <div class="collapse mt-3" id="historialCompleto">
+                        <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#historialOrdenes" aria-expanded="false" aria-controls="historialOrdenes">
+                            Ver historial de órdenes médicas
+                        </button>
+                        <div class="collapse mt-3" id="historialOrdenes">
                             <div class="card card-body div-main">
-                                <h5 class="card-title">Historial Completo</h5>
-                                <p>A continuación se listan sus ordenes medicas anteriores.</p>
+                                <h5 class="card-title">Registro de Ordenes Médicas</h5>
+                                <p>A continuación se muestra un listado de la órdenes Médicas del paciente.</p>
                                 <ul class="list-group list-group-flush itemList">
-                                    <!-- Ejemplo de item. Esto debería generarse con un bucle en Django -->
-                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                                        <a href="#">Ortopedia y Traumalogia - <span>Dr. Carlo Gomez</span></a>
-                                        <div class="text-nowrap">
-                                            <span>Estado: Vigente</span>
-                                            <span class="badge bg-primary rounded-pill">12/06/2025</span>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                                        <a href="#">Dermatologia - <span>Dra. Sofia Ramirez</span></a>
-                                        <div class="text-nowrap">
-                                            <span>Estado:Completada</span>
-                                            <span class="badge bg-primary rounded-pill">05/04/2025</span>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                                        <a href="#">Gastroenterologia - <span>Dr. Luis Hernandez</span></a>
-                                        <div class="text-nowrap">
-                                            <span>Estado:Cancelada</span>
-                                            <span class="badge bg-primary rounded-pill">23/12/2024</span>
-                                        </div>
+                                    {% for orden in ordenes %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                            <div class="me-3 d-flex flex-column">
+                                                <a href="{% url 'ver_orden_medica_usuario_pdf' orden.id_orden %}" target="_blank"title="Ver orden médica del {{ orden.fecha_emision|date:'d/m/Y' }}"><strong>Orden Médica</strong> — {{ orden.fecha_emision|date:"d/m/Y" }}</a>
+                                                <small class="text-muted">Profesional: {{ orden.id_profesional.nombre1 }} {{ orden.id_profesional.nombre2 }} {{ orden.id_profesional.apellido1 }} {{ orden.id_profesional.apellido2 }}<br>Especialidad: {{ orden.id_profesional.id_especialidad.nombre_especialidad }}</small>
+                                            </div>
+                                            <div class="text-nowrap">
+                                                <span class="badge bg-primary rounded-pill">{{ orden.fecha_emision|date:"d/m/Y H:i" }}</span>
+                                                <span class="badge bg-secondary rounded-pill">{{ orden.id_profesional.get_full_name|truncatechars:12 }}</span>
+                                                <span class="badge bg-success rounded-pill">{{ orden.id_especialidad.nombre_especialidad|truncatechars:15 }}</span>{{ orden.id_especialidad.nombre_especialidad|truncatechars:15 }}</span>
+                                            </div>
+                                        </li>
+                                    {% empty %}
+                                        <li class="list-group-item div-main">No hay historial de órdenes médicas para mostrar.</li>
+                                    {% endfor %}
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row justify-content-center">
+        <div class="row justify-content-center">
                 <div class="col-lg-10 col-md-10">
+                    {% if ultimo_resultado %}
+                        <div class="container border border-dark rounded p-4 my-5 div-main">
+                            <!-- Contenido resultados de laboratorio -->
+                            <h2>Resultados de Laboratorio más reciente</h2>
+                            <p>Aquí puede visualizar su resultado de laboratorio más reciente, pare ver las demás haga click en el botón "ver historial de resultados de laboratorio"</p>
+                            {% if ultimo_resultado.archivo_pdf %}
+                                <iframe src="{% url 'prof_salud:generar_resultado_lab_pdf' ultimo_resultado.id_resultado %}" width="100%" height="800px" style="border: none;" title="Visor de PDF de Resultado de Laboratorio"></iframe>
+                                <a class="btn btn-outline-primary mt-3" href="{% url 'prof_salud:generar_resultado_lab_pdf' ultimo_resultado.id_resultado %}" download="Resultado_{{ ultimo_resultado.id_paciente.numero_documento }}_{{ ultimo_resultado.fecha_solicitud|date:'Ymd' }}.pdf">Descargar PDF del Resultado</a>
+                            {% else %}
+                                <p class="text-muted mt-3">Este resultado no tiene un archivo PDF adjunto.</p>
+                            {% endif %}
+                        </div>
+                    {% else %}
                     <div class="container border border-dark rounded p-4 my-5 div-main">
-                        <!-- Contenido resultados de laboratorio -->
-                        <h1>Resultados de Laboratorio más reciente</h1>
-                        <p>Aquí puede visualizar su resultado de laboratorio más reciente, pare ver las demás haga click en el botón "ver historial de resultados de laboratorio"</p>
-                        <div>
-                        <object data="{% static 'docs/ResultadosLaboratorio.pdf' %}" type="application/pdf" width="100%" height="500px" class="mb-3"></object>
+                        <h1>Resultados Laboratorio</h1>
+                        <p>Aún no tiene Resultados Laboratorio registrados.</p>
+                    </div>
+                    {% endif %}
+                            <!-- Contenido colapsable con el historial -->
+                            <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#historialResultados" aria-expanded="false" aria-controls="historialResultados">
+                                Ver historial de resultados de laboratorio
+                            </button>
+                            <div class="collapse mt-3" id="historialResultados">
+                                <div class="card card-body div-main">
+                                    <h5 class="card-title">Registro de Resultados Laboratorio</h5>
+                                    <p>A continuación se muestra un listado de los Resultados Laboratoriodel paciente.</p>
+                                    <ul class="list-group list-group-flush itemList">
+                                        {% for resultado in historial_resultados %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center div-main">
+                                                <div class="me-auto d-flex flex-column">
+                                                    <a href="{% url 'prof_salud:ver_resultado_lab_pdf' resultado.id_resultado %}" target="_blank" title="Ver resultado del {{ resultado.fecha_solicitud|date:'d/m/Y' }}"><strong>Resultado Laboratorio</strong> — {{ resultado.fecha_solicitud|date:"d/m/Y" }}</a>
+                                                    <small class="text-muted">Registrado por: {{ resultado.id_laboratorista.nombre1 }} {{ resultado.id_laboratorista.apellido1 }}</small>
+                                                </div>
+                                                <div class="text-nowrap">
+                                                    <span class="badge bg-primary rounded-pill">{{ resultado.fecha_registro_resultado|date:"d/m/Y H:i" }}</span>
+                                                    <span class="badge bg-success rounded-pill">{{ resultado.estado }}</span>
+                                                </div>
+                                            </li>
+                                        {% empty %}
+                                            <li class="list-group-item div-main">No hay historial de resultados de laboratorio para mostrar.</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
                             </div>
-                        <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#historialResultados" aria-expanded="false" aria-controls="historialResultados">
-                            Ver historial de resultados de laboratorio
-                        </button>
-                        <a class="btn btn-main btn-nav" href="{% static "docs/ResultadosLaboratorio.pdf" %}">Descargar PDF Resultados laboratorio</a>
-                        <!-- Contenido colapsable con el resultados laboratorio -->
-                        <div class="collapse mt-3" id="historialResultados">
-                            <div class="card card-body div-main">
-                                <h5 class="card-title">Historial Resultados Laboratorio</h5>
-                                <p>A continuación se listan sus resultados de laboratorio anteriores.</p>
-                                <ul class="list-group list-group-flush itemList">
-                                    <!-- Ejemplo de item. Esto debería generarse con un bucle en Django -->
-                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                                        <a href="#">Ortopedia y Traumalogia - <span>Dr. Carlo Gomez</span></a>
-                                        <div class="text-nowrap">
-                                            <span>Estado: Vigente</span>
-                                            <span class="badge bg-primary rounded-pill">12/06/2025</span>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                                        <a href="#">Dermatologia - <span>Dra. Sofia Ramirez</span></a>
-                                        <div class="text-nowrap">
-                                            <span>Estado:Entregada</span>
-                                            <span class="badge bg-primary rounded-pill">05/04/2025</span>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                                        <a href="#">Gastroenterologia - <span>Dr. Luis Hernandez</span></a>
-                                        <div class="text-nowrap">
-                                            <span>Estado:Cancelada</span>
-                                            <span class="badge bg-primary rounded-pill">23/12/2024</span>
-                                    </li>
-                                </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>

@@ -7,9 +7,26 @@ def login_view(request):
     if request.method == 'POST':
         nombre_usuario = request.POST.get('nombre_usuario')
         contrasena = request.POST.get('contrasena')
+        usuario = None
+
+        # 1. Intentar encontrar al usuario por su nombre de usuario
         try:
             usuario = Usuarios.objects.get(nombre_usuario=nombre_usuario)
-            if usuario.check_password(contrasena):
+        except Usuarios.DoesNotExist:
+            # 2. Si no se encuentra, intentar por número de documento en Pacientes
+            try:
+                paciente = Pacientes.objects.get(numero_documento=nombre_usuario)
+                usuario = paciente.usuario
+            except Pacientes.DoesNotExist:
+                # 3. Si tampoco, intentar por número de documento en ProfesionalSalud
+                try:
+                    profesional = ProfesionalSalud.objects.get(numero_documento=nombre_usuario)
+                    usuario = profesional.usuario
+                except ProfesionalSalud.DoesNotExist:
+                    usuario = None # El usuario no existe
+
+        if usuario is not None:
+            if usuario.check_password(contrasena): # 4. Verificar la contraseña
                 request.session['id_usuario'] = usuario.id_usuario
                 
                 # Obtenemos una lista de los nombres de los roles del usuario
@@ -33,22 +50,31 @@ def login_view(request):
                     except ProfesionalSalud.DoesNotExist:
                         messages.warning(request, 'El usuario tiene un rol profesional, pero no un perfil de profesional de salud asociado.')
 
-                # Lógica de redirección por roles
-                if any(rol in roles_profesionales for rol in roles_usuario):
-                    # Prioridad 1: Rol profesional. Si tiene perfil, redirige.
-                    if 'id_profesional' in request.session:
-                        return redirect('consultas_prof_salud')
-                elif 'paciente' in roles_usuario:
-                    # Prioridad 2: Rol paciente. Si no es profesional pero es paciente, redirige.
+                # Lógica de redirección por roles (con prioridad)
+                if 'paciente' in roles_usuario:
+                    # Prioridad 1: Rol Paciente.
                     if 'id_paciente' in request.session:
                         return redirect('inicio-usuario')
-                
+                elif 'profesional_salud' in roles_usuario:
+                    # Prioridad 2: Rol Profesional de Salud (general).
+                    if 'id_profesional' in request.session:
+                        return redirect('prof_salud:consultas_prof_salud')
+                elif 'laboratorista' in roles_usuario:
+                    # Prioridad 3: Rol Laboratorista.
+                    if 'id_profesional' in request.session:
+                        return redirect('rLaboratorio:inicio_laboratorista')
+                elif 'admin_centro_medico' in roles_usuario:
+                    # Prioridad 4: Rol Administrador de Centro Médico.
+                    if 'id_profesional' in request.session:
+                        return redirect('administrativo:inicio_admin')
+                        
                 # Si el usuario está autenticado pero no tiene un perfil válido para redirigir, mostramos el error.
                 messages.error(request, 'Rol no reconocido o sin página de inicio definida.')
             else:
-                messages.error(request, 'Nombre de usuario o contraseña incorrectos.')
-        except Usuarios.DoesNotExist:
-            messages.error(request, 'Nombre de usuario o contraseña incorrectos.')
+                messages.error(request, 'Nombre de usuario/documento o contraseña incorrectos.')
+        else:
+            messages.error(request, 'Nombre de usuario/documento o contraseña incorrectos.')
+
     return render(request, 'paginas/login.html')
 
 # para cerrar sesion y redirige al login

@@ -1,0 +1,28 @@
+{% extends "plantilla_ps.html" %}
+{% load static %}
+{% block title %}Ver Orden Medicamentos PDF{% endblock title %}
+
+{% block estilo %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock estilo %}
+
+{% block content %}
+<section class="main">
+    <div class="container-fluid">
+        <div class="row justify-content-center p-4">
+            <div class="col-lg-10 col-md-10">
+                <a class="btn btn-main btn-nav" href="{% url 'prof_salud:omed_prof_salud' %}">Volver a Órdenes de Medicamentos</a>
+                <a class="btn btn-main btn-nav" href="{% url 'prof_salud:generar_omedicamentos_pdf' orden.id_orden %}" download="OMed_{{ orden.id_paciente.numero_documento }}_{{ orden.fecha_emision|date:'Ymd' }}.pdf">Descargar PDF</a>
+                
+                <div class="container border border-dark rounded p-4 my-5 div-main">
+                    <h1>Visualizador de Orden de Medicamentos #{{ orden.id_orden }}</h1>
+                    <p>El PDF de la orden se muestra a continuación. Puede usar los controles del visor o el botón de descarga para guardarlo.</p>
+
+                    <iframe src="{% url 'prof_salud:generar_omedicamentos_pdf' orden.id_orden %}" width="100%" height="800px" style="border: none;" title="Visor de PDF de Orden de Medicamentos"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

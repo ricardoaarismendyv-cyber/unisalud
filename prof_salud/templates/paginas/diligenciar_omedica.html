@@ -12,191 +12,294 @@
     <div class="container-fluid">
         <div class="row justify-content-center p-4">
             <div class="col-lg-10 col-md-10">
-                <a class="btn btn-main btn-nav" href='{% url "hc_prof_salud" %}'>Volver</a>
-                <div class="container border border-dark rounded p-4 my-5 div-main">
-                    <h1>Diligenciar Orden Médica</h1>
-                    <p>Complete todos los campos para registrar orden médica del paciente.</p>
-                    
-                    <form method="post">
-                        {% csrf_token %}
+                <div class="mb-4">
+                    <a class="btn btn-outline-primary" href='{% url "prof_salud:om_prof_salud" %}'>
+                        <i class="fas fa-arrow-left me-6"></i> Volver
+                        </a>
+                </div>
 
-                        {# Mostrar errores generales o de campos del formulario principal #}
-                        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
-                        {% for field in form %}{% if field.errors %}<div class="alert alert-warning p-2 mt-1">{{ field.label }}: {{ field.errors|striptags }}</div>{% endif %}{% endfor %}
+                <div class="card shadow-lg border-0 rounded-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="text-center font-weight-light my-3">Diligenciar Orden Médica</h2>
+                        <h6 class="text-center font-weight-light my-3">Complete todos los campos para registrar la orden médica del paciente.</h6>
+                    </div>
+                    <div class="card-body p-4 p-md-5">
+                        <form method="post" novalidate>
+                            {% csrf_token %}
                         
-                        {{ form.as_p }} 
+                            
+                                                        
+                            {# Renderizamos los campos de paciente personalizados primero #}
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="{{ form.numero_documento_paciente.id_for_label }}" class="form-label fw-bold">{{ form.numero_documento_paciente.label }}</label>
+                                    {{ form.numero_documento_paciente }}
+                                </div>
+                                <div class="col-md-8">
+                                    <label for="{{ form.nombre_paciente.id_for_label }}" class="form-label fw-bold">{{ form.nombre_paciente.label }}</label>
+                                    {{ form.nombre_paciente }}
+                                </div>
+                            </div>
+                            {{ form.id_paciente }} {# Campo oculto #}
+                            <p>{{ form.id_tipo_orden.label_tag }} {{ form.id_tipo_orden }}</p>
+                            
 
-                        <hr>
-                        <h3>Solicitud Servicios Paciente</h3>
-                        
-                        {{ servicios_formset.management_form }}
-                        {# Mostrar errores generales del formset #}
-                        {% if servicios_formset.non_form_errors %}
-                            <div class="alert alert-danger">{{ servicios_formset.non_form_errors }}</div>
-                        {% endif %}
+                            <hr>
+                            <h3>Solicitud Servicios Paciente</h3>
+                            
+                            {{ servicios_formset.management_form }}
 
-                        <div id="servicios-container">
-                            {% for form in servicios_formset %}
+                            <div id="servicios-container">
+                                {% for form in servicios_formset %}
+                                    <div class="servicio-form border p-3 mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h4 class="form-title mb-0">Servicio #<span class="form-counter">{{ forloop.counter }}</span></h4>
+                                            <button type="button" class="btn btn-danger btn-sm delete-servicio-btn" {% if forloop.first %}style="display:none;"{% endif %}>Eliminar</button>
+                                        </div>
+                                        
+                                        {{ form.id_servicio }}
+                                        {{ form.id_paciente }} {# Campo oculto #}
+                                        <p>{{ form.codigo_servicio_select.label_tag }} {{ form.codigo_servicio_select }}</p>
+                                        <p>{{ form.nombre_servicio_select.label_tag }} {{ form.nombre_servicio_select }}</p>
+                                        <p>{{ form.tipo_servicio.label_tag }} {{ form.tipo_servicio }}</p>
+                                        <p>{{ form.indicaciones.label_tag }} {{ form.indicaciones }}</p>
+                                        <div style="display: none;">{{ form.DELETE }}</div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <div id="empty-form-template" style="display: none;">
                                 <div class="servicio-form border p-3 mb-3">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h4 class="form-title mb-0">Servicio #{{ forloop.counter }}</h4>
+                                        <h4 class="form-title mb-0">Servicio #<span class="form-counter">__prefix__</span></h4>
+                                        <button type="button" class="btn btn-danger btn-sm delete-servicio-btn">Eliminar</button>
                                     </div>
-                                    {# Mostrar errores de este formulario de servicio específico #}
-                                    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
-                                    {% for field in form %}{% if field.errors %}<div class="alert alert-warning p-2 mt-1">{{ field.label }}: {{ field.errors|striptags }}</div>{% endif %}{% endfor %}
-
-                                    {{ form.id_servicio }} {# Campo oculto #}
-                                    <p>{{ form.codigo_servicio_select.label_tag }} {{ form.codigo_servicio_select }}</p>
-                                    <p>{{ form.nombre_servicio_select.label_tag }} {{ form.nombre_servicio_select }}</p>
-                                    <p>{{ form.tipo_servicio.label_tag }} {{ form.tipo_servicio }}</p>
-                                    <p>{{ form.indicaciones.label_tag }} {{ form.indicaciones }}</p>
-                                    <div style="display: none;">{{ form.DELETE }}</div>
+                                    <div style="display: none;">
+                                        {{ servicios_formset.empty_form.id_servicio }}
+                                        {{ servicios_formset.empty_form.id_paciente }}
+                                    </div>
+                                    <p>{{ servicios_formset.empty_form.codigo_servicio_select.label_tag }} {{ servicios_formset.empty_form.codigo_servicio_select }}</p>
+                                    <p>{{ servicios_formset.empty_form.nombre_servicio_select.label_tag }} {{ servicios_formset.empty_form.nombre_servicio_select }}</p>
+                                    <p>{{ servicios_formset.empty_form.tipo_servicio.label_tag }} {{ servicios_formset.empty_form.tipo_servicio }}</p>
+                                    <p>{{ servicios_formset.empty_form.indicaciones.label_tag }} {{ servicios_formset.empty_form.indicaciones }}</p>
+                                    <div style="display: none;">{{ servicios_formset.empty_form.DELETE }}</div>
                                 </div>
-                            {% endfor %}
-                        </div>
-
-                        <div id="empty-form-template" style="display: none;">
-                            <div class="servicio-form border p-3 mb-3">
-                                <h5 class="form-title">Servicio #__prefix__</h5>
-                                {{ servicios_formset.empty_form.id_servicio }}
-                                <p>{{ servicios_formset.empty_form.codigo_servicio_select.label_tag }} {{ servicios_formset.empty_form.codigo_servicio_select }}</p>
-                                <p>{{ servicios_formset.empty_form.nombre_servicio_select.label_tag }} {{ servicios_formset.empty_form.nombre_servicio_select }}</p>
-                                <p>{{ servicios_formset.empty_form.tipo_servicio.label_tag }} {{ servicios_formset.empty_form.tipo_servicio }}</p>
-                                <p>{{ servicios_formset.empty_form.indicaciones.label_tag }} {{ servicios_formset.empty_form.indicaciones }}</p>
-                                <div style="display: none;">{{ servicios_formset.empty_form.DELETE }}</div>
                             </div>
-                        </div>
 
-                        <div class="mt-2">
-                            <button type="button" id="add-servicio-btn" class="btn btn-secondary">Añadir Otro Servicio</button>
-                            <button type="button" id="remove-servicio-btn" class="btn btn-outline-danger">Eliminar Último</button>
-                        </div>
-                        <hr>
+                            <div class="mt-2">
+                                <button type="button" id="add-servicio-btn" class="btn btn-secondary">Añadir Otro Servicio</button>
+                                <button type="button" id="remove-servicio-btn" class="btn btn-outline-danger">Eliminar Último Servicio</button>
+                            </div>
 
-                        <button type="submit" class="btn btn-primary mt-3">Guardar Orden Médica</button>
-                    </form>
+                            <div class="d-flex justify-content-end mt-4">
+                                <a href="{% url 'prof_salud:om_prof_salud' %}" class="btn btn-secondary me-2">Cancelar</a>
+                                <button type="submit" class="btn btn-primary">Guardar Orden Médica</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-{% block scripts %}
+{% block script %}
 {{ block.super }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // --- Lógica para añadir formularios de Servicio ---
-    const addServiciosBtn = document.getElementById('add-servicio-btn');
-    const serviciosContainer = document.getElementById('servicios-container');
-    const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
-    const totalFormsInput = document.querySelector('#id_servicios-TOTAL_FORMS');
+    // --- Lógica para buscar paciente por documento ---
+    const docInput = document.getElementById('id_numero_documento_paciente');
+    const nombreInput = document.getElementById('id_nombre_paciente');
+    const pacienteIdInput = document.getElementById('id_id_paciente'); // El ID correcto del campo oculto principal
 
-    addServiciosBtn.addEventListener('click', function() {
-        let formNum = parseInt(totalFormsInput.value);
-        let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formNum);
-        
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = newFormHtml;
-        
-        tempDiv.querySelector('.form-title').textContent = `Servicio #${formNum + 1}`;
-        
-        // Añadir botón de eliminar al nuevo formulario
-        const deleteBtn = document.createElement('button');
-        deleteBtn.type = 'button';
-        deleteBtn.className = 'btn btn-danger btn-sm float-end delete-servicio-btn';
-        deleteBtn.textContent = 'Eliminar';
-        tempDiv.querySelector('.servicio-form').insertBefore(deleteBtn, tempDiv.querySelector('.servicio-form').firstChild.nextSibling);
+    docInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Evita que el formulario se envíe
+            const numeroDocumento = docInput.value.trim();
+            if (numeroDocumento === '') return;
 
-        serviciosContainer.append(tempDiv.firstElementChild);
-        totalFormsInput.value = formNum + 1;
-        
-        // Volver a inicializar los listeners para los botones de eliminar y los selects
-        inicializarListenersServicios();
-    });
+            const url = `{% url 'prof_salud:buscar_paciente_por_documento' %}?numero_documento=${numeroDocumento}`;
 
-    // --- Lógica para eliminar formularios de Servicio ---
-    serviciosContainer.addEventListener('click', function(e) {
-        if (e.target && e.target.classList.contains('delete-servicio-btn')) {
-            const formToDelete = e.target.closest('.servicio-form');
-            formToDelete.style.display = 'none'; // Ocultar el formulario
-            formToDelete.querySelector('input[id$="-DELETE"]').checked = true; // Marcar para eliminar
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error('Paciente no encontrado');
+                    return response.json();
+                })
+                .then(data => {
+                    nombreInput.value = data.nombre_completo;
+                    pacienteIdInput.value = data.id_paciente; // Actualiza el campo oculto principal
+
+                    // Sincronizar el ID del paciente en todos los formularios del formset (existentes y futuros)
+                    document.querySelectorAll('input[id$="-id_paciente"]').forEach(hiddenInput => {
+                        hiddenInput.value = data.id_paciente;
+                    });
+                    docInput.classList.remove('is-invalid');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    nombreInput.value = 'Paciente no encontrado.';
+                    pacienteIdInput.value = ''; // Limpia el ID principal
+                    docInput.classList.add('is-invalid');
+                    // Limpiar el ID en todos los formularios del formset
+                    document.querySelectorAll('input[id$="-id_paciente"]').forEach(hiddenInput => hiddenInput.value = '');
+                });
         }
     });
-    // --- Lógica para eliminar el último formulario de servicios ---
-    const removeServicioBtn = document.getElementById('remove-servicio-btn');
-    removeServicioBtn.addEventListener('click', function() {
-        const allServicioForms = serviciosContainer.querySelectorAll('.servicio-form');
-        // Solo eliminamos si hay más de un formulario, para no borrar el único que hay
-        if (allServicioForms.length > 1) {
-            const lastForm = allServicioForms[allServicioForms.length - 1];
-            const deleteInput = lastForm.querySelector('input[id$="-DELETE"]');
-            if (deleteInput && deleteInput.checked) {
-            } else {
-                lastForm.remove(); // Elimina el elemento del DOM
+
+    // --- Lógica genérica para Formsets ---
+    function setupFormset(options) {
+        const container = document.getElementById(options.containerId);
+        const addButton = document.getElementById(options.addButtonId);
+        const removeButton = document.getElementById(options.removeButtonId);
+        const emptyTemplate = document.getElementById(options.emptyTemplateId).innerHTML;
+        const totalFormsInput = document.querySelector(`#id_${options.formsetName}-TOTAL_FORMS`);
+        const formClass = options.formClass;
+        const deleteButtonClass = options.deleteButtonClass;
+
+        function renumerarForms() {
+            const visibleForms = container.querySelectorAll(`.${formClass}:not([style*="display: none"])`);
+            visibleForms.forEach((form, index) => {
+                const counter = form.querySelector('.form-counter');
+                if (counter) counter.textContent = index + 1;
+
+                const deleteBtn = form.querySelector(`.${deleteButtonClass}`);
+                if (deleteBtn) deleteBtn.style.display = (visibleForms.length > 1) ? 'inline-block' : 'none';
+            });
+        }
+
+        addButton.addEventListener('click', function() {
+            // ... dentro del listener del botón de añadir
+            let formNum = parseInt(totalFormsInput.value);
+            // 1. Obtener el HTML de la plantilla como texto
+            let newFormHTML = document.getElementById(options.emptyTemplateId).innerHTML;
+            // 2. Reemplazar el prefijo en el texto
+            newFormHTML = newFormHTML.replace(/__prefix__/g, formNum);
+
+            // 3. Crear un nuevo elemento div y asignarle el HTML corregido
+            const newForm = document.createElement('div');
+            newForm.innerHTML = newFormHTML;
+            // El primer hijo del div será el .servicio-form que queremos
+            const formToAdd = newForm.firstElementChild; 
+
+            // 4. Añadir el nuevo formulario al contenedor
+            container.appendChild(formToAdd); 
+            totalFormsInput.value = formNum + 1;
+
+            if (options.afterAdd) {
+                // 5. Llamar a la inicialización en el elemento correcto
+                options.afterAdd(formToAdd); 
             }
-        }
-    });
+            renumerarForms();
+        });
 
-    // --- Lógica para autocompletar campos de servicios ---
-    // Obtenemos los datos de los servicios desde la vista de Django
+        removeButton.addEventListener('click', function() {
+            const visibleForms = container.querySelectorAll(`.${formClass}:not([style*="display: none"])`);
+            if (visibleForms.length > 1) {
+                const lastForm = visibleForms[visibleForms.length - 1];
+                const deleteCheckbox = lastForm.querySelector('input[id$="-DELETE"]');
+                if (deleteCheckbox) {
+                    deleteCheckbox.checked = true;
+                    lastForm.style.display = 'none';
+                } else {
+                    lastForm.remove();
+                }
+                renumerarForms();
+            }
+        });
+
+        container.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains(deleteButtonClass)) {
+                const formToDelete = e.target.closest(`.${formClass}`);
+                const deleteCheckbox = formToDelete.querySelector('input[id$="-DELETE"]');
+                if (deleteCheckbox) {
+                    deleteCheckbox.checked = true;
+                    formToDelete.style.display = 'none';
+                } else {
+                    formToDelete.remove();
+                }
+                renumerarForms();
+            }
+        });
+
+        renumerarForms();
+    }
+
+    // --- Lógica para autocompletar campos de Servicios ---
     const serviciosData = JSON.parse('{{ servicios_json|escapejs }}');
+    let isSyncingServicios = false; // Para evitar bucles de sincronización
 
     function actualizarCamposServicio(selectElement) {
+        if (isSyncingServicios) return;
+
         const formPrefixMatch = selectElement.id.match(/id_(servicios-\d+)-/);
-        if (!formPrefixMatch) return;
+        if (!formPrefixMatch) {
+            console.error("No se pudo extraer el prefijo del formulario a partir del ID:", selectElement.id);
+            return;
+        }
 
         const formPrefix = formPrefixMatch[1];
         const selectedId = selectElement.value;
 
-        // Referencias a todos los campos del formulario
         const hiddenIdInput = document.getElementById(`id_${formPrefix}-id_servicio`);
-        const codigoSSelect = document.getElementById(`id_${formPrefix}-codigo_servicio_select`);
-        const nombreSSelect = document.getElementById(`id_${formPrefix}-nombre_servicio_select`);
+        const codigoSSelect = $(`#id_${formPrefix}-codigo_servicio_select`);
+        const nombreSSelect = $(`#id_${formPrefix}-nombre_servicio_select`);
         const tipoSInput = document.getElementById(`id_${formPrefix}-tipo_servicio`);
 
-        // Rellenar el campo de tipo de servicio automáticamente
+        isSyncingServicios = true;
+
         if (selectedId && serviciosData[selectedId]) {
             const servicio = serviciosData[selectedId];
-            // Sincronizar los selects de código y nombre
-            if (codigoSSelect) { codigoSSelect.value = selectedId; }
-            if (nombreSSelect) { nombreSSelect.value = selectedId; }
-            // Rellenar el campo de texto de tipo de servicio
-            if (tipoSInput) { tipoSInput.value = servicio.tipo_servicio || ''; }
+            if (hiddenIdInput) hiddenIdInput.value = selectedId;
+            if (tipoSInput) tipoSInput.value = servicio.tipo_servicio || '';
+
+            const otherSelect = selectElement.id.includes('codigo_servicio') ? nombreSSelect : codigoSSelect;
+            otherSelect.val(selectedId).trigger('change.select2');
         } else {
-            // Si no hay selección, limpiar todo
-            if (codigoSSelect) { codigoSSelect.value = ''; }
-            if (nombreSSelect) { nombreSSelect.value = ''; }
-            if (tipoSInput) { tipoSInput.value = ''; } // Limpiar si no se selecciona nada
+            if (hiddenIdInput) hiddenIdInput.value = '';
+            if (tipoSInput) tipoSInput.value = '';
+            if (selectElement.id.includes('codigo_servicio')) nombreSSelect.val('').trigger('change.select2');
+            else codigoSSelect.val('').trigger('change.select2');
         }
+        setTimeout(() => { isSyncingServicios = false; }, 50);
+    }
 
-        // Actualizar el campo oculto con el ID
-        if (hiddenIdInput) {
-            hiddenIdInput.value = selectedId;
-        }
-    }   
-
-    // Función para inicializar los listeners en los formularios de servicios
-    function inicializarListenersServicios() {
-        const allSelects = document.querySelectorAll('select[id$="-codigo_servicio_select"], select[id$="-nombre_servicio_select"]');
-        allSelects.forEach(select => {
-            // Evitar añadir el listener múltiples veces
+    function inicializarListenersServicios(formElement) {
+        const selects = formElement.querySelectorAll('select[id$="-codigo_servicio_select"], select[id$="-nombre_servicio_select"]');
+        selects.forEach(select => {
             if (!select.dataset.listenerAttached) {
-                select.addEventListener('change', function() {
+                $(select).on('change', function() {
                     actualizarCamposServicio(this);
                 });
                 select.dataset.listenerAttached = 'true';
-                // Llamada inicial por si el formulario ya tiene un valor al cargar la página
-                actualizarCamposServicio(select);
             }
+
+            $(select).select2({
+                placeholder: "Seleccione o busque una opción...",
+                allowClear: true,
+                width: '100%',
+                language: { noResults: () => "No se encontraron resultados" }
+            });
         });
     }
 
-    // Inicializar para los formularios que ya existen al cargar la página
-    inicializarListenersServicios();
+    // Configurar formset de Servicios
+    setupFormset({
+        formsetName: 'servicios',
+        containerId: 'servicios-container',
+        addButtonId: 'add-servicio-btn',
+        removeButtonId: 'remove-servicio-btn',
+        emptyTemplateId: 'empty-form-template',
+        formClass: 'servicio-form',
+        deleteButtonClass: 'delete-servicio-btn',
+        afterAdd: inicializarListenersServicios // Función a llamar después de añadir un form
+    });
 
+    // Inicializar listeners para los formularios que ya existen al cargar la página
+    document.querySelectorAll('.servicio-form').forEach(form => {
+        inicializarListenersServicios(form);
+    });
 });
 
-    
 </script>
-{% endblock scripts %}
+{% endblock script %}
 {% endblock content %}

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password #para codificar y verificar las contraseñas de forma segura
+import uuid
 
 # aqui cambio los nombres de las clases a tipo CamelCase (nombre pegado con cada primera letra de la palabra en mayuscula)
 #cambio las tablas de db_table a su respectivo en minuscula y un guion bajo
@@ -410,9 +411,9 @@ class Consulta(models.Model):
     peso = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True, db_comment='Peso en kg')
     talla = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True, db_comment='Talla en cm')
     imc = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True, db_comment='Indice de Masa Corporal')
-    habitos_fumador = models.CharField(max_length=9, blank=True, null=True, db_comment='Fuma')
-    habitos_alcohol = models.CharField(max_length=9, blank=True, null=True, db_comment='Consume alcohol')
-    habitos_ejercicio = models.CharField(max_length=2, blank=True, null=True, db_comment='Realiza actividad fisica')
+    habitos_fumador = models.CharField(max_length=150, blank=True, null=True, db_comment='Fuma')
+    habitos_alcohol = models.CharField(max_length=150, blank=True, null=True, db_comment='Consume alcohol')
+    habitos_ejercicio = models.CharField(max_length=150, blank=True, null=True, db_comment='Realiza actividad fisica')
     revision_sistemas = models.TextField(blank=True, null=True, db_comment='Revision por sistemas')
     impresion_diagnostica = models.TextField(blank=True, null=True, db_comment='Diagnostico al paciente')
     plan_tratamiento = models.TextField(blank=True, null=True, db_comment='Plan de tratamiento para el paciente')
@@ -433,6 +434,7 @@ class OrdenMedica(models.Model):
     id_orden = models.AutoField(primary_key=True, db_comment='ID autoincremental')
     id_paciente = models.ForeignKey('Pacientes', on_delete=models.CASCADE, db_column='id_paciente', db_comment='Referencia a PACIENTE')
     id_profesional = models.ForeignKey('ProfesionalSalud', on_delete=models.CASCADE, db_column='id_profesional', db_comment='Referencia a PROFESIONAL_SALUD')
+    id_lote = models.UUIDField(default=uuid.uuid4, editable=False, help_text='Identificador para agrupar órdenes de un mismo lote.')
     id_medicamento = models.ForeignKey('Medicamentos', on_delete=models.CASCADE, db_column='id_medicamento', null=True, blank=True, db_comment='Referencia a MEDICAMENTO')
     id_tipo_orden = models.ForeignKey('TipoOrden', on_delete=models.CASCADE, db_column='id_tipo_orden', db_comment='Referencia a TIPO_ORDEN')
     id_servicio = models.ForeignKey('Servicios', on_delete=models.CASCADE, db_column='id_servicio', null=True, blank=True, db_comment='Referencia a SERVICIOS')
@@ -504,7 +506,7 @@ class AntecedentesPaciente(models.Model):
         ('Laboral', 'Laboral'),
     ]
     tipo_antecedente = models.CharField(
-        max_length=13,
+        max_length=150,
         choices=TIPO_ANTECEDENTE_CHOICES,
         db_comment='si es: familiar, personal, etc'
     )
@@ -535,14 +537,12 @@ class ResultadosLaboratorio(models.Model):
     id_resultado = models.AutoField(primary_key=True, db_comment='ID autoincremental')
     id_paciente = models.ForeignKey('Pacientes', models.DO_NOTHING, db_column='id_paciente', db_comment='Referencia a PACIENTES')
     id_laboratorista = models.ForeignKey('ProfesionalSalud', models.DO_NOTHING, db_column='id_laboratorista', blank=True, null=True, db_comment='Referencia al laboratorista-USUARIOS que registro')
-    id_servicio = models.ForeignKey('Servicios', models.DO_NOTHING, db_column='id_servicio', blank=True, null=True, db_comment='Referencia a SERVICIOS')
     fecha_solicitud = models.DateField(db_comment='Fecha en que se solicito el examen')
-    fecha_resultado = models.DateTimeField(blank=True, null=True, db_comment='Fecha en que se registro el resultado')
-    tipo_examen = models.CharField(max_length=200, db_comment='tipo de examenes solicitados')
-    resultado = models.TextField(db_comment='Resultados de los examenes de laboratorio')
-    observaciones = models.TextField(blank=True, null=True, db_comment='Notas adicionales')
+    fecha_registro_resultado = models.DateTimeField(blank=True, null=True, db_comment='Fecha en que se registro el resultado')
+    observaciones_resultados = models.TextField(blank=True, null=True, db_comment='Notas adicionales a los resultados laboratorio')
     estado = models.CharField(max_length=10, blank=True, null=True, db_comment='Esta: pendiente, registrado, etc')
     codigo_qr = models.CharField(max_length=255, blank=True, null=True, db_comment='Codigo QR para descarga')
+    archivo_pdf = models.FileField(upload_to='resultados_laboratorio/', blank=True, null=True, db_comment='Archivo PDF con el resultado')
     fecha_registro = models.DateTimeField(blank=True, null=True, db_comment='Fecha de registro')
 
     class Meta:
@@ -550,7 +550,7 @@ class ResultadosLaboratorio(models.Model):
         db_table = 'resultados_laboratorio'
 
     def __str__(self):
-        return f'Resultado de {self.tipo_examen} para {self.id_paciente}'
+        return f'Resultado para {self.id_paciente} del {self.fecha_solicitud}'
 
 
 class Incapacidad(models.Model):
