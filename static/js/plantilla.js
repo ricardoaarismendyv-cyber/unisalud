@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', function () {
 // --- Lógica para el modo oscuro ---
     const themeToggleButton = document.getElementById('theme-toggle-img');
     const moonIcon = document.getElementById('moon-icon');
-    const root = document.documentElement; // <html>
-
+    const body = document.getElementById('page-body');
+    const mainSection = document.querySelector('.main'); // Seleccionamos la sección principal
 
 // Las rutas a las imágenes se pasan desde el HTML a través de atributos data-*
     const toggleOffImg = themeToggleButton ? themeToggleButton.dataset.toggleOff : '';
@@ -14,7 +14,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // Aplicar el tema guardado al cargar la página
     const savedTheme = localStorage.getItem('dark-mode');
     if (savedTheme === "enabled") {
-        if (body) body.classList.add('dark-mode');
+        if (body) {
+            body.classList.add('dark-mode');
+            if (mainSection) mainSection.classList.add('dark-mode'); // Aplicar también a .main
+        }
         if (themeToggleButton && toggleOnImg) themeToggleButton.src = toggleOnImg;
     } else {
         if (themeToggleButton && toggleOffImg) themeToggleButton.src = toggleOffImg;
@@ -25,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Alternar la clase
         const isDarkNow = body.classList.toggle('dark-mode');
+        if (mainSection) mainSection.classList.toggle('dark-mode'); // Alternar también en .main
 
         // Cambiar src del toggle (si existen las rutas)
         if (isDarkNow) {
@@ -72,25 +76,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Tamaño de fuente
     let currentFontSize = parseInt(localStorage.getItem('access_fontSize')) || 16;
-    root.style.fontSize = currentFontSize + 'px';
+    document.documentElement.style.fontSize = currentFontSize + 'px';
 
     // Abrir/Cerrar sidebar
     if (openBtn && sidebar) {
         openBtn.addEventListener('click', () => {
-            sidebar.style.width = '340px';
+            sidebar.style.width = '350px'; /* Un poco más de espacio para el texto */
         });
     }
     if (closeBtn && sidebar) {
         closeBtn.addEventListener('click', () => {
-            sidebar.style.width = '0';
+            sidebar.style.width = '0px';
         });
     }
 
     // Aumentar el tamaño de la letra
     if (increaseBtn) {
         increaseBtn.addEventListener('click', () => {
-            currentFontSize = Math.min(currentFontSize + 2, 28);
-            root.style.fontSize = currentFontSize + 'px';
+            currentFontSize = Math.min(currentFontSize + 2, 24); // Límite ajustado para rem
+            document.documentElement.style.fontSize = currentFontSize + 'px';
             localStorage.setItem('access_fontSize', currentFontSize);
         });
     }
@@ -98,8 +102,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Disminuir el tamaño de la letra
     if (decreaseBtn) {
         decreaseBtn.addEventListener('click', () => {
-            currentFontSize = Math.max(currentFontSize - 2, 10);
-            root.style.fontSize = currentFontSize + 'px';
+            currentFontSize = Math.max(currentFontSize - 2, 12); // Límite ajustado para rem
+            document.documentElement.style.fontSize = currentFontSize + 'px';
             localStorage.setItem('access_fontSize', currentFontSize);
         });
     }
@@ -136,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (resetBtn) {
         resetBtn.addEventListener('click', () => {
             currentFontSize = 16;
-            root.style.fontSize = '16px';
+            document.documentElement.style.fontSize = '16px';
             body.classList.remove('dyslexia-font', 'high-contrast', 'color-blind-mode');
             [dyslexiaBtn, contrastBtn, daltonBtn].forEach(btn => btn?.classList.remove('active'));
             localStorage.removeItem('access_fontSize');
@@ -148,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Aplicar preferencias guardadas
     if (localStorage.getItem('access_fontSize')) {
-        root.style.fontSize = localStorage.getItem('access_fontSize') + 'px';
+        document.documentElement.style.fontSize = localStorage.getItem('access_fontSize') + 'px';
     }
     if (localStorage.getItem('access_dyslexia') === '1') {
         body.classList.add('dyslexia-font');

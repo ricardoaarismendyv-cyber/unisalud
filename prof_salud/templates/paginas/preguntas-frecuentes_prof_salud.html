@@ -8,6 +8,15 @@
     <link rel="stylesheet" href="{% static "css/preguntas.css" %}">
 {% endblock estilo %}
 
+
+{% block auth_button %}
+<li>
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url 'consultas_prof_salud' %}'">
+        <img class="img-button" src="{% static 'img/log-in.svg' %}" alt="Icono login"> Cerrar Sesión</button>
+</li>
+{% endblock auth_button %}
+
+
 {% block content %}
 <section class="main">
     <div class="container-fluid">

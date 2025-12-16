@@ -42,6 +42,7 @@
                     <button type="button" class="navButton1" onclick="window.location.href='{% url "preguntas-frecuentes" %}'">Preguntas frecuentes</button>
                 {% endif %}
             </li>
+            <li style="margin-left: 0.5rem;"></li>
             <li>
                 {% if request.session.active_role == 'admin_centro_medico' %}
                     <button type="button" class="navButton1" onclick="window.location.href='{% url "usosistema_admin" %}'">¿Cómo usar el sistema?</button>
