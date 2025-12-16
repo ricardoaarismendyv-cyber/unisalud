@@ -9,7 +9,7 @@ from io import BytesIO
 #se elimina la class DetallesMedicamento
 class Roles(models.Model): 
     id_rol = models.AutoField(primary_key=True, db_comment='ID autoincremental del roles')
-    nombre_rol = models.CharField(unique=True, max_length=50, db_comment='Nombre de los roles: paciente, profesional_salud, laboratorista, recepcionista, admin_centro_medico')
+    nombre_rol = models.CharField(unique=True, max_length=50, db_comment='Nombre de los roles: paciente, profesional_salud, laboratorista, recepcionista, admin_centro_medico, turnero')
     descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion de los roles para mayor claridad, opcional')
 
     class Meta:
@@ -23,7 +23,7 @@ class Roles(models.Model):
 
 class Usuarios(models.Model):
     id_usuario = models.AutoField(primary_key=True, db_comment='ID autoincremental del usuario')
-    roles = models.ManyToManyField('Roles', db_comment='Roles asignados para pacientes, profesional salud, recepcionista, laboratorista, adm centro')
+    roles = models.ManyToManyField('Roles', db_comment='Roles asignados para pacientes, profesional salud, recepcionista, laboratorista, adm centro, turnero')
     nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
     contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
     email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')

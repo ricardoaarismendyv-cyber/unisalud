@@ -28,29 +28,44 @@ def login_view(request):
                         paciente = Pacientes.objects.get(usuario=usuario)
                         request.session['id_paciente'] = paciente.id_paciente
                     except Pacientes.DoesNotExist:
-                        messages.warning(request, 'El usuario tiene el rol de paciente, pero no un perfil asociado.')
+                        messages.warning(
+                            request,
+                            'El usuario tiene rol paciente pero no perfil asociado.'
+                        )
 
                 # ----------------------
                 # PERFIL PROFESIONAL
                 # ----------------------
-                roles_prof = ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']
+                roles_prof = [
+                    'profesional_salud',
+                    'laboratorista',
+                    'recepcionista',
+                    'admin_centro_medico'
+                ]
 
                 if any(r in roles_prof for r in roles_usuario):
                     try:
                         profesional = ProfesionalSalud.objects.get(usuario=usuario)
                         request.session['id_profesional'] = profesional.id_profesional
                     except ProfesionalSalud.DoesNotExist:
-                        messages.warning(request, 'El usuario es profesional, pero no tiene perfil asignado.')
+                        messages.warning(
+                            request,
+                            'El usuario es profesional pero no tiene perfil.'
+                        )
 
                 # ----------------------
-                # REDIRECCIONES
+                # REDIRECCIONES POR ROL
                 # ----------------------
 
-                # Profesional → a Turnos
+                if 'turnero' in roles_usuario:
+                    return redirect('inicio-turnero')
+
                 if any(r in roles_prof for r in roles_usuario):
-                    return redirect('consultas_prof_salud', id_profesional=request.session['id_profesional'])
+                    return redirect(
+                        'consultas_prof_salud',
+                        id_profesional=request.session.get('id_profesional', 1)
+                    )
 
-                # Paciente → a inicio paciente
                 if 'paciente' in roles_usuario:
                     return redirect('inicio-usuario')
 
@@ -58,12 +73,19 @@ def login_view(request):
                 return redirect('login')
 
             else:
-                messages.error(request, 'Nombre de usuario o contraseña incorrectos.')
+                messages.error(
+                    request,
+                    'Nombre de usuario o contraseña incorrectos.'
+                )
 
         except Usuarios.DoesNotExist:
-            messages.error(request, 'Nombre de usuario o contraseña incorrectos.')
+            messages.error(
+                request,
+                'Nombre de usuario o contraseña incorrectos.'
+            )
 
     return render(request, 'paginas/login.html')
+
 
 
 # para cerrar sesion y redirige al login
