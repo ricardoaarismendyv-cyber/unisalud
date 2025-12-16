@@ -181,8 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const openBtn = document.getElementById('accessibility-icon');
   const sidebar = document.getElementById('accessibility-sidebar');
   const closeBtn = document.getElementById('close-sidebar-btn');
-
-  const increaseBtn = document.getElementById('increase-font');
+</script>
+    {% block script %}
+        <script>
+    const increaseBtn = document.getElementById('increase-font');
   const decreaseBtn = document.getElementById('decrease-font');
   const dyslexiaBtn = document.getElementById('dyslexia-font');
   const contrastBtn = document.getElementById('high-contrast');
@@ -342,5 +344,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
         </script>
+        {% endblock %}
     </body>
 </html>
