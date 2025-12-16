@@ -30,6 +30,10 @@
                         {% if 'paciente' in request.session.roles %}
                             <option value="{% url 'inicio-usuario' %}" selected>Paciente</option>
                         {% endif %}
+                        {% if 'turnero' in request.session.roles %}
+
+                            <option value="{% url 'inicio-turnero' %}">Turnero</option>
+                        {% endif %}
                         {% if 'profesional_salud' in request.session.roles or 'laboratorista' in request.session.roles or 'recepcionista' in request.session.roles %}
                             <option value="{% url 'inicio_prof_salud' %}">Profesional de salud</option>
                         {% endif %}

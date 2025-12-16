@@ -38,6 +38,9 @@
                         {% if 'profesional_salud' in request.session.roles or 'laboratorista' in request.session.roles or 'recepcionista' in request.session.roles %}
                             <option value="{% url 'inicio_prof_salud' %}" selected>Profesional de salud</option>
                         {% endif %}
+                        {% if 'turnero' in request.session.roles %}
+                            <option value="{% url 'inicio-turnero' %}">Turnero</option>
+                        {% endif %}
                         {% if 'admin_centro_medico' in request.session.roles %}
                             <option value="{% url 'inicio_admin' %}">Administrativo</option>
                         {% endif %}

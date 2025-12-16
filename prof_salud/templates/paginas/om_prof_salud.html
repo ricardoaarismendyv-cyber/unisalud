@@ -9,7 +9,12 @@
 
 {% block auth_button %}
 <li>
+<<<<<<< HEAD
     <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url 'consultas_prof_salud' %}'">
+=======
+    {# Enlace funcional a la vista 'logout' (ajustar nombre en urls.py si es distinto) #}
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "logout" %}'">
+>>>>>>> sergio
         <img class="img-button" src="{% static 'img/log-in.svg' %}" alt="Icono login"> Cerrar Sesión</button>
 </li>
 {% endblock auth_button %}
