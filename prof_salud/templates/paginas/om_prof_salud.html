@@ -7,14 +7,11 @@
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 {% endblock estilo %}
 
-            {% block inicio_btn %}
-            <li>
-                <a class="navButton0" href="{% url 'prof_salud:inicio_prof_salud' %}">Inicio</a></li>
-            {% endblock inicio_btn %}
-
 {% block auth_button %}
+{# En esta página, reemplazamos el botón de login por el de logout #}
 <li>
-    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url 'prof_salud:consultas_prof_salud' %}'">
+    {# Enlace funcional a la vista 'logout' (ajustar nombre en urls.py si es distinto) #}
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "logout" %}'">
         <img class="img-button" src="{% static 'img/log-in.svg' %}" alt="Icono login"> Cerrar Sesión</button>
 </li>
 {% endblock auth_button %}
@@ -24,52 +21,40 @@
 <section class="main">
     <div class="container-fluid">
         <div class="row justify-content-center p-4">
+            <!-- Columna para el contenido principal -->
             <div class="col-lg-10 col-md-10">
                 <div>
-                    <a class="btn btn-main btn-nav" href="{% url 'prof_salud:inicio_prof_salud' %}">Volver</a> 
+                    <a class="btn btn-main btn-nav" href="{% url 'inicio_prof_salud' %}">Volver</a>
+                    <a class="btn btn-main btn-nav" href="{% static 'docs/omejemplo.pdf' %}">Descargar orden médica reciente</a>   
                 </div>
+            </div>
             <div class="row justify-content-center">
                 <div class="col-lg-10 col-md-10">
                     <div class="container border border-dark rounded p-4 my-5 div-main">
-                        <h2>Diligenciar orden médica</h2>
-                        <a class="btn btn-outline-primary" href="{% url 'prof_salud:diligenciar_omedica' %}">Diligenciar Nueva Orden Médica</a>
-
-                        {% if ultima_orden_medica %}
-                            <p class="mt-3">A continuación se muestra la última Orden Médica que ha registrado:</p>
-                            <p><b>Paciente:</b> {{ ultima_orden_medica.id_paciente }}<br>
-                                <b>Fecha de emisión:</b> {{ ultima_orden_medica.fecha_emision|date:"d/m/Y H:i" }}
-                            </p>
-                            <object data="{% url 'prof_salud:generar_omedica_pdf' ultima_orden_medica.id_orden %}" type="application/pdf" width="100%" height="500px" class="mb-3">
-                            </object>
-                            <div class="my-3">
-                                <a href="{% url 'prof_salud:generar_omedica_pdf' ultima_orden_medica.id_orden %}" class="btn btn-outline-danger" download="OM_{{ ultima_orden_medica.id_paciente.numero_documento }}_{{ ultima_orden_medica.fecha_emision|date:'Ymd' }}.pdf">Descargar PDF de la última orden médica</a>
+                        <h1>Diligenciar orden médica</h1>
+                        <a class="btn btn-main btn-nav" href="{% static 'docs/omdiligencia.pdf' %}">Diligenciar</a>
+                        <p>Por favor diligencie el siguiente formulario para crear la orden médica del paciente.</p>
+                        <p>Recuerde que la información debe ser precisa y completa para garantizar la atención</p>
+                        <div>
+                        <object data="{% static 'docs/ordenmedicameje.pdf' %}" type="application/pdf" width="100%" height="500px" class="mb-3"></object>
                             </div>
-                            <button class="btn btn-main mt-3" type="button" data-bs-toggle="collapse" data-bs-target="#verOrdenesMedicas" aria-expanded="false" aria-controls="verOrdenesMedicas">
-                                Ver Historial Ordenes Médicas Completo
-                            </button>
-                        {% else %}
-                            <div class="alert alert-info mt-3" role="alert">
-                                No se ha encontrado una orden médica reciente para mostrar. Puede <a href="{% url 'prof_salud:diligenciar_omedica' %}" class="alert-link">diligenciar una nueva</a>.
-                            </div>
-                        {% endif %}
-                        <!-- Contenido colapsable con el historial de órdenes médicas -->
+                        <button class="btn btn-main" type="button" data-bs-toggle="collapse" data-bs-target="#verOrdenesMedicas" aria-expanded="false" aria-controls="verOrdenesMedicas">
+                            Ver órdenes médicas
+                        </button>
+                        <!-- Contenido colapsable con el historial -->
                         <div class="collapse mt-3" id="verOrdenesMedicas">
                             <div class="card card-body div-main">
                                 <h5 class="card-title">Ordenes médicas</h5>
                                 <p>A continuación se muestra su última orden médica.</p>
                                 <ul class="list-group list-group-flush itemList">
-                                    {% for omedica in historial_ordenes_medicas %}
+                                    <!-- Ejemplo de item. Esto debería generarse con un bucle en Django -->
                                     <li class="list-group-item d-flex justify-content-between align-items-center div-main">
-                                        <a href="{% url 'prof_salud:generar_omedica_pdf' omedica.id_orden %}" target="_blank">
-                                            Orden médica del {{ omedica.fecha_emision|date:"d/m/Y" }}</a>
+                                        <a href="{% static 'docs/ordenmhistorial.pdf' %}">Última orden médica</a>
                                         <div class="text-nowrap">
                                             <span>Estado:Vigente</span>
-                                            <span class="badge bg-primary rounded-pill">{{ omedica.fecha_emision|date:"d/m/Y H:i" }}</span>
+                                            <span class="badge bg-primary rounded-pill">12/06/2025</span>
                                         </div>
                                     </li>
-                                {% empty %}
-                                    <li class="list-group-item div-main">No hay ordenes médicas para mostrar.</li>
-                                {% endfor %}
                                 </ul>
                             </div>
                         </div>

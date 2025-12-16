@@ -14,7 +14,6 @@
 
 {% block content %}
 
-
 <section class="main">
     <div class="container-fluid">
         <div class="row p-4">
@@ -31,15 +30,16 @@
                     <label for="roleSelector" class="form-label">Roles disponibles</label>
                     <select
                         class="form-select form-select-lg"
-                        id="roleSelector">
+                        id="roleSelector"
+                    >
                         {% if 'paciente' in request.session.roles %}
-                            <option value="{% url 'cambiar_rol' %}?rol=paciente" {% if request.session.active_role == 'paciente' %}selected{% endif %}>Paciente</option>
+                            <option value="{% url 'inicio-usuario' %}">Paciente</option>
                         {% endif %}
                         {% if 'profesional_salud' in request.session.roles or 'laboratorista' in request.session.roles or 'recepcionista' in request.session.roles %}
-                            <option value="{% url 'cambiar_rol' %}?rol=profesional_salud" {% if request.session.active_role == 'profesional_salud' %}selected{% endif %}>Profesional de salud</option>
+                            <option value="{% url 'inicio_prof_salud' %}" selected>Profesional de salud</option>
                         {% endif %}
                         {% if 'admin_centro_medico' in request.session.roles %}
-                            <option value="{% url 'cambiar_rol' %}?rol=admin_centro_medico" {% if request.session.active_role == 'admin_centro_medico' %}selected{% endif %}>Administrativo</option>
+                            <option value="{% url 'inicio_admin' %}">Administrativo</option>
                         {% endif %}
                     </select>
                 </div>
@@ -54,7 +54,7 @@
                             </div>
                             <h3>Historia Clínica</h3>
                             <p>Acceda para revisar, actualizar y documentar la información médica, diagnósticos y plan de tratamiento del paciente en la Historia Clínica Electrónica (HCE), cumpliendo con la normativa de confidencialidad.</p>
-                            <a class="btn btn-primary" href="{% url 'prof_salud:hc_prof_salud' %}">
+                            <a class="btn btn-primary" href="{% url 'hc_prof_salud' %}">
                                 Gestionar Historias
                             </a>
                         </div>
@@ -68,7 +68,7 @@
                             </div>
                             <h3>Órdenes Médicas</h3>
                             <p>Acceda para emitir, revisar y gestionar ordenes médicas (medicamentos, laboratorios, procedimientos) y solicitudes de interconsulta, documentando el plan de tratamiento activo del paciente.</p>
-                            <a class="btn btn-primary" href='{% url "prof_salud:om_prof_salud" %}'>
+                            <a class="btn btn-primary" href='{% url "om_prof_salud" %}'>
                                 Gestionar Órdenes
                             </a>
                         </div>
@@ -82,7 +82,7 @@
                             </div>
                             <h3>Órdenes de Medicamentos</h3>
                             <p>Acceda para prescribir, modificar o suspender medicamentos del paciente (incluyendo dosis, vía y frecuencia), verificando las alertas de seguridad y documentando la farmacoterapia actual.</p>
-                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url "prof_salud:omed_prof_salud" %}'">
+                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url "omed_prof_salud" %}'">
                                 Gestionar Medicamentos
                             </button>
                         </div>
@@ -96,31 +96,20 @@
                             </div>
                             <h3>Consultas y Agenda</h3>
                             <p>Revise su agenda de consultas programadas, gestione la disponibilidad y atienda a sus pacientes de manera organizada.</p>
-                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url "prof_salud:consultas_prof_salud" %}'">
+                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url "consultas_prof_salud" profesional.id_profesional %}'">
                                 Ver Agenda
                             </button>
-                        </div>
-                    </div>
-                    <!-- Resultados de Laboratorio -->
-                    <div class="col-xl-6 col-md-6 mb-4">
-                        <div class="feature-card card-hover">
-                            <div class="feature-icon">
-                                <i class="fas fa-clipboard-list"></i>
-                            </div>
-                            <h3>Resultados de Laboratorio</h3>
-                            <p>Acceda para revisar los resultados de laboratorio de sus pacientes, facilitando el seguimiento y diagnóstico clínico.</p>
-                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url "prof_salud:resultados_lab" %}'">
-                                Ver Resultados Laboratorio
-                            </button>
+
                         </div>
                     </div>
                 </div>
             </div>
+
             <!-- Columna para las imágenes -->
             <div class="col-lg-4 col-md-12">
                 <div class="visual-section">
                     <div class="image-container mb-4">
-                        <img src="{% static 'img/profsalud.jpg' %}" alt="Profesional médico" class="img-fluid rounded shadow-lg">
+                        <img src="{% static 'img/doctor.png' %}" alt="Profesional médico" class="img-fluid rounded shadow-lg">
                     </div>
                     <div class="image-container">
                         <img src="{% static 'img/infografíaunisalud.png' %}" alt="Infografía UniSalud" class="img-fluid rounded shadow-lg">
@@ -147,7 +136,6 @@
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
-
 
 /* Estilos generales */
 .main {

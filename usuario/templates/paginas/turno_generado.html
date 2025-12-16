@@ -4,14 +4,11 @@
 
 {% block estilo %}
 {{ block.super }}
-    <link rel="stylesheet" href="{% static "css/custom.css" %}">
-
+<link rel="stylesheet" href="{% static "css/custom.css" %}">
 {% endblock estilo %}
 
 {% block auth_button %}
-{# En esta página, reemplazamos el botón de login por el de logout #}
 <li>
-    {# Asumimos que tienes una URL llamada 'logout' para cerrar la sesión #}
     <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "inicio-usuario" %}'">
         <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
     </button>
@@ -19,22 +16,28 @@
 {% endblock auth_button %}
 
 {% block content %}
-
 <section class="main">
     <div class="container-fluid">
         <div class="row p-4 justify-content-center p-5">
-            <!-- Columna para el contenido principal -->
+
             <div class="col-lg-10 col-md-10">
                 <a class="btn btn-main btn-nav" href='{% url "inicio-usuario" %}'>Volver</a>
-                <a class="btn btn-main btn-nav justify-content-center".href='{% url "turnos-usuario" %}'>Escanear código QR de nuevo</a>
+                <a class="btn btn-main btn-nav justify-content-center" href='#' onclick="location.reload()">Escanear código QR de nuevo</a>
             </div>
+
             <div class="row justify-content-center">
                 <div class="container border border-dark rounded p-4 my-5 div-main">
                     <h1>Asignar turno</h1>
                     <center>
-                        <p>Su turno en {{ centro_medico }} es el número {{ turno }}</p>
-                        <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR del turno" width="220">
-                        <p><br>Recuerde que este número de turno cuenta con verificacion y tiempo limite tras el cual sera eliminado</p>
+                        <p>Su turno en {{ centro }} es el número <strong>{{ turno.numero }}</strong></p>
+
+                        <img src="{% static 'img/qr_dinamico.png' %}" alt="QR dinámico">
+
+                        <p class="mt-3">
+                            Este turno es válido hasta: <strong>{{ turno.expiracion|date:"H:i:s" }}</strong>
+                        </p>
+
+                        <p><br>Recuerde que este número de turno cuenta con verificación y tiempo límite tras el cual será eliminado.</p>
                     </center>
                 </div>
             </div>

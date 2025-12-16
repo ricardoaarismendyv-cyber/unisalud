@@ -2,81 +2,95 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout # para manejar la sesión del usuario
 from django.contrib import messages
 from usuario.models import Usuarios, Pacientes, ProfesionalSalud, Roles, TipoIdentificacion, Genero, EstadoCivil, GrupoRh, EstratoSocioeconomico
-from django.urls import reverse # <--- AÑADIR ESTA LÍNEA
 
 def login_view(request):
     if request.method == 'POST':
         nombre_usuario = request.POST.get('nombre_usuario')
         contrasena = request.POST.get('contrasena')
-        usuario = None
 
-        # 1. Intentar encontrar al usuario por su nombre de usuario
         try:
             usuario = Usuarios.objects.get(nombre_usuario=nombre_usuario)
-        except Usuarios.DoesNotExist:
-            # 2. Si no se encuentra, intentar por número de documento en Pacientes
-            try:
-                paciente = Pacientes.objects.get(numero_documento=nombre_usuario)
-                usuario = paciente.usuario
-            except Pacientes.DoesNotExist:
-                # 3. Si tampoco, intentar por número de documento en ProfesionalSalud
-                try:
-                    profesional = ProfesionalSalud.objects.get(numero_documento=nombre_usuario)
-                    usuario = profesional.usuario
-                except ProfesionalSalud.DoesNotExist:
-                    usuario = None # El usuario no existe
 
-        if usuario is not None:
-            if usuario.check_password(contrasena): # 4. Verificar la contraseña
+            if usuario.check_password(contrasena):
+
+                # Guardar id_usuario
                 request.session['id_usuario'] = usuario.id_usuario
-                
-                # Obtenemos una lista de los nombres de los roles del usuario
+
+                # Guardar roles
                 roles_usuario = [rol.nombre_rol for rol in usuario.roles.all()]
                 request.session['roles'] = roles_usuario
 
-                # Intentamos cargar el perfil de paciente si el rol existe
+                # ----------------------
+                # PERFIL PACIENTE
+                # ----------------------
                 if 'paciente' in roles_usuario:
                     try:
                         paciente = Pacientes.objects.get(usuario=usuario)
                         request.session['id_paciente'] = paciente.id_paciente
                     except Pacientes.DoesNotExist:
-                        messages.warning(request, 'El usuario tiene el rol de paciente, pero no un perfil de paciente asociado.')
+                        messages.warning(
+                            request,
+                            'El usuario tiene rol paciente pero no perfil asociado.'
+                        )
 
-                # Intentamos cargar el perfil profesional si el rol existe
-                roles_profesionales = ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']
-                if any(rol in roles_profesionales for rol in roles_usuario):
+                # ----------------------
+                # PERFIL PROFESIONAL
+                # ----------------------
+                roles_prof = [
+                    'profesional_salud',
+                    'laboratorista',
+                    'recepcionista',
+                    'admin_centro_medico'
+                ]
+
+                if any(r in roles_prof for r in roles_usuario):
                     try:
-                        prof_salud = ProfesionalSalud.objects.get(usuario=usuario)
-                        request.session['id_profesional'] = prof_salud.id_profesional
+                        profesional = ProfesionalSalud.objects.get(usuario=usuario)
+                        request.session['id_profesional'] = profesional.id_profesional
                     except ProfesionalSalud.DoesNotExist:
-                        messages.warning(request, 'El usuario tiene un rol profesional, pero no un perfil de profesional de salud asociado.')
+                        messages.warning(
+                            request,
+                            'El usuario es profesional pero no tiene perfil.'
+                        )
 
-                # --- LÓGICA DE REDIRECCIÓN CENTRALIZADA ---
-                # Redirigimos a través de 'cambiar_rol' para inicializar la sesión correctamente.
-                # Esto asegura que 'active_role' y el ID específico del rol se configuren de manera consistente.
+                # ----------------------
+                # REDIRECCIONES POR ROL
+                # ----------------------
+
+                if 'turnero' in roles_usuario:
+                    return redirect('inicio-turnero')
+
+                if any(r in roles_prof for r in roles_usuario):
+                    return redirect(
+                        'consultas_prof_salud',
+                        id_profesional=request.session.get('id_profesional', 1)
+                    )
+
                 if 'paciente' in roles_usuario:
-                    # Prioridad 1: Rol Paciente.
-                    return redirect(f"{reverse('cambiar_rol')}?rol=paciente")
-                elif any(rol in roles_profesionales for rol in roles_usuario):
-                    # Si no es paciente pero tiene un rol profesional, lo mandamos a esa vista.
-                    return redirect(f"{reverse('cambiar_rol')}?rol=profesional_salud")
-                elif 'admin_centro_medico' in roles_usuario:
-                    return redirect(f"{reverse('cambiar_rol')}?rol=admin_centro_medico")
-                        
-                # Si el usuario está autenticado pero no tiene un perfil válido para redirigir, mostramos el error.
-                messages.error(request, 'Rol no reconocido o sin página de inicio definida.')
+                    return redirect('inicio-usuario')
+
+                messages.error(request, 'Rol no reconocido.')
+                return redirect('login')
+
             else:
-                messages.error(request, 'Nombre de usuario/documento o contraseña incorrectos.')
-        else:
-            messages.error(request, 'Nombre de usuario/documento o contraseña incorrectos.')
+                messages.error(
+                    request,
+                    'Nombre de usuario o contraseña incorrectos.'
+                )
+
+        except Usuarios.DoesNotExist:
+            messages.error(
+                request,
+                'Nombre de usuario o contraseña incorrectos.'
+            )
 
     return render(request, 'paginas/login.html')
 
+
+
 # para cerrar sesion y redirige al login
 def logout_view(request):
-    # logout(request) funciona con el sistema de auth de Django.
-    # Para limpiar la sesión manual, usamos flush().
-    request.session.flush()
+    logout(request)
     return redirect('login')
 
 

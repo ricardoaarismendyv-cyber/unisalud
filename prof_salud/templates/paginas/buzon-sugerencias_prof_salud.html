@@ -3,9 +3,12 @@
 {% block title %}Buzon de sugerencias{% endblock title %}
 
 {% block auth_button %}
+{# En esta página, reemplazamos el botón de login por el de logout #}
 <li>
-    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url 'consultas_prof_salud' %}'">
-        <img class="img-button" src="{% static 'img/log-in.svg' %}" alt="Icono login"> Cerrar Sesión</button>
+    {# Asumimos que tienes una URL llamada 'logout' para cerrar la sesión #}
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "logout" %}'">
+        <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
+    </button>
 </li>
 {% endblock auth_button %}
 

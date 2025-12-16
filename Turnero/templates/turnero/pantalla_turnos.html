@@ -1,0 +1,103 @@
+{% extends "turnero/plantilla_turnero.html" %}
+{% load static %}
+
+{% block estilo %}
+<style>
+    .turnero-wrapper2 {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .turno-box-actual2 {
+        flex: 2;
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    }
+
+    .historial-box2 {
+        flex: 1;
+        background: white;
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    }
+
+    .numero-turno-actual2 {
+        font-size: 6rem;
+        font-weight: bold;
+    }
+</style>
+{% endblock estilo %}
+
+{% block content %}
+
+<a class="btn btn-secondary mb-4" href="{% url 'inicio-turnero' %}">
+    ⬅ Volver
+</a>
+
+<div class="turnero-wrapper2">
+
+<div class="turno-box-actual2">
+    <h2 class="mb-4 text-center">Turno Actual</h2>
+
+{% if turno_actual %}
+    <div class="d-flex flex-wrap justify-content-center gap-4">
+        {% for t in turno_actual %}
+            <div class="numero-turno-actual2 text-center p-4"
+                    style="min-width:180px; background:white; border-radius:20px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+                <h1 class="display-3 fw-bold text-primary">
+                    {{ t.letra }}{{ t.numero }}
+                </h1>
+                <p class="fs-4 fw-semibold text-success">Llamando</p>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="fs-3 text-muted text-center">Sin turnos llamados</p>
+{% endif %}
+
+
+    <hr class="my-4">
+
+    <h3 class="text-center mb-3">Siguiente Turno</h3>
+
+    {% if turno_siguiente %}
+        <div class="text-center" style="font-size: 3rem; font-weight: bold;">
+            {{ turno_siguiente.letra }}{{ turno_siguiente.numero }}
+        </div>
+        <p class="text-center text-secondary fw-semibold">En espera</p>
+    {% else %}
+        <p class="text-center text-muted">Sin próximos turnos</p>
+    {% endif %}
+</div>
+
+
+    <div class="historial-box2">
+        <h2 class="titulo-turnero2 text-center">Historial de Turnos Cerrados</h2>
+
+        <table class="table table-striped text-center">
+            <thead>
+                <tr>
+                    <th>Turno</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in historial %}
+                <tr>
+                    <td>{{ t.letra }}{{ t.numero }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td class="text-muted">Sin historial</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock content %}

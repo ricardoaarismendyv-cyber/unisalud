@@ -1,27 +1,32 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+import uuid
+from datetime import timedelta
+# Create your views here.
 from login.decorators import role_required
-from .models import Pacientes, Consulta, OrdenMedica, ResultadosLaboratorio
-from django.http import HttpResponseBadRequest
-from django.urls import reverse
+from .models import Pacientes, Usuarios, Roles, TipoIdentificacion, Genero, Turnos
 from django.contrib import messages
+import qrcode
+import base64
+from io import BytesIO
+import uuid
+from django.shortcuts import render
+from .models import Turnos  # si quieres guardarlo en BD
+import string
+from django.urls import reverse
 
 
-@role_required(allowed_roles=['paciente', 'profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico'])
+
+@role_required(allowed_roles=['paciente'])
 def inicio_usuario(request):
     try:
         paciente_id = request.session.get('id_paciente')
-        # Si no está en la sesión (porque venimos de cambiar de rol o del login inicial), lo buscamos.
         if not paciente_id:
-            usuario_id = request.session.get('id_usuario')
-            if not usuario_id:
-                messages.error(request, 'Sesión de usuario no encontrada. Por favor, inicie sesión.')
-                return redirect('login')
-            
-            # Buscamos el perfil de paciente asociado al usuario logueado.
-            paciente = Pacientes.objects.get(usuario_id=usuario_id)
-            paciente_id = paciente.id_paciente
-            request.session['id_paciente'] = paciente_id # ¡Lo guardamos en la sesión!
-
+            # Si no hay id_paciente en la sesión, es un error de acceso.
+            messages.error(request, 'No tienes permiso para acceder a esta página. Se requiere un perfil de paciente.')
+            return redirect('login')
+        request.session['active_role'] = 'paciente' # <--- AÑADIR ESTA LÍNEA
         paciente = Pacientes.objects.get(id_paciente=paciente_id)
         return render(request, 'paginas/inicio-usuario.html', {'paciente': paciente, 'roles': request.session.get('roles', [])})
     except Pacientes.DoesNotExist:
@@ -30,94 +35,117 @@ def inicio_usuario(request):
 
 @role_required(allowed_roles=['paciente'])
 def hcusuario(request):
-    paciente_id = request.session.get('id_paciente')
-    # Obtenemos todas las consultas del paciente, ordenadas de más reciente a más antigua
-    historial_consultas = Consulta.objects.filter(id_paciente_id=paciente_id, estado='Atendido').order_by('-fecha_atencion')
-    # La última consulta es el primer elemento de la lista
-    ultima_consulta = historial_consultas.first()
-    
-    return render(request, 'paginas/historia-clinica-usuario.html', {
-        'ultima_consulta': ultima_consulta,
-        'historial': historial_consultas
-    })
-
-@role_required(allowed_roles=['paciente'])
-def ver_hc_usuario_pdf(request, consulta_id):
-    # Construir la URL hacia el PDF generado en prof_salud
-    pdf_url = reverse('prof_salud:generar_hc_pdf', args=[consulta_id])
-
-    # Renderizar plantilla con iframe (ruta estandarizada)
-    return render(request, 'paginas/ver_hc_usuario_pdf.html', {
-        'pdf_url': pdf_url,
-        'consulta_id': consulta_id
-    })
+    return render(request, 'paginas/historia-clinica-usuario.html')
 
 @role_required(allowed_roles=['paciente'])
 def omusuario(request):
-    paciente_id = request.session.get('id_paciente')
-    # Obtenemos todas las órdenes de servicios agrupadas por lote
-    ordenes = OrdenMedica.objects.filter(
-        id_paciente_id=paciente_id,
-        id_servicio__isnull=False
-    ).order_by('id_lote', '-fecha_emision').distinct('id_lote')
-    # La última orden es el primer elemento
-    ultima_orden = ordenes.first()
-    
-    # Obtenemos también los resultados de laboratorio del paciente
-    historial_resultados = ResultadosLaboratorio.objects.filter(
-        id_paciente_id=paciente_id
-    ).order_by('-fecha_registro_resultado')
-    ultimo_resultado = historial_resultados.first()
-    
-    return render(request, 'paginas/orden-medica-usuario.html', {
-        'ultima_orden': ultima_orden,
-        'ordenes': ordenes, # Pasamos el historial completo a la plantilla
-        'ultimo_resultado': ultimo_resultado,
-        'historial_resultados': historial_resultados
-    })
-
-@role_required(allowed_roles=['paciente'])
-def ver_orden_medica_usuario_pdf(request, orden_id):
-    # Construir la URL hacia el PDF generado en prof_salud
-    pdf_url = reverse('prof_salud:generar_omedica_pdf', args=[orden_id])
-
-    # Renderizar plantilla con iframe (ruta estandarizada)
-    return render(request, 'paginas/ver_orden_medica_usuario_pdf.html', {
-        'pdf_url': pdf_url,
-        'orden_id': orden_id
-    })
+    return render(request, 'paginas/orden-medica-usuario.html')
 
 @role_required(allowed_roles=['paciente'])
 def omeusuario(request):
-    paciente_id = request.session.get('id_paciente')
-    # Obtenemos todas las órdenes de medicamentos agrupadas por lote
-    ordenes = OrdenMedica.objects.filter(
-        id_paciente_id=paciente_id,
-        id_medicamento__isnull=False
-    ).order_by('id_lote', '-fecha_emision').distinct('id_lote')
-    # La última orden es el primer elemento
-    ultima_orden = ordenes.first()
-    
-    return render(request, 'paginas/orden-medicamentos-usuario.html', {
-        'ultima_orden': ultima_orden,
-        'ordenes': ordenes
-    })
+    return render(request, 'paginas/orden-medicamentos-usuario.html')
 
-
-@role_required(allowed_roles=['paciente'])
-def ver_orden_medicamentos_usuario_pdf(request, orden_id):
-    # Construir la URL hacia el PDF generado en prof_salud
-    pdf_url = reverse('prof_salud:generar_omedicamentos_pdf', args=[orden_id])
-
-    # Renderizar plantilla con iframe (ruta estandarizada)
-    return render(request, 'paginas/ver_orden_medicamentos_usuario_pdf.html', {
-        'pdf_url': pdf_url,
-        'orden_id': orden_id
-    })
+# views.py
 
 @role_required(allowed_roles=['paciente'])
 def turnosusuario(request):
-    return render(request, 'paginas/turnos-usuario.html')
+
+    # Si ya hay un turno guardado en la sesión
+    turno_id_session = request.session.get("turno_id")
+
+    if turno_id_session:
+        try:
+            turno_existente = Turnos.objects.get(id_turno=turno_id_session)
+
+            if turno_existente.estado != "pendiente":
+                del request.session["turno_id"]
+            else:
+                qr = qrcode.make(turno_existente.solicitud_turno)
+                buffer = BytesIO()
+                qr.save(buffer, format="PNG")
+                qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+                return render(request, 'paginas/turnos-usuario.html', {
+                    "turno": turno_existente.solicitud_turno,
+                    "qr_base64": qr_base64,
+                })
+
+        except Turnos.DoesNotExist:
+            if "turno_id" in request.session:
+                del request.session["turno_id"]
+
+    # ---------- CORRECCIÓN IMPORTANTE ----------
+    # Obtener usuario REAL desde tu modelo Usuarios
+    from usuario.models import Usuarios, Pacientes
+    usuario_real = Usuarios.objects.get(id_usuario=request.session['id_usuario'])
+
+    # Buscar si ya existe paciente
+    try:
+        paciente = Pacientes.objects.get(usuario=usuario_real)
+    except Pacientes.DoesNotExist:
+        paciente = None
+
+    # Si no existe paciente, crearlo automáticamente
+    if paciente is None:
+        paciente = Pacientes.objects.create(
+            usuario=usuario_real,
+            nombre1=usuario_real.nombre_usuario,  # Temporal
+            apellido1="",
+            numero_documento="N/A",
+            id_tipo_identificacion_id=1,
+            id_genero_id=1
+        )
+
+    # ---------- Inicializar letra y número ----------
+    if "letra" not in request.session:
+        request.session["letra"] = "A"
+    if "numero" not in request.session:
+        request.session["numero"] = 1
+
+    letra = request.session["letra"]
+    numero = request.session["numero"]
+
+    turno_texto = f"{letra}{numero:03d}"
+
+    # ---------- Crear nuevo turno ----------
+    nuevo_turno = Turnos.objects.create(
+        id_paciente=paciente,
+        id_profesional_id=1,
+        id_centro_medico_id=1,
+        estado="pendiente",
+        fecha_hora_turno=timezone.now(),
+        solicitud_turno=turno_texto,
+        categoria_turno="General",
+        modulo_asignado="Recepción",
+        letra=letra,
+        numero=numero
+    )
+
+    request.session["turno_id"] = nuevo_turno.id_turno
+
+    # ---------- Actualizar letra y número ----------
+    if numero < 999:
+        request.session["numero"] += 1
+    else:
+        import string
+        letras = list(string.ascii_uppercase)
+        pos = letras.index(letra)
+        request.session["letra"] = letras[pos + 1] if pos < 25 else "A"
+        request.session["numero"] = 1
+
+    # ---------- Generar QR ----------
+    qr = qrcode.make(turno_texto)
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+    return render(request, 'paginas/turnos-usuario.html', {
+        "turno": turno_texto,
+        "qr_base64": qr_base64,
+    })
+
+
+
 
 # Las siguientes vistas pueden ser públicas, no requieren login
 def preguntasfrecuentes(request):
@@ -131,31 +159,3 @@ def buzonsugerencias(request):
 
 def contactanos(request):
     return render(request, 'paginas/contactanos.html')
-
-@role_required(allowed_roles=['paciente', 'profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico'])
-def cambiar_rol(request):
-    """
-    Vista centralizada para cambiar el rol activo del usuario.
-    Limpia los IDs de sesión específicos y redirige a la página de inicio del nuevo rol.
-    """
-    nuevo_rol = request.GET.get('rol')
-    if not nuevo_rol or nuevo_rol not in request.session.get('roles', []):
-        messages.error(request, "Rol no válido o no tienes permiso para usarlo.")
-        return redirect('login') # O a una página de inicio por defecto
-
-    # 1. Limpiar IDs de roles específicos de la sesión para un cambio limpio.
-    request.session.pop('id_paciente', None)
-    request.session.pop('id_profesional', None)
-    # request.session.pop('id_admin', None) # Descomentar si usas un ID de admin separado
-
-    # 2. Establecer el nuevo rol activo
-    request.session['active_role'] = nuevo_rol
-
-    # 3. Redirigir a la vista de inicio correspondiente.
-    # Las vistas de destino se encargarán de poblar su propio ID de perfil.
-    if nuevo_rol == 'paciente':
-        return redirect('inicio-usuario')
-    elif nuevo_rol in ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']:
-        return redirect('prof_salud:inicio_prof_salud')
-    
-    return redirect('login')
