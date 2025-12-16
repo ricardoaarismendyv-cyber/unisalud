@@ -488,9 +488,9 @@ h1, h2, h3, h4, h5, h6 {
     text-align: left;
     font-weight: 600;
 }
-.dark-mode-sidebar h2 {
+.dark-mode .sidebar h2 {
     padding: 8px 8px 8px 32px;
-    color:black;
+    color:var(--text-dark);
     text-align: left;
     font-weight: 600;
 }
