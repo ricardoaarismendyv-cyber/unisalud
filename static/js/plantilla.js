@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // --- Lógica para el modo oscuro ---
     const themeToggleButton = document.getElementById('theme-toggle-img');
     const moonIcon = document.getElementById('moon-icon');
+    const body = document.getElementById('page-body');
     const root = document.documentElement; // <html>
 
 
