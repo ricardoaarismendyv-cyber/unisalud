@@ -1,18 +1,27 @@
 from django.shortcuts import render, redirect
 from login.decorators import role_required
 from .models import Pacientes, Consulta, OrdenMedica, ResultadosLaboratorio
+from django.http import HttpResponseBadRequest
 from django.urls import reverse
 from django.contrib import messages
 
-@role_required(allowed_roles=['paciente'])
+
+@role_required(allowed_roles=['paciente', 'profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico'])
 def inicio_usuario(request):
     try:
         paciente_id = request.session.get('id_paciente')
+        # Si no está en la sesión (porque venimos de cambiar de rol o del login inicial), lo buscamos.
         if not paciente_id:
-            # Si no hay id_paciente en la sesión, es un error de acceso.
-            messages.error(request, 'No tienes permiso para acceder a esta página. Se requiere un perfil de paciente.')
-            return redirect('login')
-        request.session['active_role'] = 'paciente' # <--- AÑADIR ESTA LÍNEA
+            usuario_id = request.session.get('id_usuario')
+            if not usuario_id:
+                messages.error(request, 'Sesión de usuario no encontrada. Por favor, inicie sesión.')
+                return redirect('login')
+            
+            # Buscamos el perfil de paciente asociado al usuario logueado.
+            paciente = Pacientes.objects.get(usuario_id=usuario_id)
+            paciente_id = paciente.id_paciente
+            request.session['id_paciente'] = paciente_id # ¡Lo guardamos en la sesión!
+
         paciente = Pacientes.objects.get(id_paciente=paciente_id)
         return render(request, 'paginas/inicio-usuario.html', {'paciente': paciente, 'roles': request.session.get('roles', [])})
     except Pacientes.DoesNotExist:
@@ -122,3 +131,31 @@ def buzonsugerencias(request):
 
 def contactanos(request):
     return render(request, 'paginas/contactanos.html')
+
+@role_required(allowed_roles=['paciente', 'profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico'])
+def cambiar_rol(request):
+    """
+    Vista centralizada para cambiar el rol activo del usuario.
+    Limpia los IDs de sesión específicos y redirige a la página de inicio del nuevo rol.
+    """
+    nuevo_rol = request.GET.get('rol')
+    if not nuevo_rol or nuevo_rol not in request.session.get('roles', []):
+        messages.error(request, "Rol no válido o no tienes permiso para usarlo.")
+        return redirect('login') # O a una página de inicio por defecto
+
+    # 1. Limpiar IDs de roles específicos de la sesión para un cambio limpio.
+    request.session.pop('id_paciente', None)
+    request.session.pop('id_profesional', None)
+    # request.session.pop('id_admin', None) # Descomentar si usas un ID de admin separado
+
+    # 2. Establecer el nuevo rol activo
+    request.session['active_role'] = nuevo_rol
+
+    # 3. Redirigir a la vista de inicio correspondiente.
+    # Las vistas de destino se encargarán de poblar su propio ID de perfil.
+    if nuevo_rol == 'paciente':
+        return redirect('inicio-usuario')
+    elif nuevo_rol in ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']:
+        return redirect('prof_salud:inicio_prof_salud')
+    
+    return redirect('login')

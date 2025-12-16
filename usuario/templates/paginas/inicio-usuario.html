@@ -4,7 +4,7 @@
 
 {% block auth_button %}
 <li>
-    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "login" %}'">
+    <button type="button" class="navButton0 login-btn" onclick="window.location.href='{% url "logout" %}'">
         <img class="img-button" src="{% static "img/log-out.svg" %}" alt="Icono de logout"> Cerrar Sesión
     </button>
 </li>
@@ -12,7 +12,6 @@
 
 {% block content %}
 
-<section class="main.dark-mode">
 <section class="main">
     <div class="container-fluid">
         <div class="row p-4">
@@ -29,13 +28,13 @@
                     <label for="roleSelector" class="form-label">Roles disponibles</label>
                     <select class="form-select form-select-lg" id="roleSelector">
                         {% if 'paciente' in request.session.roles %}
-                            <option value="{% url 'inicio-usuario' %}" selected>Paciente</option>
+                            <option value="{% url 'cambiar_rol' %}?rol=paciente" {% if request.session.active_role == 'paciente' %}selected{% endif %}>Paciente</option>
                         {% endif %}
                         {% if 'profesional_salud' in request.session.roles or 'laboratorista' in request.session.roles or 'recepcionista' in request.session.roles %}
-                            <option value="{% url 'inicio_prof_salud' %}">Profesional de salud</option>
+                            <option value="{% url 'cambiar_rol' %}?rol=profesional_salud" {% if request.session.active_role == 'profesional_salud' %}selected{% endif %}>Profesional de salud</option>
                         {% endif %}
                         {% if 'admin_centro_medico' in request.session.roles %}
-                            <option value="{% url 'inicio_admin' %}">Administrativo</option>
+                            <option value="{% url 'cambiar_rol' %}?rol=admin_centro_medico" {% if request.session.active_role == 'admin_centro_medico' %}selected{% endif %}>Administrativo</option>
                         {% endif %}
                     </select>
                 </div>
@@ -132,7 +131,6 @@
     --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-<div class="border border-black ...>
 
 /* Estilos generales */
 .main {

@@ -14,7 +14,12 @@ def login_admin(request):
 
 @role_required(allowed_roles=ALLOWED_ADMIN_ROLES)
 def inicio_admin(request):
-    return render(request, 'paginas/inicio_admin.html')
+    """
+    Esta vista ahora redirige al flujo centralizado de cambio de rol
+    para asegurar que la sesión se inicialice correctamente.
+    """
+    # Redirigimos a través de cambiar_rol para usar la lógica unificada.
+    return redirect(f"{reverse('cambiar_rol')}?rol=admin_centro_medico")
 
 @role_required(allowed_roles=ALLOWED_ADMIN_ROLES)
 def gestion_admin(request):

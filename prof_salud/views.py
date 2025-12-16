@@ -23,14 +23,22 @@ ALLOWED_PROF_ROLES = ['profesional_salud', 'laboratorista', 'recepcionista', 'ad
 @role_required(allowed_roles=ALLOWED_PROF_ROLES)
 def inicio_prof_salud(request):
         try:
-                # Obtener el ID del profesional desde la sesión y buscar el objeto
+                # 1. Intentar obtener el ID del profesional desde la sesión.
                 profesional_id = request.session.get('id_profesional')
+
+                # 2. Si no está en la sesión (porque venimos de otro rol), lo buscamos.
                 if not profesional_id:
-                        messages.error(request, 'No se encontró un perfil de profesional de salud en su sesión.')
-                        return redirect('login')
-                #  asegura que el rol activo se mantenga consistente a lo largo de la sesión del usuario, especialmente cuando navega entre diferentes perfiles si tiene más de uno.
-                if 'active_role' not in request.session:
-                        request.session['active_role'] = 'profesional_salud'
+                        usuario_id = request.session.get('id_usuario')
+                        if not usuario_id:
+                                messages.error(request, 'Sesión de usuario no encontrada. Por favor, inicie sesión.')
+                                return redirect('login')
+                        
+                        # Buscamos el perfil profesional asociado al usuario logueado.
+                        profesional = ProfesionalSalud.objects.get(usuario_id=usuario_id)
+                        profesional_id = profesional.id_profesional
+                        request.session['id_profesional'] = profesional_id # ¡Lo guardamos en la sesión!
+
+                # La vista cambiar_rol ya se encarga de establecer el rol activo. No lo sobrescribimos aquí.
                 profesional = ProfesionalSalud.objects.get(id_profesional=profesional_id)
                 return render(request, 'paginas/inicio_prof_salud.html', {'profesional': profesional, 'roles': request.session.get('roles', [])})
         except ProfesionalSalud.DoesNotExist:

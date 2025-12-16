@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout # para manejar la sesión del usuario
 from django.contrib import messages
 from usuario.models import Usuarios, Pacientes, ProfesionalSalud, Roles, TipoIdentificacion, Genero, EstadoCivil, GrupoRh, EstratoSocioeconomico
+from django.urls import reverse # <--- AÑADIR ESTA LÍNEA
 
 def login_view(request):
     if request.method == 'POST':
@@ -50,23 +51,17 @@ def login_view(request):
                     except ProfesionalSalud.DoesNotExist:
                         messages.warning(request, 'El usuario tiene un rol profesional, pero no un perfil de profesional de salud asociado.')
 
-                # Lógica de redirección por roles (con prioridad)
+                # --- LÓGICA DE REDIRECCIÓN CENTRALIZADA ---
+                # Redirigimos a través de 'cambiar_rol' para inicializar la sesión correctamente.
+                # Esto asegura que 'active_role' y el ID específico del rol se configuren de manera consistente.
                 if 'paciente' in roles_usuario:
                     # Prioridad 1: Rol Paciente.
-                    if 'id_paciente' in request.session:
-                        return redirect('inicio-usuario')
-                elif 'profesional_salud' in roles_usuario:
-                    # Prioridad 2: Rol Profesional de Salud (general).
-                    if 'id_profesional' in request.session:
-                        return redirect('prof_salud:consultas_prof_salud')
-                elif 'laboratorista' in roles_usuario:
-                    # Prioridad 3: Rol Laboratorista.
-                    if 'id_profesional' in request.session:
-                        return redirect('rLaboratorio:inicio_laboratorista')
+                    return redirect(f"{reverse('cambiar_rol')}?rol=paciente")
+                elif any(rol in roles_profesionales for rol in roles_usuario):
+                    # Si no es paciente pero tiene un rol profesional, lo mandamos a esa vista.
+                    return redirect(f"{reverse('cambiar_rol')}?rol=profesional_salud")
                 elif 'admin_centro_medico' in roles_usuario:
-                    # Prioridad 4: Rol Administrador de Centro Médico.
-                    if 'id_profesional' in request.session:
-                        return redirect('administrativo:inicio_admin')
+                    return redirect(f"{reverse('cambiar_rol')}?rol=admin_centro_medico")
                         
                 # Si el usuario está autenticado pero no tiene un perfil válido para redirigir, mostramos el error.
                 messages.error(request, 'Rol no reconocido o sin página de inicio definida.')

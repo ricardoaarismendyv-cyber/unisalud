@@ -16,4 +16,5 @@ urlpatterns = [
     path('uso-del-sistema', views.usosistema, name='usosistema'),
     path('buzon-sugerencias', views.buzonsugerencias, name='buzonsugerencias'),
     path('contactanos', views.contactanos, name='contactanos'),
+    path('cambiar-rol/', views.cambiar_rol, name='cambiar_rol'), # URL para la nueva vista
 ]
