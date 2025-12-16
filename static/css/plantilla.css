@@ -6,6 +6,11 @@
     font-style: normal;
 }
 
+html {
+    font-size: 16px; /* tamaño normal */
+    transition: font-size 0.2s ease;
+}
+
 
 /* Variables de colores */
 :root {
@@ -102,14 +107,14 @@ main {
 }
 
 .navButton0, .navButton1, .foot-button, .login-btn {
-    padding: 12px 24px;
+    padding: 0.75rem 1.5rem;
     color: var(--white);
     background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
     cursor: pointer;
     position: relative;
     border-radius: 50px;
     transition: all 0.3s ease;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 600;
     box-shadow: var(--shadow);
     border: none;
@@ -148,7 +153,7 @@ main {
     border-radius: 50px;
     padding: 12px 24px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 0.875rem;
     transition: all 0.3s ease;
     text-decoration: none;
     display: inline-block;
@@ -494,7 +499,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 12px 20px;
     margin: 8px 25px;
     text-decoration: none;
-    font-size: 16px;
+    font-size: 1rem;
     color: var(--text-dark);
     background-color: var(--bg-light);
     border: 1px solid var(--border-light);
@@ -559,7 +564,7 @@ body.high-contrast .accordion-body {
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
     line-height: 1.6;
-    font-size: 15px;
+    font-size: 0.95rem;
 }
 body.high-contrast header.mainHeader,
 body.high-contrast .mainNav,
@@ -604,7 +609,7 @@ body.high-contrast h1 {
 /* Aplicación de la fuente para dislexia */
 body.dyslexia-font {
     font-family: 'OpenDyslexic', sans-serif !important;
-    font-size: 18px;
+    font-size: 1.125rem;
     line-height: 1.6;
 }
 

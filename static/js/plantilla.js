@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', function () {
 // --- Lógica para el modo oscuro ---
     const themeToggleButton = document.getElementById('theme-toggle-img');
     const moonIcon = document.getElementById('moon-icon');
-    const body = document.getElementById('page-body');
+    const root = document.documentElement; // <html>
+
 
 // Las rutas a las imágenes se pasan desde el HTML a través de atributos data-*
     const toggleOffImg = themeToggleButton ? themeToggleButton.dataset.toggleOff : '';
@@ -71,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Tamaño de fuente
     let currentFontSize = parseInt(localStorage.getItem('access_fontSize')) || 16;
-    body.style.fontSize = currentFontSize + 'px';
+    root.style.fontSize = currentFontSize + 'px';
 
     // Abrir/Cerrar sidebar
     if (openBtn && sidebar) {
@@ -89,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (increaseBtn) {
         increaseBtn.addEventListener('click', () => {
             currentFontSize = Math.min(currentFontSize + 2, 28);
-            body.style.fontSize = currentFontSize + 'px';
+            root.style.fontSize = currentFontSize + 'px';
             localStorage.setItem('access_fontSize', currentFontSize);
         });
     }
@@ -98,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (decreaseBtn) {
         decreaseBtn.addEventListener('click', () => {
             currentFontSize = Math.max(currentFontSize - 2, 10);
-            body.style.fontSize = currentFontSize + 'px';
+            root.style.fontSize = currentFontSize + 'px';
             localStorage.setItem('access_fontSize', currentFontSize);
         });
     }
@@ -135,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (resetBtn) {
         resetBtn.addEventListener('click', () => {
             currentFontSize = 16;
-            body.style.fontSize = '16px';
+            root.style.fontSize = '16px';
             body.classList.remove('dyslexia-font', 'high-contrast', 'color-blind-mode');
             [dyslexiaBtn, contrastBtn, daltonBtn].forEach(btn => btn?.classList.remove('active'));
             localStorage.removeItem('access_fontSize');
@@ -147,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Aplicar preferencias guardadas
     if (localStorage.getItem('access_fontSize')) {
-        body.style.fontSize = localStorage.getItem('access_fontSize') + 'px';
+        root.style.fontSize = localStorage.getItem('access_fontSize') + 'px';
     }
     if (localStorage.getItem('access_dyslexia') === '1') {
         body.classList.add('dyslexia-font');
