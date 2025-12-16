@@ -47,8 +47,8 @@ main {
 body {
     background: linear-gradient(135deg, var(--bg-light) 0%, var(--white) 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-weight: 400; 
-    font-size: 1rem; /* Hereda el tamaño del html */
+    font-weight: 400;
+    font-size: 1.05rem;
     transition: background-color 0.3s ease;
     color: var(--text-dark);
 }
@@ -80,7 +80,7 @@ main.dark-mode{
 /* css de inicio */
 main {
     margin-top: 30px;
-    margin-bottom: 40px;
+    margin-bottom: 10px;
 }
 
 /*animacion contenedores*/
@@ -132,7 +132,7 @@ main {
     position: relative;
     border-radius: 50px;
     transition: all 0.3s ease;
-    font-size: 0.9rem;
+    font-size: 14px;
     font-weight: 600;
     box-shadow: var(--shadow);
     border: none;
@@ -488,9 +488,9 @@ h1, h2, h3, h4, h5, h6 {
     text-align: left;
     font-weight: 600;
 }
-.dark-mode-sidebar h2 {
+.dark-mode .sidebar h2 {
     padding: 8px 8px 8px 32px;
-    color:black;
+    color:var(--text-dark);
     text-align: left;
     font-weight: 600;
 }
@@ -498,7 +498,7 @@ h1, h2, h3, h4, h5, h6 {
 .sidebar-button {
     padding: 12px 20px;
     margin: 8px 25px;
-    text-decoration: none; 
+    text-decoration: none;
     font-size: 1rem;
     color: var(--text-dark);
     background-color: var(--bg-light);
