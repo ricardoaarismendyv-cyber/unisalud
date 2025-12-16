@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-
+import socket
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -31,8 +31,20 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-!l-yc9h$9on^#lc(v6&e7^divq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80)) # Se conecta a una IP externa para saber cuál es la IP local.
+    LOCAL_IP = s.getsockname()[0]
+    s.close()
+except Exception:
+    LOCAL_IP = '127.0.0.1'
 
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', LOCAL_IP]
+
+BASE_DOMAIN = os.getenv('BASE_DOMAIN', f'http://{LOCAL_IP}:8000')
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # Application definition
 
@@ -47,6 +59,8 @@ INSTALLED_APPS = [
     'prof_salud',
     'administrativo',
     'login',
+    'rLaboratorio'
+    
 ]
 
 
