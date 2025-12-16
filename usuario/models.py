@@ -27,6 +27,7 @@ class Usuarios(models.Model):
     nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
     contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
     email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
+    numero_documento = models.CharField(max_length=20, blank=True, null=True, db_comment='Numero del documento del usuario, puede ser null si no tiene perfil')
     
     class Meta:
         managed = True
