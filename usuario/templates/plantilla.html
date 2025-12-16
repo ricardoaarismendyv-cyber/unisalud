@@ -53,26 +53,19 @@
             </li>
         </ul>
             <ul class="navMenu">
-            <!-- Menú de selección de idioma -->
-            <li class="navLogo seleccionIdioma">
-                <input type="button" id="language-button" class="navButton1" value="Español">
-                <ul id="language-menu" class="menuIdioma">
-                    <li><a href="#">Español</a></li>
-                    <li><a href="#">English</a></li>
-                </ul>
-            </li>
             <li class="dark-mode-btn"> 
                 <!-- Pasamos las rutas de las imágenes al JS a través de atributos data-* -->
-                <img id="theme-toggle-img" 
+                <img id="theme-toggle-img" class="hc-icon"
                     src="{% static "img/toggle-left.svg" %}" 
                     data-toggle-off="{% static 'img/toggle-left.svg' %}"
                     data-toggle-on="{% static 'img/toggle-right (2).svg' %}"
                     alt="toggle-off" style="cursor: pointer;">
-                <img id="moon-icon" src="{% static "img/moon (1).svg" %}" alt="moon" style="cursor: pointer;">
+                <img id="moon-icon" class="hc-icon"
+                src="{% static "img/moon (1).svg" %}" alt="moon" style="cursor: pointer;">
             </li>
-            
+
             <!-- Contenedor para el menú de accesibilidad -->
-            <li class="navLogo accessibility-container">
+            <li class="hc-icon">
                 <img id="accessibility-icon" class="access-button" src="{% static "img/accessibility.svg" %}" alt="Opciones de accesibilidad">
             </li>
             {% block auth_button %}
@@ -89,7 +82,7 @@
 
         </main>
         <footer>
-            
+
             <!-- place footer here -->
             {% block footer %}{% endblock footer %}
         <div class="footer-bar">
@@ -115,21 +108,23 @@
                         {% endif %}
                     </li>
                 </ul>
-                <p>© Copyright 2025 Unisalud</p>
+                <!--© Copyright 2025 Unisalud -->
             </nav>
         </div>
 
         <!-- Barra Lateral de Accesibilidad -->
         <div id="accessibility-sidebar" class="sidebar">
-            <button id="close-sidebar-btn" class="close-sidebar-button">&times;</button>
+        <button id="close-sidebar-btn" class="close-sidebar-button">&times;</button>
             <h2>Opciones de Accesibilidad</h2>
             <button id="increase-font" class="sidebar-button">Aumentar Tamaño de Letra</button>
             <button id="decrease-font" class="sidebar-button">Disminuir Tamaño de Letra</button>
             <button id="dyslexia-font" class="sidebar-button">Fuente para la dislexia</button>
             <button id="high-contrast" class="sidebar-button">Contraste Alto</button>
+            <button id="daltonia-font" class="sidebar-button">Daltonismo</button>
             <button id="reset-accessibility" class="sidebar-button">Restablecer</button>
         </div>
-
+        </div>
+        <div id="color-blind-overlay" aria-hidden="true"></div>
 
     </footer>
         <!-- Bootstrap JavaScript Libraries -->
@@ -147,7 +142,14 @@
 
         <!-- Carga del script de la plantilla -->
         <script src="{% static 'js/plantilla.js' %}"></script>
-        
+
+<svg style="height: 0; width: 0; position: absolute; overflow: hidden;" aria-hidden="true">
+    <defs>
+        <filter id="color-blind-filter">
+            <feColorMatrix type="matrix" values="0.33 0.67 0 0 0  0.33 0.67 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+        </filter>
+    </defs>
+</svg>
         <!-- Script base de la plantilla (siempre se carga) -->
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -174,14 +176,171 @@
                     });
                 }
             });
-        </script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Elementos del DOM (coinciden con los ids de tu template)
+  const openBtn = document.getElementById('accessibility-icon');
+  const sidebar = document.getElementById('accessibility-sidebar');
+  const closeBtn = document.getElementById('close-sidebar-btn');
 
-        <!-- Bloque para scripts específicos de cada página -->
-        {% block script %}
-        <script>
-                    body.style.fontSize = currentFontSize + 'px';
+  const increaseBtn = document.getElementById('increase-font');
+  const decreaseBtn = document.getElementById('decrease-font');
+  const dyslexiaBtn = document.getElementById('dyslexia-font');
+  const contrastBtn = document.getElementById('high-contrast');
+  const daltoniaBtn = document.getElementById('daltonia-font');
+  const resetBtn = document.getElementById('reset-accessibility');
+
+  // Estado (tamaño de fuente)
+  let currentFontSize = parseInt(localStorage.getItem('access_fontSize')) || 16;
+  document.body.style.fontSize = currentFontSize + 'px';
+
+  // Asegurarnos de que la sidebar empiece cerrada (coincide con tu CSS .sidebar {width:0})
+  if (sidebar) {
+    sidebar.style.width = sidebar.style.width || '0';
+    sidebar.setAttribute('aria-hidden', sidebar.style.width === '0' ? 'true' : 'false');
+  }
+
+  // Funciones para abrir y cerrar
+  function openSidebar() {
+    if (!sidebar) return;
+    sidebar.style.width = '340px'; // ancho del panel, ajusta si hace falta
+    sidebar.setAttribute('aria-hidden', 'false');
+    // opcional: poner foco en primer control
+    const firstBtn = sidebar.querySelector('.sidebar-button');
+    if (firstBtn) firstBtn.focus();
+  }
+  function closeSidebar() {
+    if (!sidebar) return;
+    sidebar.style.width = '0';
+    sidebar.setAttribute('aria-hidden', 'true');
+    if (openBtn) openBtn.focus();
+  }
+
+  // Event listeners abrir/cerrar
+  if (openBtn) openBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = sidebar && sidebar.style.width && sidebar.style.width !== '0px';
+    if (isOpen) closeSidebar(); else openSidebar();
+  });
+  if (closeBtn) closeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeSidebar();
+  });
+
+  // Cerrar con tecla Esc cuando el panel esté abierto
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (sidebar && sidebar.style.width && sidebar.style.width !== '0px') {
+        closeSidebar();
+      }
+    }
+  });
+
+  // Cerrar al hacer click fuera del sidebar
+  document.addEventListener('click', (e) => {
+    if (!sidebar) return;
+    const clickedInside = sidebar.contains(e.target) || (openBtn && openBtn.contains(e.target));
+    const isOpen = sidebar.style.width && sidebar.style.width !== '0px';
+    if (isOpen && !clickedInside) closeSidebar();
+  });
+
+  // Previene que c(evita cierre)
+  if (sidebar) sidebar.addEventListener('click', (e) => e.stopPropagation());
+
+  // Funciones de accesibilidad
+  function setFontSize(size) {
+    currentFontSize = size;
+    document.body.style.fontSize = currentFontSize + 'px';
+    localStorage.setItem('access_fontSize', currentFontSize);
+  }
+
+  // Aumentar
+  if (increaseBtn) increaseBtn.addEventListener('click', () => {
+    setFontSize(Math.min(currentFontSize + 2, 28));
+  });
+
+  // Disminuir
+  if (decreaseBtn) decreaseBtn.addEventListener('click', () => {
+    setFontSize(Math.max(currentFontSize - 2, 10));
+  });
+
+  // Fuente para dislexia 
+  if (dyslexiaBtn) dyslexiaBtn.addEventListener('click', () => {
+    const active = document.body.classList.toggle('dyslexia-font');
+    dyslexiaBtn.classList.toggle('active', active);
+    localStorage.setItem('access_dyslexia', active ? '1' : '0');
+  });
+
+  // Contraste alto
+  if (contrastBtn) contrastBtn.addEventListener('click', () => {
+    const active = document.body.classList.toggle('high-contrast');
+    contrastBtn.classList.toggle('active', active);
+    localStorage.setItem('access_contrast', active ? '1' : '0');
+  });
+
+    //Daltonismo
+document.getelementById("daltonia-font").addEventListener("click", () => {
+    document.body.classList.toggle("daltonia-font");
+    localStorage.setItem("access_daltonia",
+      document.body.classList.contains("daltonia-font") ? "1" : "0"
+    );
+});
+
+  // Restablecer todo
+  if (resetBtn) resetBtn.addEventListener('click', () => {
+    // tamaño por defecto
+    setFontSize(16);
+    // eliminar clases
+    document.body.classList.remove('dyslexia-font', 'high-contrast', 'daltonia-font');
+    // quitar estados visuales en botones
+    if (dyslexiaBtn) dyslexiaBtn.classList.remove('active');
+    if (contrastBtn) contrastBtn.classList.remove('active');
+    if (daltoniaBtn) daltoniaBtn.classList.remove('active');
+    // limpiar localStorage
+    localStorage.removeItem('access_fontSize');
+    localStorage.removeItem('access_dyslexia');
+    localStorage.removeItem('access_contrast');
+    localStorage.removeItem('access_daltonia');
+  });
+
+  // Aplicar preferencias guardadas (si existen)
+  if (localStorage.getItem('access_dyslexia') === '1') {
+    document.body.classList.add('dyslexia-font');
+    if (dyslexiaBtn) dyslexiaBtn.classList.add('active');
+  }
+  if (localStorage.getItem('access_contrast') === '1') {
+    document.body.classList.add('high-contrast');
+    if (contrastBtn) contrastBtn.classList.add('active');
+  }
+  if (localStorage.getItem('access_daltonia') === '1') {
+    document.body.classList.add('daltonia-font');
+    if (daltoniaBtn)
+  }
+
+});
+document.addEventListener("DOMContentLoaded", function () {
+    const panel = document.querySelector(".accesibilidad-panel, #accesibilidadPanel, .accesibilidad, #accessibility"); 
+    const openBtn = document.querySelector(".open-accessibility, #openAccessibility, #btnAccesibilidad, .btn-accesibilidad");
+    const closeBtn = document.querySelector(".close-accessibility, #closeAccessibility, .cerrar-accesibilidad");
+
+    if (!panel) {
+        console.error("❌ No encuentro el panel de accesibilidad en el HTML.");
+        return;
+    }
+
+    if (openBtn) {
+        openBtn.addEventListener("click", () => {
+            panel.style.display = "block";
+        });
+    } else {
+        console.error("❌ No encuentro el botón que debe abrir accesibilidad.");
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+            panel.style.display = "none";
+        });
+    }
+});
         </script>
-        {% endblock script %}
-        
     </body>
 </html>
