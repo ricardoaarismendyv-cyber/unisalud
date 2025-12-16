@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, DiagnosticoPaciente, AntecedentesPaciente, Enfermedades, Consulta, OrdenMedica, Servicios, EstadoOrden, TipoOrden, Medicamentos
 from login.decorators import role_required
@@ -10,6 +10,11 @@ from django.template.loader import get_template #obtener o descargar una plantil
 from xhtml2pdf import pisa #conversión real que realiza el trabajo de transformar el contenido HTML y CSS en el formato PDF.
 from io import BytesIO #generar un archivo (como un PDF o una imagen) y enviarlo inmediatamente a un usuario a través de una API web, sin tocar el sistema de archivos del servidor.
 from django.core.serializers.json import DjangoJSONEncoder
+from usuario.models import ProfesionalSalud, Usuarios, Roles, TipoIdentificacion, Genero, CentrosMedicos, Especialidades, Turnos
+from login.decorators import role_required
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+
 
 ALLOWED_PROF_ROLES = ['profesional_salud', 'laboratorista', 'recepcionista', 'admin_centro_medico']
 
@@ -411,4 +416,13 @@ def diligenciar_omedicamentos(request):
     return render(request, 'paginas/diligenciar_omedicamentos.html', {
         'medicamento_formset': medicamento_formset,
         'medicamentos_json': medicamentos_json,
+    })
+def consultas_prof_salud(request, id_profesional):
+
+    turnos = Turnos.objects.filter(
+        id_profesional=id_profesional
+    ).select_related('id_paciente').order_by('fecha_hora_turno')
+
+    return render(request, 'paginas/consultas_prof_salud.html', {
+        'turnos': turnos
     })

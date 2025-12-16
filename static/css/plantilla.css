@@ -672,4 +672,18 @@ body.color-blind-mode {
 body.color-blind-mode .mainHeader,
 body.color-blind-mode .footer-bar {
     position: static !important;
+.card-historial {
+    border-radius: 20px;
+    background: #fff;
+}
+}
+.titulo-card {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.card-historial table th,
+.card-historial table td {
+    font-size: 1.2rem;
+    padding: 6px 0;
 }

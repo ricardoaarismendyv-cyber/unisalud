@@ -1,13 +1,15 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password #para codificar y verificar las contraseñas de forma segura
-
+from django.core.files.base import ContentFile
+import qrcode
+from io import BytesIO
 # aqui cambio los nombres de las clases a tipo CamelCase (nombre pegado con cada primera letra de la palabra en mayuscula)
 #cambio las tablas de db_table a su respectivo en minuscula y un guion bajo
 #cambio las foreignKey para que usen la class adecuada
 #se elimina la class DetallesMedicamento
 class Roles(models.Model): 
     id_rol = models.AutoField(primary_key=True, db_comment='ID autoincremental del roles')
-    nombre_rol = models.CharField(unique=True, max_length=50, db_comment='Nombre de los roles: paciente, profesional_salud, laboratorista, recepcionista, admin_centro_medico')
+    nombre_rol = models.CharField(unique=True, max_length=50, db_comment='Nombre de los roles: paciente, profesional_salud, laboratorista, recepcionista, admin_centro_medico, turnero')
     descripcion = models.TextField(blank=True, null=True, db_comment='Descripcion de los roles para mayor claridad, opcional')
 
     class Meta:
@@ -23,7 +25,7 @@ class Roles(models.Model):
 #para ello se elimina el parámetro db_comment en el ManyToManyField de Roles en la clase Usuarios
 class Usuarios(models.Model):
     id_usuario = models.AutoField(primary_key=True, db_comment='ID autoincremental del usuario')
-    roles = models.ManyToManyField('Roles')
+    roles = models.ManyToManyField('Roles', db_comment='Roles asignados para pacientes, profesional salud, recepcionista, laboratorista, adm centro, turnero')
     nombre_usuario = models.CharField(unique=True, max_length=50, db_comment='Login unico para el usuario')
     contrasena = models.CharField(max_length=255, db_comment='Contrasena que crea el usuario')
     email = models.CharField(unique=True, max_length=100, blank=True, null=True, db_comment='Correo principal-login del usuario')
@@ -476,23 +478,27 @@ class DiagnosticoPaciente(models.Model):
 
 class Turnos(models.Model):
     id_turno = models.AutoField(primary_key=True, db_comment='ID autoincremental')
-    id_paciente = models.ForeignKey('Pacientes', models.DO_NOTHING, db_column='id_paciente', db_comment='Referencia a PACIENTES')
+    id_paciente = models.ForeignKey('Pacientes', models.SET_NULL, db_column='id_paciente', null=True, blank=True, db_comment='Referencia a PACIENTES')
     id_profesional = models.ForeignKey('ProfesionalSalud', models.DO_NOTHING, db_column='id_profesional', db_comment='Referencia a PROFESIONAL_SALUD')
     id_centro_medico = models.ForeignKey('CentrosMedicos', models.DO_NOTHING, db_column='id_centro_medico', db_comment='Referencia a CENTROS_MEDICOS')
-    estado = models.CharField(max_length=10, blank=True, null=True, db_comment='Esta: programada, atendido, etc')
+    estado = models.CharField(max_length=10, blank=True, null=True, db_comment='Estado: programada, atendido, etc')
     fecha_hora_turno = models.DateTimeField(db_comment='Fecha y hora de la asignacion del turno')
     solicitud_turno = models.CharField(max_length=8, blank=True, null=True, db_comment='Solicitado a partir de los 10m del centro medico')
     categoria_turno = models.CharField(max_length=19, blank=True, null=True, db_comment='El paciente escoge la opcion')
     modulo_asignado = models.CharField(max_length=100, blank=True, null=True, db_comment='Modulo asignado: Facturacion, Laboratorios, Atencion, etc')
-    creado_en = models.DateTimeField(blank=True, null=True, db_comment='Fecha de registro')
+    letra = models.CharField(max_length=1)
+    numero = models.IntegerField()
+    creado = models.DateTimeField(auto_now_add=True)       # NOT NULL obligatorio
+    creado_en = models.DateTimeField(blank=True, null=True)
+
+
 
     class Meta:
         managed = True
         db_table = 'turnos'
         unique_together = (('fecha_hora_turno', 'id_profesional'),)
 
-    def __str__(self):
-        return f'Turno para {self.id_paciente} el {self.fecha_hora_turno}'
+
 
 
 class AntecedentesPaciente(models.Model):
@@ -574,3 +580,4 @@ class Incapacidad(models.Model):
 
     def __str__(self):
         return f'Incapacidad para {self.id_paciente} del {self.fecha_inicio} al {self.fecha_fin}'
+
